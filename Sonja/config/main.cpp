@@ -45,5 +45,6 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 
 	}
+	// system ("leaks webserv");
 	return EXIT_SUCCESS;
 }

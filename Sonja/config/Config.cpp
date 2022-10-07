@@ -1,4 +1,5 @@
 #include "Config.hpp"
+#include "Server.hpp"
 
 Config::Config(std::string infile_name): _servers(), _infile_name(infile_name.c_str()), _infile()
 {
@@ -15,12 +16,11 @@ Config::~Config(void)
 
 void	clear_input(std::string &line)
 {
-	//delete comment in line
-	if (line.find_first_of("#"))
+	if (line.find_first_of("#") != STREND)
 	{
-			size_t i = line.find_first_of("#");
-			if (i != STREND)
-				line.erase(i);
+		size_t i = line.find_first_of("#");
+		if (i != STREND)
+			line.erase(i);
 	}
 }
 
@@ -47,8 +47,7 @@ void Config::parse_location(Location &location, std::vector<std::string> tokens)
 	{
 		clear_input(line);
 		std::vector<std::string> tokens = get_tokens(line);
-		// std::cout << "TOKENXXXXX   " << tokens.at(0) << std::endl;
-		// if (line.find("}") == 0)
+
 		if (!tokens.empty() && tokens.at(0) == "}")
 			break;
 		location.root = "4565";
@@ -60,24 +59,37 @@ void Config::parse_server(Server &server)
 	std::string line;
 	while (getline(_infile, line))
 	{
-		// std::cout << "BEFORE   " << line << std::endl;
 		clear_input(line);
-		// std::cout << "AFTER   " << line << std::endl;
 		std::vector<std::string> tokens = get_tokens(line);
-		// std::cout << "TOKEN   " << tokens.at(1) << std::endl;
-		// if (line.find("}") == 0)
 		if (!tokens.empty() && tokens.at(0) == "}")
 			break;
-		// else if (line.find("location") == 0)
+		else if (!tokens.empty() && tokens.at(0) == "server_name")
+		{
+				if (tokens.size() != 2)
+					throw std::invalid_argument("Error❗\nInvalid information in config file for server name in line:\n " + line);
+				else
+					server.setServerName(tokens.back());
+		}
+		else if (!tokens.empty() && tokens.at(0) == "ip-address")
+		{
+				if (tokens.size() != 2 || server.setIpAddress(tokens.back()))
+					throw std::invalid_argument("Error❗\nInvalid information in config file for ip address in line:\n " + line);
+				else
+					server.setIpAddress(tokens.back());
+		}
+		else if (!tokens.empty() && tokens.at(0) == "port")
+		{
+			if (tokens.size() != 2 || server.setPort(tokens.back()))
+				throw std::invalid_argument("Error❗\nInvalid information in config file for port in line:\n " + line);
+			else
+				server.setPort(tokens.back());
+		}
 		else if (!tokens.empty() && tokens.at(0) == "location")
 		{
-			Location* location = new Location();
-			server.locations.push_back(*location);
-			parse_location(*location, tokens);
+			Location location = Location();
+			server.setLocation(location);
+			parse_location(location, tokens);
 		}
-		// else
-		// {
-		// }
 	}
 }
 
@@ -87,30 +99,22 @@ void Config::start_parsing()
 
 	while (getline(_infile, line))
 	{
-		// std::cout << "BEFORE   " << line << std::endl;
 		clear_input(line);
 		std::vector<std::string> tokens = get_tokens(line);
-		// std::cout << "AFTER   " << line << std::endl;
-		// std::cout << "TOKEN   " << tokens.at(0) << std::endl;
-		// std::cout << "TOKEN   " << tokens.at(1) << std::endl;
-		if (tokens.size() != 1)
+		if (tokens.size() > 1)
+			std::cout << "TOKEN   " << tokens.size() << "  " << tokens.at(0) << std::endl;
+		if (tokens.size() > 1)
 		{
 			if (tokens.at(1) != "{")
-				throw std::invalid_argument("Error❗\nInvalid information in config file at server line");
+				throw std::invalid_argument("Error❗\nInvalid information in config file for server in line:\n " + line);
 		}
 		if (!tokens.empty() && tokens.at(0) != "server")
 			throw std::invalid_argument("Error❗\nConfig file does not start with server block");
 		if (!tokens.empty() && tokens.at(0) == "server")
 		{
-			Server* server = new Server();
-			_servers.push_back(*server);
-			parse_server(*server);
+			Server server = Server();
+			_servers.push_back(server);
+			parse_server(server);
 		}
-		// if (line.find("server") == 0)
-		// {
-		// 	Server* server = new Server();
-		// 	_servers.push_back(*server);
-		// 	parse_server(*server);
-		// }
 	}
 }
