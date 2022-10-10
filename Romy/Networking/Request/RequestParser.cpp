@@ -65,67 +65,118 @@ std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
 
 void		RequestParser::split_CRLF(char * buffer)
 {
-	//wie kann ich hier abfangen ob auch wirklich CRLF an Ende ist
-	//bzw was passiert bei einem fehler??
-	//wird der v immer neuen speicher allocieren? bzw wie kann ich am Anfang reserven??
+
+	//TODO:wird der v immer neuen speicher allocieren? bzw wie kann ich am Anfang reserven??
 	std::string CRLF = buffer;
 	std::string delimeter = "\r\n";
 	size_t pos = 0;
 	while ((pos = CRLF.find(delimeter)) != std::string::npos)
 	{
-		this->_CRLF_split.push_back(CRLF.substr(0, pos));
+		std::string test = CRLF.substr(0, pos);
+		if (!test.empty())
+		{
+			this->_CRLF_split.push_back(test);
+		}
 		CRLF.erase(0, pos + delimeter.length());
 	}
-	//doppel CRLF checken
+	if (_CRLF_split.empty())
+		throw std::runtime_error("Request syntax error");
+	//catch in the main
 	parseRequestLine(_CRLF_split.front());
-	//abbrechen wenn ein parseteil schief geht!
 	parseRequestHeader();
+	//body starts here
 }
 
-void		RequestParser::parseRequestLine(std::string reqLine)
+std::string &		RequestParser::RequestLineMethod(std::string &Method)
 {
 	std::string delimeter = " ";
 	size_t pos = 0;
 
-	pos = reqLine.find(delimeter);
-	this->_method = reqLine.substr(0, pos);
-	reqLine.erase(0, pos + delimeter.length());
-	pos = reqLine.find(delimeter);
-	this->_URI = reqLine.substr(0, pos);
-	reqLine.erase(0, pos + delimeter.length());
-	pos = reqLine.find(delimeter);
-	this->_version = reqLine.substr(0, pos);
+	pos = Method.find(delimeter);
 	if (pos != std::string::npos)
 	{
-		std::cout << "syntax error" << std::endl;
-		// return EXIT_FAILURE;
-		//TODO:handle return values!
+		this->_method = Method.substr(0, pos);
+		if (this->_method.compare("GET") == 0)
+			std::cout << RED << "WORKED" << RESET << std::endl;
+		else
+			throw std::runtime_error("Wrong Method");
+		Method.erase(0, pos + delimeter.length());
+		return (Method);
+		// pos = Method.find(delimeter);
 	}
+	throw std::runtime_error("Wrong Method");
+	//what should we do if one request is bad? 
+	//still keep on with the others or stop the programm?
+	
+}
+
+
+std::string &		RequestParser::RequestLineURI(std::string &URI)
+{
+	std::string delimeter = " ";
+	size_t pos = 0;
+	pos = URI.find(delimeter);
+	if (pos != std::string::npos)
+	{
+		this->_URI = URI.substr(0, pos);
+		//better parsing aka check URI syntax (allowed chars and just *)
+		URI.erase(0, pos + delimeter.length());
+		return (URI);
+	}
+	else
+		throw std::runtime_error("Wrong Method");
+}
+
+void		RequestParser::RequestLineVersion(std::string &version)
+{
+	std::string delimeter = " ";
+	size_t pos = 0;
+	pos = version.find(delimeter);
+	if (pos == std::string::npos)
+		this->_version = version.substr(0, pos);
+	else
+		throw std::runtime_error("RequestLine parsing failed");
+	//TODO:handle return values!
+	
 
 }
+
+void		RequestParser::parseRequestLine(std::string reqLine)
+{
+	//make it more readable
+	RequestLineVersion(RequestLineURI(RequestLineMethod(reqLine)));
+}
+
 void		RequestParser::parseRequestHeader()
 {
 
 	std::vector<std::string>::iterator it = _CRLF_split.begin();
 	it++;
-	std::string delimeter = " ";
+	std::string delimeter = ":";
+	//hier z.b. kann der User request ohne doppelpunkt eingeben?
+	//und sollte man deswegen beim : splitten?
 	for(; it != _CRLF_split.end(); it++)
 	{
 		size_t pos = 0;
 		pos = it->find(delimeter);
-		std::string a = it->substr(0, pos);
-		std::string b = it->substr(pos + 1, it->length());
-		// this->_requestH[a] = b;//other way to insert
-		//check if insert geklappt hat
-		//
-		this->_requestH.insert(std::pair<std::string, std::string>(a, b));
-		a.clear();
-		b.clear();
+		if (pos != std::string::npos)
+		{
+			std::string a = it->substr(0, pos);
+			std::string b = it->substr(pos + 1, it->length());
+			this->_requestH.insert(std::pair<std::string, std::string>(a, b));
+			//check if insert was successful
+			a.clear();
+			b.clear();
+		}
+		else
+			throw std::runtime_error("RequestHeader parsing failed");
 	}
 }
+
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
+
 std::string const & RequestParser::getMethod() const
 {
 	return this->_method;
