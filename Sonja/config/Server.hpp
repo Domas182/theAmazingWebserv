@@ -44,11 +44,16 @@ class Server
 		// const std::vector<Location>	getLocation() const;
 		const std::string			getServerName() const;
 		const std::string			getIpAddress() const;
+		uint32_t					getPort() const;
+		const std::string			getRoot() const;
+		const std::string			getIndex() const;
 
-		void						setLocation(Location &location);
+		void						setLocation(Location location);
 		void						setServerName(std::string server_name);
 		int							setIpAddress(std::string ip_address);
 		int							setPort(std::string port);
+		int							setRoot(std::string root);
+		int							setIndex(std::string idnex);
 	//operation overload schreiben zum printen der Daten
 };
 

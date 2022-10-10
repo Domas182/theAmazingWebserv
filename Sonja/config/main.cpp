@@ -38,6 +38,7 @@ int main(int argc, char** argv)
 	{
 		Config parser(file);
 		parser.start_parsing();
+		std::cout << parser << std::endl;
 	}
 	catch (const std::exception& e)
 	{
