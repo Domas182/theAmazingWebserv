@@ -86,6 +86,14 @@ int Server::setIndex(std::string index)
 	return (SUCCESS);
 }
 
+int Server::setMethods(std::set<std::string> methods)
+{
+	index.erase(remove(index.begin(), index.end(), ';'));
+	if (count(index.begin(), index.end(), '.') != 1)
+		return (FAILURE);
+	this->_index = index;
+	return (SUCCESS);
+}
 
 const std::string Server::getServerName() const
 {

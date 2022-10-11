@@ -54,7 +54,7 @@ class Server
 		int							setPort(std::string port);
 		int							setRoot(std::string root);
 		int							setIndex(std::string idnex);
-	//operation overload schreiben zum printen der Daten
+		int							setMethods(std::set<std::string> methods);
 };
 
 #endif /* SERVER_HPP */

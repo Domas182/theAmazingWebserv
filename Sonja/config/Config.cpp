@@ -100,6 +100,13 @@ void Config::parse_server(Server server)
 			else
 				_servers.back().setIndex(tokens.back());
 		}
+		else if (!tokens.empty() && tokens.at(0) == "allowed_methods")
+		{
+			if (tokens.size() < 2 || server.setMethods(tokens.back()))
+				throw std::invalid_argument("Error❗\nInvalid information in config file for allowed methods in line:\n " + line);
+			else
+				_servers.back().setMethods(tokens.back());
+		}
 		else if (!tokens.empty() && tokens.at(0) == "location")
 		{
 			Location location = Location();
@@ -131,7 +138,6 @@ void Config::start_parsing()
 			Server server = Server();
 			_servers.push_back(server);
 			parse_server(server);
-			std::cout << server.getServerName() << std::endl;
 		}
 	}
 }
@@ -143,12 +149,12 @@ std::ostream	&operator<<(std::ostream &os, const Config &config) {
 	int	i = 0;
 	for (std::vector<Server>::const_iterator it = config.getServer().begin(); it != config.getServer().end(); it++) {
 
-		os << "\nSERVER: " << i << std::endl;
-		os << "_servers_name:	" << it->getServerName();
-		os << "\n_ip-address:	" << it->getIpAddress();
-		os << "\n_port:	" << it->getPort();
-		os << "\n_root:	" << it->getRoot();
-		os << "\n_index:	" << it->getIndex();
+		os << "\nSERVER: " << i;
+		os << "Servers Name:	\n" << it->getServerName();
+		os << "IP Address:	\n" << it->getIpAddress();
+		os << "Port:	\n" << it->getPort();
+		os << "Root:	\n" << it->getRoot();
+		os << "Index:	\n" << it->getIndex();
 		i++;
 	}
 	return os;
