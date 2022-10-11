@@ -74,14 +74,14 @@ void		RequestParser::split_CRLF(char * buffer)
 	{
 		std::string test = CRLF.substr(0, pos);
 		if (!test.empty())
-		{
 			this->_CRLF_split.push_back(test);
-		}
 		CRLF.erase(0, pos + delimeter.length());
 	}
 	if (_CRLF_split.empty())
 		throw std::runtime_error("Request syntax error");
 	//catch in the main
+	//general error catches on a higher level
+	//but do they need to be handled for the response?
 	parseRequestLine(_CRLF_split.front());
 	parseRequestHeader();
 	//body starts here
@@ -97,7 +97,13 @@ std::string &		RequestParser::RequestLineMethod(std::string &Method)
 	{
 		this->_method = Method.substr(0, pos);
 		if (this->_method.compare("GET") == 0)
-			std::cout << RED << "WORKED" << RESET << std::endl;
+			std::cout << RED << "GET" << RESET << std::endl;
+		else if (this->_method.compare("POST") == 0)
+			std::cout << RED << "POST" << RESET << std::endl;
+		else if (this->_method.compare("DELETE") == 0)
+			std::cout << RED << "DELETE" << RESET << std::endl;	
+			//noch die anderen typen einbauen
+			//put as post 
 		else
 			throw std::runtime_error("Wrong Method");
 		Method.erase(0, pos + delimeter.length());
@@ -124,7 +130,7 @@ std::string &		RequestParser::RequestLineURI(std::string &URI)
 		return (URI);
 	}
 	else
-		throw std::runtime_error("Wrong Method");
+		throw std::runtime_error("Wrong URI");
 }
 
 void		RequestParser::RequestLineVersion(std::string &version)
@@ -133,7 +139,13 @@ void		RequestParser::RequestLineVersion(std::string &version)
 	size_t pos = 0;
 	pos = version.find(delimeter);
 	if (pos == std::string::npos)
-		this->_version = version.substr(0, pos);
+	{
+		std::string test_version = version.substr(0, pos);
+		if (test_version.compare("HTTP/1.1") == 0)
+			this->_version = version.substr(0, pos);
+		else
+		throw std::runtime_error("Wrong version");
+	}
 	else
 		throw std::runtime_error("RequestLine parsing failed");
 	//TODO:handle return values!
@@ -165,6 +177,7 @@ void		RequestParser::parseRequestHeader()
 			std::string b = it->substr(pos + 1, it->length());
 			this->_requestH.insert(std::pair<std::string, std::string>(a, b));
 			//check if insert was successful
+			//how??
 			a.clear();
 			b.clear();
 		}
