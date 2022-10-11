@@ -8,6 +8,8 @@ Config::Config(std::string infile_name): _servers(), _infile_name(infile_name.c_
 		throw std::invalid_argument("Error❗\nCould not open config file");
 }
 
+Config::Config() {}
+
 Config::~Config(void)
 {
 	_infile.close();
@@ -37,7 +39,7 @@ std::vector<std::string>	get_tokens(std::string line)
 	return (tokens);
 }
 
-void Config::parse_location(Location &location, std::vector<std::string> tokens)
+void Config::parse_location(Location location, std::vector<std::string> tokens)
 {
 	std::string line;
 
@@ -54,7 +56,7 @@ void Config::parse_location(Location &location, std::vector<std::string> tokens)
 	}
 }
 
-void Config::parse_server(Server &server)
+void Config::parse_server(Server server)
 {
 	std::string line;
 	while (getline(_infile, line))
@@ -68,21 +70,35 @@ void Config::parse_server(Server &server)
 				if (tokens.size() != 2)
 					throw std::invalid_argument("Error❗\nInvalid information in config file for server name in line:\n " + line);
 				else
-					server.setServerName(tokens.back());
+					_servers.back().setServerName(tokens.back());
 		}
 		else if (!tokens.empty() && tokens.at(0) == "ip-address")
 		{
 				if (tokens.size() != 2 || server.setIpAddress(tokens.back()))
 					throw std::invalid_argument("Error❗\nInvalid information in config file for ip address in line:\n " + line);
 				else
-					server.setIpAddress(tokens.back());
+					_servers.back().setIpAddress(tokens.back());
 		}
 		else if (!tokens.empty() && tokens.at(0) == "port")
 		{
 			if (tokens.size() != 2 || server.setPort(tokens.back()))
 				throw std::invalid_argument("Error❗\nInvalid information in config file for port in line:\n " + line);
 			else
-				server.setPort(tokens.back());
+				_servers.back().setPort(tokens.back());
+		}
+		else if (!tokens.empty() && tokens.at(0) == "root")
+		{
+			if (tokens.size() != 2 || server.setRoot(tokens.back()))
+				throw std::invalid_argument("Error❗\nInvalid information in config file for root in line:\n " + line);
+			else
+				_servers.back().setRoot(tokens.back());
+		}
+		else if (!tokens.empty() && tokens.at(0) == "index")
+		{
+			if (tokens.size() != 2 || server.setIndex(tokens.back()))
+				throw std::invalid_argument("Error❗\nInvalid information in config file for index in line:\n " + line);
+			else
+				_servers.back().setIndex(tokens.back());
 		}
 		else if (!tokens.empty() && tokens.at(0) == "location")
 		{
@@ -115,6 +131,25 @@ void Config::start_parsing()
 			Server server = Server();
 			_servers.push_back(server);
 			parse_server(server);
+			std::cout << server.getServerName() << std::endl;
 		}
 	}
+}
+
+const std::vector<Server>	&Config::getServer() const { return _servers; }
+
+std::ostream	&operator<<(std::ostream &os, const Config &config) {
+
+	int	i = 0;
+	for (std::vector<Server>::const_iterator it = config.getServer().begin(); it != config.getServer().end(); it++) {
+
+		os << "\nSERVER: " << i << std::endl;
+		os << "_servers_name:	" << it->getServerName();
+		os << "\n_ip-address:	" << it->getIpAddress();
+		os << "\n_port:	" << it->getPort();
+		os << "\n_root:	" << it->getRoot();
+		os << "\n_index:	" << it->getIndex();
+		i++;
+	}
+	return os;
 }

@@ -6,12 +6,13 @@
 #    By: sreinhol <sreinhol@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/28 20:06:19 by sreinhol          #+#    #+#              #
-#    Updated: 2022/10/03 22:34:40 by sreinhol         ###   ########.fr        #
+#    Updated: 2022/10/10 18:20:27 by sreinhol         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = c++
-FLAGS = -std=c++98 -Wall -Werror -Wextra
+# FLAGS = -std=c++98 -Wall -Werror -Wextra
+FLAGS = -std=c++98
 NAME = webserv
 
 SRC = config/main.cpp config/Config.cpp config/Server.cpp config/Location.cpp
