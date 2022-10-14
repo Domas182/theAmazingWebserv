@@ -229,7 +229,8 @@ int main(void)
 	img_content = readFileIntoString2(imgfilename);
 	std::string respone;
 	std::string imgrespone;
-	respone = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: text/html\n\r\n";
+	std::cout << f_content.size() << std::endl;
+	respone = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: text/html\nContent-Length: 130\n\r\n";
 	imgrespone = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: image/jpeg\n\r\n";
 
 	respone.append(f_content);
