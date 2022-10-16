@@ -3,12 +3,21 @@
 Server::Server()
 {
 	_index = "index.html";
+	_limit_body = 10000000;
+	sn = false;
+	ip = false;
+	p = false;
+	r = false;
+	i = false;
+	am = false;
+	lb = false;
+	l = false;
 }
 
 Server::~Server()
 {}
 
-void Server::setLocation(Location location)
+void Server::setLocation(Location const &location)
 {
 	_locations.push_back(location);
 }
@@ -86,21 +95,42 @@ int Server::setIndex(std::string index)
 	return (SUCCESS);
 }
 
-int Server::setMethods(std::set<std::string> methods)
+int Server::setMethods(std::string methods)
 {
-	index.erase(remove(index.begin(), index.end(), ';'));
-	if (count(index.begin(), index.end(), '.') != 1)
-		return (FAILURE);
-	this->_index = index;
+	methods.erase(remove(methods.begin(), methods.end(), ';'));
+	std::string tmp = methods;
+	char *token = strtok(const_cast<char*>(tmp.c_str()), ",");
+	while (token != NULL)
+	{
+		if ((strcmp(token, "GET") == 0) || (strcmp(token, "POST") == 0) || (strcmp(token, "DELETE") == 0))
+		{
+			_allowed_methods.push_back(token);
+			token = strtok(NULL, ",");
+		}
+		else
+			return (FAILURE);
+	}
 	return (SUCCESS);
 }
 
-const std::string Server::getServerName() const
+int Server::setLimitBody(std::string limit)
+{
+	uint32_t tmp;
+	limit.erase(remove(limit.begin(), limit.end(), ';'));
+	std::stringstream s(limit);
+	s >> tmp;
+	if (tmp < 0 || check_uint32(limit))
+		return (FAILURE);
+	this->_limit_body = atol(limit.c_str());
+	return (SUCCESS);
+}
+
+const std::string &Server::getServerName() const
 {
 	return (this->_server_name);
 }
 
-const std::string Server::getIpAddress() const
+const std::string &Server::getIpAddress() const
 {
 	return (this->_ip_address);
 }
@@ -110,12 +140,113 @@ uint32_t Server::getPort() const
 	return (this->_port);
 }
 
-const std::string Server::getRoot() const
+const std::string &Server::getRoot() const
 {
 	return (this->_root);
 }
 
-const std::string Server::getIndex() const
+const std::string &Server::getIndex() const
 {
 	return (this->_index);
+}
+
+const std::vector<std::string> &Server::getMethods() const
+{
+	return (this->_allowed_methods);
+}
+
+uint32_t Server::getLimitBody() const
+{
+	return (this->_limit_body);
+}
+
+const std::vector<Location>	&Server::getLocation() const { return _locations; }
+
+// // ************************************************************************** //
+// //                               Location                                     //
+// // ************************************************************************** //
+
+void Location::setProxy(std::string proxy)
+{
+	proxy.erase(remove(proxy.begin(), proxy.end(), ';'));
+	_proxy = proxy;
+	_root = proxy;
+}
+
+int Location::setLocMethods(std::string methods)
+{
+	methods.erase(remove(methods.begin(), methods.end(), ';'));
+	std::string tmp = methods;
+	char *token = strtok(const_cast<char*>(tmp.c_str()), ",");
+	while (token != NULL)
+	{
+		if ((strcmp(token, "GET") == 0) || (strcmp(token, "POST") == 0) || (strcmp(token, "DELETE") == 0))
+		{
+			_loc_methods.push_back(token);
+			token = strtok(NULL, ",");
+		}
+		else
+			return (FAILURE);
+	}
+	return (SUCCESS);
+}
+
+int Location::setIndex(std::string index)
+{
+	index.erase(remove(index.begin(), index.end(), ';'));
+	if (count(index.begin(), index.end(), '.') != 1)
+		return (FAILURE);
+	this->_index = index;
+	return (SUCCESS);
+}
+
+int Location::setRoot(std::string root)
+{
+	root.erase(remove(root.begin(), root.end(), ';'));
+	if (count(root.begin(), root.end(), '/') < 1)
+		return (FAILURE);
+	this->_root = root;
+	return (SUCCESS);
+}
+
+int Location::setDirectoryListing(std::string listing)
+{
+	listing.erase(remove(listing.begin(), listing.end(), ';'));
+	if (listing == "on")
+	{
+		this->_dir_list = true;
+		return (SUCCESS);
+	}
+	else if (listing == "off")
+	{
+		this->_dir_list = false;
+		return (SUCCESS);
+	}
+	else
+		return (FAILURE);
+}
+
+const std::string &Location::getProxy() const
+{
+	return (this->_proxy);
+}
+
+const std::vector<std::string> &Location::getLocMethods() const
+{
+	return (this->_loc_methods);
+}
+
+const std::string &Location::getIndex() const
+{
+	return (this->_index);
+}
+
+const std::string &Location::getRoot() const
+{
+	return (this->_root);
+}
+
+bool Location::getDirectoryListing() const
+{
+	return (this->_dir_list);
 }

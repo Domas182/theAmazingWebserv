@@ -11,16 +11,37 @@
 #include <set>
 #include <map>
 
-#include "Location.hpp"
 #define SUCCESS 0
 #define FAILURE 1
 #define STREND std::string::npos
 
 // ************************************************************************** //
-//                               Server Class                                //
+//                               Server Class                                 //
 // ************************************************************************** //
 
-class Location;
+struct Location 
+{
+	std::string						_proxy;
+	std::vector<std::string>		_loc_methods;
+	std::string						_index;
+	std::string						_root;
+	bool							_dir_list;
+	void							setProxy(std::string proxy);
+	int								setLocMethods(std::string methods);
+	int								setIndex(std::string idnex);
+	int								setRoot(std::string root);
+	int								setDirectoryListing(std::string listing);
+	const std::string				&getProxy() const;
+	const std::vector<std::string>	&getLocMethods() const;
+	const std::string				&getIndex() const;
+	const std::string				&getRoot() const;
+	bool							getDirectoryListing() const;
+
+	bool		i;
+	bool		am;
+	bool		r;
+	bool		dl;
+};
 
 class Server
 {
@@ -30,31 +51,43 @@ class Server
 		uint32_t					_port;
 		std::string					_root;
 		std::string					_index;
-		std::set<std::string>		_allowed_methods;
-		std::string					_errorpages;
-		unsigned long				_limit_body;
+		std::vector<std::string>	_allowed_methods;
+		uint32_t					_limit_body;
 		std::vector<Location>		_locations;
-
-		void		default_init();
 
 	public:
 		Server();
 		~Server();
-		
-		// const std::vector<Location>	getLocation() const;
-		const std::string			getServerName() const;
-		const std::string			getIpAddress() const;
-		uint32_t					getPort() const;
-		const std::string			getRoot() const;
-		const std::string			getIndex() const;
 
-		void						setLocation(Location location);
+		bool		sn;
+		bool		ip;
+		bool		p;
+		bool		r;
+		bool		i;
+		bool		am;
+		bool		lb;
+		bool		l;
+		
+
+		const std::vector<Location>		&getLocation() const;
+		const std::string				&getServerName() const;
+		const std::string				&getIpAddress() const;
+		uint32_t						getPort() const;
+		const std::string				&getRoot() const;
+		const std::string				&getIndex() const;
+		const std::vector<std::string>	&getMethods() const;
+		uint32_t						getLimitBody() const;
+
+		void						setLocation(Location const &location);
 		void						setServerName(std::string server_name);
 		int							setIpAddress(std::string ip_address);
 		int							setPort(std::string port);
 		int							setRoot(std::string root);
 		int							setIndex(std::string idnex);
-		int							setMethods(std::set<std::string> methods);
+		int							setMethods(std::string methods);
+		int							setLimitBody(std::string methods);
+	
+		void						reserve_location();
 };
 
 #endif /* SERVER_HPP */

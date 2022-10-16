@@ -12,6 +12,8 @@ int	infile_format(std::string infile)
 	return (0);
 }
 
+
+
 int main(int argc, char** argv)
 {
 	if (argc > 2)
@@ -34,11 +36,13 @@ int main(int argc, char** argv)
 	}
 	else
 		file = "config_files/default.conf";
+	
 	try
 	{
 		Config parser(file);
 		parser.start_parsing();
 		std::cout << parser << std::endl;
+		// system ("leaks webserv");
 	}
 	catch (const std::exception& e)
 	{

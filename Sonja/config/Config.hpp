@@ -10,7 +10,6 @@
 #include <sstream>
 
 #include "Server.hpp"
-#include "Location.hpp"
 #include <iostream>
 #include <stdexcept>
 #include <iterator>
@@ -28,22 +27,19 @@ class Server;
 class Config
 {
 	private:
-	std::vector<Server>	_servers;
-	std::string			_infile_name;
-	std::ifstream		_infile;
-	// nmbr of servers
+	std::vector<Server>		_servers;
+	std::string				_infile_name;
+	std::ifstream			_infile;
 
-	void	parse_server(Server server);
-	void	parse_location(Location location, std::vector<std::string> tokens);
+	void	parse_server(Server &server);
+	void	parse_location(std::vector<std::string> tokens, Location &location);
 
 	public:
 	Config();
 	Config(std::string infile);
 	~Config(void);
-	
-	const std::vector<Server>	&getServer() const;
 
-	// Config & operator=(Config const & rhs); //copy assignment operator overload
+	const std::vector<Server>	&getServer() const;
 
 	void	start_parsing();
 };
