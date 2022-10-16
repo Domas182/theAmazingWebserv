@@ -17,9 +17,9 @@ Server::Server()
 Server::~Server()
 {}
 
-void Server::setLocation(Location const &location)
+void Server::setLocation(std::vector<Location> location)
 {
-	_locations.push_back(location);
+	_locations = location;
 }
 
 uint32_t check_uint32(std::string word)

@@ -28,6 +28,7 @@ class Config
 {
 	private:
 	std::vector<Server>		_servers;
+	std::vector<Location>	_loc;
 	std::string				_infile_name;
 	std::ifstream			_infile;
 

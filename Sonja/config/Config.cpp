@@ -2,9 +2,8 @@
 #include "Server.hpp"
 #include <vector>
 
-Config::Config(std::string infile_name): _servers(), _infile_name(infile_name.c_str()), _infile()
+Config::Config(std::string infile_name): _servers(), _loc(), _infile_name(infile_name.c_str()), _infile()
 {
-	_servers.reserve(10);
 	_infile.open(_infile_name);
 	if (!_infile.is_open())
 		throw std::invalid_argument("Error❗\nCould not open config file");
@@ -111,6 +110,8 @@ void Config::parse_server(Server &server)
 {
 	std::string line;
 
+	if (!_loc.empty())
+		_loc.clear();
 	while (getline(_infile, line))
 	{
 		clear_input(line);
@@ -123,7 +124,7 @@ void Config::parse_server(Server &server)
 					throw std::invalid_argument("Error❗\nInvalid information in config file for server name in line:\n " + line);
 				else
 				{
-					_servers.back().setServerName(tokens.back());
+					server.setServerName(tokens.back());
 					server.sn = true;
 				}
 		}
@@ -133,7 +134,7 @@ void Config::parse_server(Server &server)
 					throw std::invalid_argument("Error❗\nInvalid information in config file for ip address in line:\n " + line);
 				else
 				{
-					_servers.back().setIpAddress(tokens.back());
+					server.setIpAddress(tokens.back());
 					server.ip = true;
 				}
 		}
@@ -143,7 +144,7 @@ void Config::parse_server(Server &server)
 				throw std::invalid_argument("Error❗\nInvalid information in config file for port in line:\n " + line);
 			else
 			{
-				_servers.back().setPort(tokens.back());
+				server.setPort(tokens.back());
 				server.p = true;
 			}
 		}
@@ -154,7 +155,7 @@ void Config::parse_server(Server &server)
 			else
 			{
 				server.r = true;
-				_servers.back().setRoot(tokens.back());
+				server.setRoot(tokens.back());
 			}
 		}
 		else if (!tokens.empty() && tokens.at(0) == "index")
@@ -163,7 +164,7 @@ void Config::parse_server(Server &server)
 				throw std::invalid_argument("Error❗\nInvalid information in config file for index in line:\n " + line);
 			else
 			{
-				_servers.back().setIndex(tokens.back());
+				server.setIndex(tokens.back());
 				server.i = true;
 			}
 		}
@@ -176,7 +177,7 @@ void Config::parse_server(Server &server)
 				std::string methods;
 				for (size_t i = 1; i < tokens.size(); i++)
 					methods = methods + "," + tokens.at(i);
-				if (_servers.back().setMethods(methods))
+				if (server.setMethods(methods))
 					throw std::invalid_argument("Error❗\nInvalid information in config file for allowed methods in line:\n " + line);
 				server.am = true;
 			}
@@ -187,7 +188,7 @@ void Config::parse_server(Server &server)
 				throw std::invalid_argument("Error❗\nInvalid information in config file for limit body in line:\n " + line);
 			else
 			{
-				_servers.back().setLimitBody(tokens.back());
+				server.setLimitBody(tokens.back());
 				server.am = true;
 			}
 		}
@@ -195,7 +196,7 @@ void Config::parse_server(Server &server)
 		{
 			Location location;
 			parse_location(tokens, location);
-			server.setLocation(location);
+			_loc.push_back(location);
 		}
 	}
 }
@@ -218,9 +219,9 @@ void Config::start_parsing()
 		if (!tokens.empty() && tokens.at(0) == "server")
 		{
 			Server server;
-			// _servers.push_back(server);
-			_servers.push_back(server);
 			parse_server(server);
+			server.setLocation(_loc);
+			_servers.push_back(server);
 		}
 	}
 }
