@@ -91,6 +91,7 @@ class ft_tsocket
 		const int trueFlag = 1;
 		if (setsockopt(_socketFd, SOL_SOCKET, SO_REUSEADDR, &trueFlag, sizeof(int)) < 0)
 			perror("Failure");
+
 	}
 
 		ft_tsocket	&operator=(ft_tsocket const& src)
@@ -135,7 +136,7 @@ class ft_tsocket
 		{
 			int sentBytes = 0;
 
-			sentBytes = send(fd, &answer[0], answer.size(), 0);
+			sentBytes = send(fd, &answer[0], answer.size(), MSG_NOSIGNAL);
 			return (sentBytes);
 		}
 
@@ -182,6 +183,9 @@ struct							client
 	std::string					statusCode;
 	int							sentBytes;
 	int							totalSentBytes;
+	bool						requestFlag;
+	int							tmpCnt;
+	std::string					response;
 	int							bytesToSend;
 };
 
@@ -218,6 +222,24 @@ bool	portAvailable(std::vector<struct server> servers, int port, int i)
 	return (true);
 }
 
+void requestReady(std::vector<unsigned char> request, bool &clientFlag, size_t bytes)
+{
+	size_t i = 0;
+	if (clientFlag == false)
+	{
+		while (i < bytes && request[i] != '\0' && clientFlag != true)
+		{
+			//std::cout << request[i];
+			if (request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\r' && request[i+3] == '\n')
+			{
+				clientFlag = true;
+				std::cout << "yes\n" << std::endl;
+			}
+			i++;
+		}
+	}
+}
+
 int main(void)
 {
 	std::string filename("test.html");
@@ -230,8 +252,9 @@ int main(void)
 	std::string respone;
 	std::string imgrespone;
 	std::cout << f_content.size() << std::endl;
-	respone = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: text/html\nContent-Length: 130\n\r\n";
-	imgrespone = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: image/jpeg\n\r\n";
+	respone = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: text/html\nContent-Length: 151\n\r\n";
+	std::cout << img_content.size() << std::endl;
+	imgrespone = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: image/jpeg\nContent-Length: 29036\n\r\n";
 
 	respone.append(f_content);
 	imgrespone.append(img_content);
@@ -281,6 +304,8 @@ int main(void)
                     fcntl(c.socket, F_SETFL, O_NONBLOCK);
                     c.servIndex = k;
                     c.statusCode = "0";
+					c.requestFlag = false;
+					c.tmpCnt = 0;
                     poFD.addFd(c.socket);
                     clients.push_back(c);
                 }
@@ -299,11 +324,25 @@ int main(void)
                     }
                     else
                     {
-                        //clients[k].answer = reinterpret_cast<unsigned char*>(respone.c_str());
-                        //clients[k].answer = reinterpret_cast<unsigned char*>(respone.c_str());
-                        // clients[k].answer = reinterpret_cast<unsigned char*>(const_cast<char*>(respone.c_str()));
-                        // clients[k].bytesToSend = clients[k].answer.size();
-                        clients[k].totalSentBytes = 0;
+						//check if header is complete
+						requestReady(request, clients[k].requestFlag, servers[clients[k].servIndex].sock.nbytes);
+						if (clients[k].requestFlag == true)
+						{
+							std::cout << "1" << std::endl;
+							if (clients[k].tmpCnt == 0)
+							{
+								clients[k].response = respone;
+								clients[k].tmpCnt = 1;
+							} else if (clients[k].tmpCnt == 1) {
+								clients[k].response = imgrespone;
+								clients[k].tmpCnt = 0;
+							}
+							//clients[k].response = respone;
+							std::cout << "cnt: " << clients[k].tmpCnt << std::endl;
+                    		clients[k].sentBytes = clients[k].response.size();
+                        	clients[k].totalSentBytes = 0;
+							clients[k].requestFlag = false;
+						}
                     }
                 }
             }
@@ -315,14 +354,15 @@ int main(void)
                     if ((k = lookClient(poFD.getPfd()[i].fd, clients)) != -1)
                     {
                         //std::cout << clients[k].answer.size() << std::endl;
-                        if (clients[k].answer.size() >= 0)
+                        if (clients[k].response.size() >= 0)
                         {
-		std::cout << "1" << std::endl;
-                            clients[k].sentBytes = servers[clients[k].servIndex].sock.socketSend(poFD.getPfd()[i].fd, respone.c_str());
+                            clients[k].sentBytes = servers[clients[k].servIndex].sock.socketSend(poFD.getPfd()[i].fd, clients[k].response);
                             clients[k].totalSentBytes+= clients[k].sentBytes;
 			    //return when answer parsing is done
                             //clients[k].answer.erase(clients[k].answer.begin(), clients[k].answer.begin() + clients[k].sentBytes);
-                            if (clients[k].answer.size() == 0)
+							clients[k].response.clear();
+							std::cout << clients[k].response.size() << std::endl;
+							if (clients[k].response.size() == 0)
                             {
 								//somehow handle error status codes
                                 if (clients[k].statusCode == "413")
@@ -332,7 +372,7 @@ int main(void)
                                 }
                                 if (clients[k].statusCode == "301")
                                     sleep(10);
-                                clients[k].answer.clear();
+                                clients[k].response.clear();
                              }
                         }
                     }
