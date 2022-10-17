@@ -11,7 +11,6 @@
 #include <sstream>
 #include <sys/wait.h>
 #include <vector>
-#define PORT 9999
 
 std::string readFileIntoString2(const std::string& path) {
     std::ostringstream ss;
