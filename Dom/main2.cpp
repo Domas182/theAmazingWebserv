@@ -15,6 +15,7 @@
 #include "server.hpp"
 #include "client.hpp"
 
+
 std::string readFileIntoString2(const std::string& path) {
     std::ostringstream ss;
 	std::ifstream input_file(path);
