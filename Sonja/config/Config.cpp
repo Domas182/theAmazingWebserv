@@ -1,10 +1,8 @@
 #include "Config.hpp"
 #include "Server.hpp"
-#include <vector>
 
-Config::Config(std::string infile_name): _servers(), _infile_name(infile_name.c_str()), _infile()
+Config::Config(std::string infile_name): _servers(), _loc(), _infile_name(infile_name.c_str()), _infile()
 {
-	_servers.reserve(10);
 	_infile.open(_infile_name);
 	if (!_infile.is_open())
 		throw std::invalid_argument("Error❗\nCould not open config file");
@@ -110,21 +108,32 @@ void Config::parse_location(std::vector<std::string> tokens, Location &location)
 void Config::parse_server(Server &server)
 {
 	std::string line;
+	std::string methods;
 
+	if (!_loc.empty())
+		_loc.clear();
 	while (getline(_infile, line))
 	{
 		clear_input(line);
 		std::vector<std::string> tokens = get_tokens(line);
 		if (!tokens.empty() && tokens.at(0) == "}")
+		{
+			server.open_bracket = false;
 			break;
+		}
 		else if (!tokens.empty() && tokens.at(0) == "server_name")
 		{
 				if (tokens.size() != 2 || server.sn == true)
 					throw std::invalid_argument("Error❗\nInvalid information in config file for server name in line:\n " + line);
 				else
 				{
-					_servers.back().setServerName(tokens.back());
+					server.setServerName(tokens.back());
 					server.sn = true;
+				}
+				if (!_servers.empty())
+				{
+					if (_servers.back().getServerName() == server.getServerName())
+						throw std::invalid_argument("Error❗\nConfig file contains the same server name multiple times.\n" + line);
 				}
 		}
 		else if (!tokens.empty() && tokens.at(0) == "ip-address")
@@ -133,7 +142,7 @@ void Config::parse_server(Server &server)
 					throw std::invalid_argument("Error❗\nInvalid information in config file for ip address in line:\n " + line);
 				else
 				{
-					_servers.back().setIpAddress(tokens.back());
+					server.setIpAddress(tokens.back());
 					server.ip = true;
 				}
 		}
@@ -143,7 +152,7 @@ void Config::parse_server(Server &server)
 				throw std::invalid_argument("Error❗\nInvalid information in config file for port in line:\n " + line);
 			else
 			{
-				_servers.back().setPort(tokens.back());
+				server.setPort(tokens.back());
 				server.p = true;
 			}
 		}
@@ -154,7 +163,7 @@ void Config::parse_server(Server &server)
 			else
 			{
 				server.r = true;
-				_servers.back().setRoot(tokens.back());
+				server.setRoot(tokens.back());
 			}
 		}
 		else if (!tokens.empty() && tokens.at(0) == "index")
@@ -163,7 +172,7 @@ void Config::parse_server(Server &server)
 				throw std::invalid_argument("Error❗\nInvalid information in config file for index in line:\n " + line);
 			else
 			{
-				_servers.back().setIndex(tokens.back());
+				server.setIndex(tokens.back());
 				server.i = true;
 			}
 		}
@@ -173,10 +182,9 @@ void Config::parse_server(Server &server)
 				throw std::invalid_argument("Error❗\nInvalid information in config file for allowed methods in line:\n " + line);
 			else
 			{
-				std::string methods;
 				for (size_t i = 1; i < tokens.size(); i++)
 					methods = methods + "," + tokens.at(i);
-				if (_servers.back().setMethods(methods))
+				if (server.setMethods(methods))
 					throw std::invalid_argument("Error❗\nInvalid information in config file for allowed methods in line:\n " + line);
 				server.am = true;
 			}
@@ -187,7 +195,7 @@ void Config::parse_server(Server &server)
 				throw std::invalid_argument("Error❗\nInvalid information in config file for limit body in line:\n " + line);
 			else
 			{
-				_servers.back().setLimitBody(tokens.back());
+				server.setLimitBody(tokens.back());
 				server.am = true;
 			}
 		}
@@ -195,8 +203,39 @@ void Config::parse_server(Server &server)
 		{
 			Location location;
 			parse_location(tokens, location);
-			server.setLocation(location);
+			if (location.getLocMethods().empty())
+			{
+				if (methods.empty())
+					location.setLocMethods(",GET,POST,DELETE;");
+				else
+					location.setLocMethods(methods);
+			}
+			_loc.push_back(location);
 		}
+	}
+}
+
+void Config::check_data()
+{
+	int	j = 0;
+	if (_servers.size() > 10)
+		throw std::invalid_argument("Error❗\nToo many servers! Maximum 10 servers.");
+	if (_servers.size() < 1)
+		throw std::invalid_argument("Error❗\nNo server defined in config file. Minimum 1 server.");
+	for (std::vector<Server>::const_iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
+		if (it->getServerName().empty())
+			throw std::invalid_argument("Error❗\nServer name is missing in config file.");
+		if (!it->getPort())
+			throw std::invalid_argument("Error❗\nPort is missing in config file.");
+		Server server = getServer().at(j);
+		std::set<std::string>::const_iterator it2;
+		for (std::vector<Location>::const_iterator it2 = server.getLocation().begin(); it2 != server.getLocation().end(); it2++)
+		{
+			if (it2->getIndex().empty())
+				throw std::invalid_argument("Error❗\nIndex is missing in server block.");
+		}
+		j++;
 	}
 }
 
@@ -214,15 +253,24 @@ void Config::start_parsing()
 				throw std::invalid_argument("Error❗\nInvalid information in config file for server in line:\n " + line);
 		}
 		if (!tokens.empty() && tokens.at(0) != "server")
-			throw std::invalid_argument("Error❗\nConfig file does not start with server block");
+		{
+			if (_servers.empty())
+				throw std::invalid_argument("Error❗\nConfig file does not start with server block.");
+			else
+				throw std::invalid_argument("Error❗\nInvalid content in config file outside of server block.");
+
+		}
 		if (!tokens.empty() && tokens.at(0) == "server")
 		{
 			Server server;
-			// _servers.push_back(server);
-			_servers.push_back(server);
 			parse_server(server);
+			if (server.open_bracket == true)
+				throw std::invalid_argument("Error❗\nServer block in config file is not closed.");
+			server.setLocation(_loc);
+			_servers.push_back(server);
 		}
 	}
+	check_data();
 }
 
 const std::vector<Server>	&Config::getServer() const { return _servers; }
@@ -230,10 +278,10 @@ const std::vector<Server>	&Config::getServer() const { return _servers; }
 std::ostream	&operator<<(std::ostream &os, const Config &config) {
 
 	int	j = 0;
-	int	k = 0;
 	std::set<std::string>::const_iterator it;
 	for (std::vector<Server>::const_iterator it = config.getServer().begin(); it != config.getServer().end(); it++)
 	{
+		int	k = 0;
 		os << "\nSERVER: " << j << "\n";
 		os << "Servers Name:	" << it->getServerName() << "\n";
 		os << "IP Address:	" << it->getIpAddress() << "\n";

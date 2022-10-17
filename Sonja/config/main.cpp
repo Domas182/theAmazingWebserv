@@ -42,13 +42,11 @@ int main(int argc, char** argv)
 		Config parser(file);
 		parser.start_parsing();
 		std::cout << parser << std::endl;
-		// system ("leaks webserv");
 	}
 	catch (const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
 		return EXIT_FAILURE;
-
 	}
 	// system ("leaks webserv");
 	return EXIT_SUCCESS;

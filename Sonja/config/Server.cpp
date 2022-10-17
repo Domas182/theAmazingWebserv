@@ -4,6 +4,7 @@ Server::Server()
 {
 	_index = "index.html";
 	_limit_body = 10000000;
+	_port = 0;
 	sn = false;
 	ip = false;
 	p = false;
@@ -12,14 +13,18 @@ Server::Server()
 	am = false;
 	lb = false;
 	l = false;
+	open_bracket = true;
+	_allowed_methods.push_back("GET");
+	_allowed_methods.push_back("POST");
+	_allowed_methods.push_back("DELETE");
 }
 
 Server::~Server()
 {}
 
-void Server::setLocation(Location const &location)
+void Server::setLocation(std::vector<Location> location)
 {
-	_locations.push_back(location);
+	_locations = location;
 }
 
 uint32_t check_uint32(std::string word)
@@ -98,14 +103,30 @@ int Server::setIndex(std::string index)
 int Server::setMethods(std::string methods)
 {
 	methods.erase(remove(methods.begin(), methods.end(), ';'));
+	for (int i = 0; i < 3; i++)
+		_allowed_methods.at(i).clear();
+	_allowed_methods.clear();
 	std::string tmp = methods;
 	char *token = strtok(const_cast<char*>(tmp.c_str()), ",");
+	char *tmp2 = token;
+	char *tmp3 = NULL;
 	while (token != NULL)
 	{
 		if ((strcmp(token, "GET") == 0) || (strcmp(token, "POST") == 0) || (strcmp(token, "DELETE") == 0))
 		{
 			_allowed_methods.push_back(token);
 			token = strtok(NULL, ",");
+			if (token)
+			{
+				if (strcmp(tmp2, token) == 0)
+					return (FAILURE);
+				if (tmp3)
+				{
+					if (strcmp(tmp3, token) == 0)
+						return (FAILURE);
+				}
+				tmp3 = token;
+			}
 		}
 		else
 			return (FAILURE);
@@ -162,9 +183,7 @@ uint32_t Server::getLimitBody() const
 
 const std::vector<Location>	&Server::getLocation() const { return _locations; }
 
-// // ************************************************************************** //
-// //                               Location                                     //
-// // ************************************************************************** //
+//----------------------Location----------------------//
 
 void Location::setProxy(std::string proxy)
 {
@@ -178,12 +197,25 @@ int Location::setLocMethods(std::string methods)
 	methods.erase(remove(methods.begin(), methods.end(), ';'));
 	std::string tmp = methods;
 	char *token = strtok(const_cast<char*>(tmp.c_str()), ",");
+	char *tmp2 = token;
+	char *tmp3 = NULL;
 	while (token != NULL)
 	{
 		if ((strcmp(token, "GET") == 0) || (strcmp(token, "POST") == 0) || (strcmp(token, "DELETE") == 0))
 		{
 			_loc_methods.push_back(token);
 			token = strtok(NULL, ",");
+			if (token)
+			{
+				if (strcmp(tmp2, token) == 0)
+					return (FAILURE);
+				if (tmp3)
+				{
+					if (strcmp(tmp3, token) == 0)
+						return (FAILURE);
+				}
+				tmp3 = token;
+			}
 		}
 		else
 			return (FAILURE);
