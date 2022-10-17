@@ -16,7 +16,7 @@
 #define STREND std::string::npos
 
 // ************************************************************************** //
-//                               Server Class                                 //
+//                               Location Struct                              //
 // ************************************************************************** //
 
 struct Location 
@@ -43,6 +43,10 @@ struct Location
 	bool		dl;
 };
 
+// ************************************************************************** //
+//                               Server Class                                 //
+// ************************************************************************** //
+
 class Server
 {
 	private:
@@ -68,6 +72,7 @@ class Server
 		bool		lb;
 		bool		l;
 		
+		bool		open_bracket;
 
 		const std::vector<Location>		&getLocation() const;
 		const std::string				&getServerName() const;
@@ -78,7 +83,6 @@ class Server
 		const std::vector<std::string>	&getMethods() const;
 		uint32_t						getLimitBody() const;
 
-		// void						setLocation(Location const &location);
 		void						setLocation(std::vector<Location> location);
 		void						setServerName(std::string server_name);
 		int							setIpAddress(std::string ip_address);

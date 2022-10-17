@@ -3,9 +3,7 @@
 #define CONFIG_HPP
 
 #include <string>
-#include <map>
 #include <vector>
-#include <set>
 #include <fstream>
 #include <sstream>
 
@@ -34,6 +32,7 @@ class Config
 
 	void	parse_server(Server &server);
 	void	parse_location(std::vector<std::string> tokens, Location &location);
+	void	check_data();
 
 	public:
 	Config();
