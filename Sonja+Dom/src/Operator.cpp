@@ -2,6 +2,7 @@
 #include "Server.hpp"
 #include "Poller.hpp"
 #include "Client.hpp"
+#include "../Request/RequestParser.hpp"
 
 
 int fdServer(int fd, std::vector<Server> servers)
@@ -33,8 +34,10 @@ void requestReady(std::vector<unsigned char> request, Client& client, size_t byt
 		{
 			if (request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\r' && request[i+3] == '\n')
 			{
+
 				client.setFlagT();
 			}
+			client.pushRequest(request[i]);
 			i++;
 		}
 	}
@@ -58,6 +61,7 @@ void Operator::start_process()
 	PollFd poFD;
 
 	std::vector<Client> clients;
+	//TODO:ASK SONJA 
 
 	while(1)
 	{
@@ -70,6 +74,7 @@ void Operator::start_process()
 				poFD.addFd(_servers[j].getSockFd());
 			}
 		}
+		std::vector<unsigned char> request;
 		for (size_t i = 0; i < poFD.getFdCount(); i++)
 		{
 			if (poFD.getPfd()[i].revents & POLLIN) 
@@ -86,8 +91,8 @@ void Operator::start_process()
 				{
 					int k;
 					k = lookClient(poFD.getPfd()[i].fd, clients);
-					std::vector<unsigned char> request;
 					request = _servers[clients[k].getIndex()].sockRecv(i, poFD);
+					// 	NOW THERES STUFF IN THE BUFFER TAHT HOLDS THE REQUEST
 					if (request.size() <= 0)
 					{
 						std::vector<Client>::iterator it(clients.begin());
@@ -98,11 +103,28 @@ void Operator::start_process()
 					else
 					{
 						//check if header is complete
+						// for (size_t i = 0; i < request.size(); i++)
+						// 	std::cout << RED << request[i] << RESET;
 						requestReady(request, clients[k], _servers[clients[k].getIndex()].getNBytes());
+						// for (size_t i = 0; i < request.size(); i++)
+							// std::cout << GREEN << request[i] << RESET;
 						// clients[k].setFlagT();
+							// std::cout << YELLOW << "GOTCHSA" << RESET << std::endl;
 						if (clients[k].getFlag() == true)
 						{
-							std::cout << "1" << std::endl;
+							for (size_t i = 0; i < clients[k].getRequest().size(); i++)
+								std::cout << CYAN << clients[k].getRequest()[i] << RESET;
+							//clients[k].printRequest();
+							RequestParser RP(clients[k].getRequest());
+							// char temp[request.size()];
+							// for (size_t i = 0; i < request.size(); i++)
+							// 	temp[i] = request[i];
+							// std::cout << request.size() << std::endl;
+							// for (size_t i = 0; i < request.size(); i++)
+							// 	std::cout << temp[i];
+
+
+							//std::cout << "1" << std::endl;
 							if (clients[k].getCnt() == 0)
 							{
 								// clients[k].setResp(respone);
@@ -113,6 +135,7 @@ void Operator::start_process()
 								clients[k].setResp(_servers[k].getImg_Response());
 								clients[k].setCnt(0);
 							}
+							clients[k].getRequest().clear();
 							clients[k].setFlagF();
 						}
 					}

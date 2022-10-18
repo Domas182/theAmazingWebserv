@@ -33,6 +33,7 @@ class Client
 		int							_tmpCnt;
 		std::string					_response;
 		int							_bytesToSend;
+		std::vector<unsigned char> 	_request;
 
 	public:
 		Client();
@@ -49,6 +50,7 @@ class Client
 		std::string			getResponse();
 		size_t				getResponseSize();
 		std::string			getStatusCode();
+		std::vector<unsigned char> & getRequest();
 
 		void		setFlagT();
 		void		setFlagF();
@@ -57,6 +59,8 @@ class Client
 		void		setSentBytes(int bytes);
 		void		setTotalSentBytes();
 		void		setStatusCode(std::string);
+		void 		pushRequest(unsigned char c);
+        void 		printRequest();
 };
 
 #endif /* CLIENT_HPP */

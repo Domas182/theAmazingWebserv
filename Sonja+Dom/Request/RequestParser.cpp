@@ -6,8 +6,10 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-RequestParser::RequestParser()
+RequestParser::RequestParser(std::vector<unsigned char> request)
 {
+	split_CRLF(request);
+	std::cout << CYAN << *this << RESET << std::endl; 
 }
 
 // RequestParser::RequestParser( const RequestParser & src )
@@ -63,11 +65,17 @@ std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
 ** --------------------------------- METHODS ----------------------------------
 */
 
-void		RequestParser::split_CRLF(char * buffer)
+void		RequestParser::split_CRLF(std::vector<unsigned char> buffer)
 {
 
+	// std::vector<char> input({ 'a', 'b', 'c' });//buffer
+    // std::string s(input.begin(), input.end());
+    // std::cout << s;
+
 	//TODO:wird der v immer neuen speicher allocieren? bzw wie kann ich am Anfang reserven??
-	std::string CRLF = buffer;
+	// std::string CRLF = buffer;
+	std::string CRLF(buffer.begin(), buffer.end());
+	//different syntax due to namespace?
 	std::string delimeter = "\r\n";
 	size_t pos = 0;
 	while ((pos = CRLF.find(delimeter)) != std::string::npos)
@@ -82,6 +90,11 @@ void		RequestParser::split_CRLF(char * buffer)
 	//catch in the main
 	//general error catches on a higher level
 	//but do they need to be handled for the response?
+	// for (size_t i = 0; i < _CRLF_split.size(); i++)
+	// {
+
+	// 	std::cout << RED <<_CRLF_split[i] << RESET << std::endl;
+	// }
 	parseRequestLine(_CRLF_split.front());
 	parseRequestHeader();
 	//body starts here

@@ -59,6 +59,12 @@ size_t Client::getResponseSize()
 	return(_response.size());
 }
 
+std::vector<unsigned char> & Client::getRequest()
+{
+	return (_request);
+}
+
+
 void Client::setSentBytes(int bytes)
 {
 	_sentBytes = bytes;
@@ -87,4 +93,16 @@ void Client::setStatusCode(std::string string)
 std::string Client::getStatusCode()
 {
 	return (_statCode);
+}
+
+void    Client::pushRequest(unsigned char c)
+{
+    _request.push_back(c);
+}
+
+void    Client::printRequest()
+{
+    for (size_t i = 0; i < _request.size(); i++)
+        std::cout << _request[i];
+    std::cout << std::endl;
 }
