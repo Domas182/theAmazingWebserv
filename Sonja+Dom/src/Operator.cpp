@@ -3,6 +3,7 @@
 #include "Poller.hpp"
 #include "Client.hpp"
 #include "../Request/RequestParser.hpp"
+#include "../Request/Handler.hpp"
 
 
 int fdServer(int fd, std::vector<Server> servers)
@@ -116,6 +117,7 @@ void Operator::start_process()
 								std::cout << CYAN << clients[k].getRequest()[i] << RESET;
 							//clients[k].printRequest();
 							RequestParser RP(clients[k].getRequest());
+							Handler H(RP);
 							// char temp[request.size()];
 							// for (size_t i = 0; i < request.size(); i++)
 							// 	temp[i] = request[i];
