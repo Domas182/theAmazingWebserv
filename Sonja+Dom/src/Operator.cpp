@@ -3,6 +3,7 @@
 #include "Poller.hpp"
 #include "Client.hpp"
 #include "../Request/RequestParser.hpp"
+#include "../Request/Handler.hpp"
 #include "../Response/Response.hpp"
 
 
@@ -115,7 +116,7 @@ void Operator::start_process()
 						if (clients[k].getFlag() == true)
 						{
 							RequestParser RP(clients[k].getRequest());
-
+							Handler H(RP);
 							if (RP.getURI() == "/favicon.ico")
 								clients[k].setResp(_servers[clients[k].getIndex()].getFavi_Response());
 							else if (RP.getURI() == "/cat.jpeg")				
