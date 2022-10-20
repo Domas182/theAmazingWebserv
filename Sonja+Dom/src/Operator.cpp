@@ -2,6 +2,7 @@
 #include "Server.hpp"
 #include "Poller.hpp"
 #include "Client.hpp"
+#include "stdlib.h"
 #include "../Request/RequestParser.hpp"
 #include "../Request/Handler.hpp"
 #include "../Response/Response.hpp"
@@ -36,18 +37,118 @@ void requestReady(std::vector<unsigned char> request, Client& client, size_t byt
 
 		while (i < bytes && request[i] != '\0' && client.getFlag() == false)
 		{
-			if ((request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\r' && request[i+3] == '\n') || (request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\n'))
+			if (request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\r' && request[i+3] == '\n')
 			{
 				client.printRequest();
-				std::cout << "nbytes: " << bytes << "^^^^^^\n\n\n\n" << std::endl;
 				client.setFlagT();
-				break ;
+				i += 4;
+				for (int k = 0; k < 2; k++)
+				{
+					client.pushRequest('\r');
+					client.pushRequest('\n');
+				}
+				// if (request[0] == 'P' && request[1] == 'O' && request[2] == 'S' && request[3] == 'T')
+				// {
+					std::cout << "ARE WE JERE??" << std::endl;
+					RequestParser RP(client.getRequest());
+					if (RP.getMethod() == "POST")
+					{
+						std::unordered_map<std::string, std::string>::const_iterator got = RP.getRequestH().find("Content-Length");
+						int contLen = atoi(got->second.c_str());
+						std::cout << contLen << std::endl;
+						for (int j = 0; j < contLen; j++)
+						{
+							client.pushBody(request[i]);
+							i++;
+						}
+					}
+					//RP._body = client._body
 			} else {
 				client.pushRequest(request[i++]);
 			}
 		}
+//		if (request[0] == 'P' && request[1] == 'O' && request[2] == 'S' && request[3] == 'T' && client.getFlag() == true)
+//		{
+//			client.setBFlagT();
+//			i += 4;
+//			std::vector<unsigned char>::iterator it = request.begin();
+//			std::advance(it, i);
+//			std::cout << *it << " << this is it || and this is i >> " << i << std::endl;
+//			while (it != request.end())
+//			{
+//				std::cout << request[i];
+//				client.pushBody(request[i]);
+//				it++;
+//				i++;
+//			}
+//			std::cout << "\n\n\n\n\n\n\nWe got post!" << std::endl;
+//		}
 	}
 }
+
+// void requestReady(std::vector<unsigned char> request, Client& client, size_t bytes)
+// {
+// 	size_t i = 0;
+// 	if (client.getFlag() == false)
+// 	{
+// //		while (i < bytes && request[i] != '\0' && client.getFlag() != true)
+
+// 		while (i < bytes && request[i] != '\0' && client.getFlag() == false)
+// 		{
+// 			if (request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\r' && request[i+3] == '\n')
+// 			{
+// 				client.printRequest();
+// 				std::cout << "nbytes: " << bytes << "^^^^^^\n\n\n\n" << std::endl;
+// 				client.setFlagT();
+// 				i += 4;
+// 				for (int k = 0; k < 2; k++)
+// 				{
+// 					client.pushRequest('\r');
+// 					client.pushRequest('\n');
+// 				}
+// 				RequestParser RP(client.getRequest());
+// 				std::unordered_map<std::string, std::string>::const_iterator got = RP.getRequestH().find("Content-Length");
+// 				std::cout << "LEEEEEENGTH!!!!:" << got->second << std::endl;
+// 				int contLen = atoi(got->second.c_str());
+// 				std::cout << contLen << std::endl;
+// 				for (int j = 0; j < contLen; j++)
+// 				{
+// 					client.pushBody(request[i]);
+// 					i++;
+// 				}
+
+
+// 				// if (request[0] == 'P' && request[1] == 'O' && request[2] == 'S' && request[3] == 'T')
+// 				// {
+// 				// 	client.setBFlagT();
+// 				// 	i += 4;
+// 				// 	std::vector<unsigned char>::iterator it = request.begin();
+// 				// 	std::advance(it, i);
+
+// 				// }
+// 				// //break ;
+// 			} else {
+// 				client.pushRequest(request[i++]);
+// 			}
+// 		}
+// //		if (request[0] == 'P' && request[1] == 'O' && request[2] == 'S' && request[3] == 'T' && client.getFlag() == true)
+// //		{
+// //			client.setBFlagT();
+// //			i += 4;
+// //			std::vector<unsigned char>::iterator it = request.begin();
+// //			std::advance(it, i);
+// //			std::cout << *it << " << this is it || and this is i >> " << i << std::endl;
+// //			while (it != request.end())
+// //			{
+// //				std::cout << request[i];
+// //				client.pushBody(request[i]);
+// //				it++;
+// //				i++;
+// //			}
+// //			std::cout << "\n\n\n\n\n\n\nWe got post!" << std::endl;
+// //		}
+// 	}
+// }
 
 void Operator::start_process()
 {
@@ -116,15 +217,22 @@ void Operator::start_process()
 						if (clients[k].getFlag() == true)
 						{
 							RequestParser RP(clients[k].getRequest());
-							Handler H(RP);
-							if (RP.getURI() == "/favicon.ico")
-								clients[k].setResp(_servers[clients[k].getIndex()].getFavi_Response());
-							else if (RP.getURI() == "/cat.jpeg")				
-								clients[k].setResp(_servers[clients[k].getIndex()].getImg_Response());
-							else if (RP.getURI() == "/")
-								clients[k].setResp(_servers[clients[k].getIndex()].getResponse());
-							clients[k].getRequest().clear();
-							clients[k].setFlagF();
+							clients[k].printBody();	
+							//Handler H(RP);
+							if (RP.getMethod() == "GET")
+							{
+								if (RP.getURI() == "/favicon.ico")
+									clients[k].setResp(_servers[clients[k].getIndex()].getFavi_Response());
+								else if (RP.getURI() == "/cat.jpeg")				
+									clients[k].setResp(_servers[clients[k].getIndex()].getImg_Response());
+								else if (RP.getURI() == "/")
+									clients[k].setResp(_servers[clients[k].getIndex()].getResponse());
+								clients[k].getRequest().clear();
+								clients[k].setFlagF();
+							} else {
+								clients[k].setResp("");
+								clients[k].setFlagF();
+							}
 						}
 					}
 				}

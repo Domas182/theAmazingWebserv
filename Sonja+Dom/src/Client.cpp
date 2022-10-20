@@ -7,6 +7,7 @@ Client::Client(int index, int socket) : _socket(socket), _sIndex(index)
 	fcntl(_socket, F_SETFL, O_NONBLOCK);
 	_statCode = '0';
 	_requestFlag = false;
+	_bodyFlag = false;
 	_tmpCnt = 0;
 }
 
@@ -35,6 +36,16 @@ void Client::setFlagT()
 void Client::setFlagF()
 {
 	_requestFlag = false;
+}
+
+void Client::setBFlagF()
+{
+	_requestFlag = false;
+}
+
+void Client::setBFlagT()
+{
+	_requestFlag = true;
 }
 
 int Client::getCnt()
@@ -100,6 +111,11 @@ void    Client::pushRequest(unsigned char c)
     _request.push_back(c);
 }
 
+void    Client::pushBody(unsigned char c)
+{
+    _body.push_back(c);
+}
+
 void    Client::printRequest()
 {
     for (size_t i = 0; i < _request.size(); i++)
@@ -109,5 +125,13 @@ void    Client::printRequest()
 	{
 		std::cout << std::endl;
 	}
+    std::cout << std::endl;
+}
+
+void    Client::printBody()
+{
+    for (size_t i = 0; i < _body.size(); i++)
+        std::cout << _body[i];
+	//for break condition
     std::cout << std::endl;
 }
