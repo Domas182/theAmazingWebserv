@@ -198,6 +198,7 @@ int Server::setF_Content()
 		return (FAILURE);
 	ss << input_file.rdbuf();
 	this->_f_content = ss.str();
+	std::cout << ">>>>> yoyoyo" << _f_content.size() << std::endl;
 	return (SUCCESS);
 }
 
@@ -213,12 +214,25 @@ int Server::setImg_Content()
 	return (SUCCESS);
 }
 
+int Server::setFavi_Content()
+{
+	std::ostringstream ss;
+	std::ifstream input_img;
+	input_img.open(_root + "favicon.ico");
+	if (!input_img.is_open())
+		return (FAILURE);
+	ss << input_img.rdbuf();
+	this->_favi_content = ss.str();
+	std::cout << "this.>>>>>>" << _favi_content.size() << std::endl;
+	return (SUCCESS);
+}
+
 int Server::setResponse()
 {
 	std::string response;
 	response = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: text/html\nContent-Length: 151\n\r\n";
 	response.append(getF_Content());
-	this->_response = response;
+	this->_response = response;	
 	return (SUCCESS);
 }
 
@@ -228,6 +242,15 @@ int Server::setImg_Response()
 	response = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: image/jpeg\nContent-Length: 29036\n\r\n";
 	response.append(getImg_Content());
 	this->_imgresponse = response;
+	return (SUCCESS);
+}
+
+int Server::setFavi_Response()
+{
+	std::string response;
+	response = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: image/x-icon\nContent-Length: 318\n\r\n";
+	response.append(getFavi_Content());
+	this->_faviresponse = response;
 	return (SUCCESS);
 }
 
@@ -276,6 +299,11 @@ const std::string &Server::getImg_Content() const
 	return (this->_img_content);
 }
 
+const std::string &Server::getFavi_Content() const
+{
+	return (this->_favi_content);
+}
+
 const std::string &Server::getResponse() const
 {
 	return (this->_response);
@@ -284,6 +312,11 @@ const std::string &Server::getResponse() const
 const std::string &Server::getImg_Response() const
 {
 	return (this->_imgresponse);
+}
+
+const std::string &Server::getFavi_Response() const
+{
+	return (this->_faviresponse);
 }
 
 int const& Server::getSockFd() const

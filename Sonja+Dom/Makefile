@@ -3,15 +3,15 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: rschleic <rschleic@student.42.fr>          +#+  +:+       +#+         #
+#    By: dtamulis <dtamulis@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/28 20:06:19 by sreinhol          #+#    #+#              #
-#    Updated: 2022/10/18 19:57:11 by rschleic         ###   ########.fr        #
+#    Updated: 2022/10/20 01:40:11 by dtamulis         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = c++
-FLAGS = -std=c++98 -Wall -Werror -Wextra
+FLAGS = -std=c++98 -g -Wall -Wextra
 # FLAGS = -g -std=c++98
 NAME = webserv
 

@@ -30,15 +30,19 @@ void requestReady(std::vector<unsigned char> request, Client& client, size_t byt
 	size_t i = 0;
 	if (client.getFlag() == false)
 	{
-		while (i < bytes && request[i] != '\0' && client.getFlag() != true)
-		{
-			if (request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\r' && request[i+3] == '\n')
-			{
+//		while (i < bytes && request[i] != '\0' && client.getFlag() != true)
 
+		while (i < bytes && request[i] != '\0' && client.getFlag() == false)
+		{
+			if ((request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\r' && request[i+3] == '\n') || (request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\n'))
+			{
+				client.printRequest();
+				std::cout << "nbytes: " << bytes << "^^^^^^\n\n\n\n" << std::endl;
 				client.setFlagT();
+				break ;
+			} else {
+				client.pushRequest(request[i++]);
 			}
-			client.pushRequest(request[i]);
-			i++;
 		}
 	}
 }
@@ -51,8 +55,12 @@ void Operator::start_process()
 			throw std::invalid_argument("Error❗\nCould not open index file");
 		if (_servers[i].setImg_Content())
 			throw std::invalid_argument("Error❗\nCould not open image file");
+		if (_servers[i].setFavi_Content())
+			throw std::invalid_argument("Error❗\nCould not open image file");
+	
 		_servers[i].setResponse();
 		_servers[i].setImg_Response();
+		_servers[i].setFavi_Response();
 		_servers[i].bindPort();
 	}
 	std::string termin;
@@ -102,39 +110,17 @@ void Operator::start_process()
 					}
 					else
 					{
-						//check if header is complete
-						// for (size_t i = 0; i < request.size(); i++)
-						// 	std::cout << RED << request[i] << RESET;
 						requestReady(request, clients[k], _servers[clients[k].getIndex()].getNBytes());
-						// for (size_t i = 0; i < request.size(); i++)
-							// std::cout << GREEN << request[i] << RESET;
-						// clients[k].setFlagT();
-							// std::cout << YELLOW << "GOTCHSA" << RESET << std::endl;
 						if (clients[k].getFlag() == true)
 						{
-							for (size_t i = 0; i < clients[k].getRequest().size(); i++)
-								std::cout << CYAN << clients[k].getRequest()[i] << RESET;
-							//clients[k].printRequest();
 							RequestParser RP(clients[k].getRequest());
-							// char temp[request.size()];
-							// for (size_t i = 0; i < request.size(); i++)
-							// 	temp[i] = request[i];
-							// std::cout << request.size() << std::endl;
-							// for (size_t i = 0; i < request.size(); i++)
-							// 	std::cout << temp[i];
 
-
-							//std::cout << "1" << std::endl;
-							if (clients[k].getCnt() == 0)
-							{
-								// clients[k].setResp(respone);
-								clients[k].setResp(_servers[k].getResponse());
-								clients[k].setCnt(1);
-							} else if (clients[k].getCnt() == 1) {
-								// clients[k].setResp(imgrespone);
-								clients[k].setResp(_servers[k].getImg_Response());
-								clients[k].setCnt(0);
-							}
+							if (RP.getURI() == "/favicon.ico")
+								clients[k].setResp(_servers[clients[k].getIndex()].getFavi_Response());
+							else if (RP.getURI() == "/cat.jpeg")				
+								clients[k].setResp(_servers[clients[k].getIndex()].getImg_Response());
+							else if (RP.getURI() == "/")
+								clients[k].setResp(_servers[clients[k].getIndex()].getResponse());
 							clients[k].getRequest().clear();
 							clients[k].setFlagF();
 						}
@@ -154,19 +140,20 @@ void Operator::start_process()
 							
 
 							_servers[clients[k].getIndex()].sockSend(poFD.getPfd()[i].fd, clients[k]);
-							//std::cout << clients[k].response.size() << std::endl;
-							if (clients[k].getResponseSize() == 0)
-							{
-								//somehow handle error status codes
-								if (clients[k].getStatusCode() == "420")
-								{
-									close(poFD.getPfd()[i].fd);
-									poFD.deleteFd(i);
-								}
-								if (clients[k].getStatusCode() == "69")
-									sleep(10);
-								clients[k].clearResponse();
-							}
+							//std::cout << clients[k].getResponseSize() << std::endl;
+							clients[k].clearResponse();
+							//if (clients[k].getResponseSize() == 0)
+							//{
+							//	//somehow handle error status codes
+							//	if (clients[k].getStatusCode() == "420")
+							//	{
+							//		close(poFD.getPfd()[i].fd);
+							//		poFD.deleteFd(i);
+							//	}
+							//	if (clients[k].getStatusCode() == "69")
+							//		sleep(10);
+							//	clients[k].clearResponse();
+							//}
 						}
 					}
 				}
