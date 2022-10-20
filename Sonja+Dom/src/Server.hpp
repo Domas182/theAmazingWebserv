@@ -60,6 +60,7 @@ class Server
 		std::string					_f_content;
 		std::string					_img_content;
 		std::string					_ip_address;
+		std::string					_favi_content;
 		uint32_t					_port;
 		std::string					_root;
 		std::string					_index;
@@ -69,6 +70,7 @@ class Server
 
 		std::string					_response;
 		std::string					_imgresponse;
+		std::string					_faviresponse;
 
 		ft_tsocket					_sock;
 
@@ -106,8 +108,11 @@ class Server
 		uint32_t						getLimitBody() const;
 		const std::string				&getF_Content() const;
 		const std::string				&getImg_Content() const;
+		const std::string				&getFavi_Content() const;
 		const std::string				&getResponse() const;
 		const std::string				&getImg_Response() const;
+		const std::string				&getFavi_Response() const;
+
 		int const						&getSockFd() const;
 
 		void						setLocation(std::vector<Location> location);
@@ -122,6 +127,8 @@ class Server
 		int							setImg_Content();
 		int							setResponse();
 		int							setImg_Response();
+		int							setFavi_Content();
+		int							setFavi_Response();
 	
 		void						reserve_location();
 };

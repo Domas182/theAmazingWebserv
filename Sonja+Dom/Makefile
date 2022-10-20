@@ -1,22 +1,11 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: sreinhol <sreinhol@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/08/28 20:06:19 by sreinhol          #+#    #+#              #
-#    Updated: 2022/10/19 21:59:07 by sreinhol         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 CC = c++
-FLAGS = -std=c++98 -Wall -Werror -Wextra
+FLAGS = -std=c++98 -g -Wall -Wextra
 # FLAGS = -g -std=c++98
 NAME = webserv
 
 SRC = src/main.cpp src/Config.cpp src/Operator.cpp src/Server.cpp src/Poller.cpp \
-	src/Client.cpp src/Socket.cpp Request/RequestParser.cpp Request/Handler.cpp
+	src/Client.cpp src/Socket.cpp Request/RequestParser.cpp Request/Handler.cpp Response/Response.cpp
+
 HEADERS := src/Operator.hpp src/Server.hpp src/Poller.hpp src/Client.hpp \
 	src/Socket.hpp Request/Handler.hpp
 
