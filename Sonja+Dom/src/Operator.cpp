@@ -3,6 +3,7 @@
 #include "Poller.hpp"
 #include "Client.hpp"
 #include "../Request/RequestParser.hpp"
+#include "../Response/Response.hpp"
 
 
 int fdServer(int fd, std::vector<Server> servers)
