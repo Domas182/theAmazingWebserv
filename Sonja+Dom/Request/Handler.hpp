@@ -8,6 +8,7 @@
 #include <unordered_map>
 
 #include "RequestParser.hpp"
+#include "../src/Server.hpp"
 
 #define SUCCESS 0
 #define FAILURE 1
@@ -23,13 +24,17 @@ class Handler
 		std::string	_method;
 		std::string	_URI;
 		std::string	_version;
+		std::string	_path;
+		std::string	_query;
+		std::string	_port;
+		std::string	_host;
 		std::unordered_map<std::string, std::string> _requestH;
 
 	public:
 		Handler(RequestParser RP);
 		~Handler();
 
-		void	start_handling();
+		void	start_handling(Server server);
 };
 
 #endif /* HANDLER_HPP */

@@ -218,7 +218,8 @@ void Operator::start_process()
 						{
 							RequestParser RP(clients[k].getRequest());
 							clients[k].printBody();	
-							// Handler H(RP);
+							Handler H(RP);
+							H.start_handling(_servers[clients[k].getIndex()]);
 							if (RP.getMethod() == "GET")
 							{
 								if (RP.getURI() == "/favicon.ico")
