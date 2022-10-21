@@ -13,7 +13,7 @@ Response::Response(int code)
 	//setPayload takes a parameter the function that reads the file and gives back a string
 	setPayload("setPayload takes as parameter the function that reads the file and gives back a string");
 
-	std::cout << CYAN << this->constructResponse() << RESET << std::endl;
+	//std::cout << CYAN << this->constructResponse() << RESET << std::endl;
 }
 
 // Response::Response( const Response & src )

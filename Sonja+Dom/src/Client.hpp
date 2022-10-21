@@ -30,10 +30,12 @@ class Client
 		int							_sentBytes;
 		int							_totalSentBytes;
 		bool						_requestFlag;
+		bool						_bodyFlag;
 		int							_tmpCnt;
 		std::string					_response;
 		int							_bytesToSend;
 		std::vector<unsigned char> 	_request;
+		std::vector<unsigned char>	_body;
 
 	public:
 		Client();
@@ -46,6 +48,7 @@ class Client
 		int					getSock();
 		int					getIndex();
 		bool				getFlag();
+		bool				getBFlag();
 		int					getCnt();
 		std::string			getResponse();
 		size_t				getResponseSize();
@@ -54,13 +57,17 @@ class Client
 
 		void		setFlagT();
 		void		setFlagF();
+		void		setBFlagT();
+		void		setBFlagF();
 		void		setCnt(int i);
 		void		setResp(std::string resp);
 		void		setSentBytes(int bytes);
 		void		setTotalSentBytes();
 		void		setStatusCode(std::string);
 		void 		pushRequest(unsigned char c);
+		void		pushBody(unsigned char c);
         void 		printRequest();
+        void 		printBody();
 };
 
 #endif /* CLIENT_HPP */
