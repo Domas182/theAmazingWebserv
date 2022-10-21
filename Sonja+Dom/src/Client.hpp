@@ -70,4 +70,6 @@ class Client
         void 		printBody();
 };
 
+
+// TODO:integragte the requestParser in teh Client to make it better accesable!
 #endif /* CLIENT_HPP */
