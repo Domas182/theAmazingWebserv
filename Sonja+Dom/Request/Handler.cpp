@@ -3,26 +3,69 @@
 
 Handler::Handler(RequestParser RP)
 {
-	std::string	_method = RP.getMethod();
-	std::string	_URI = RP.getURI();
-	std::string	_version = RP.getVersion();
-	std::unordered_map<std::string, std::string> _requestH = RP.getRequestH();
-	start_handling();
+	this->_method = RP.getMethod();
+	this->_URI = RP.getURI();
+	// this->_URI = "http://www.w3.org/favicon.ico/?password=password";
+	this->_version = RP.getVersion();
+	this->_requestH = RP.getRequestH();
+	this->_path = "";
+	this->_query = "";
+	this->_port = "";
 }
 
 Handler::~Handler()
 {}
 
-void	Handler::start_handling()
+void	Handler::start_handling(Server server)
 {
 	std::unordered_map<std::string, std::string>::const_iterator got = _requestH.find("Host");
 	if (got == _requestH.end())
-	{
-		//set error page
-		throw std::runtime_error("No Host in Request"); //only temporary
-	}
+		throw std::runtime_error("No Host in Request"); //this is only temporary -> set error page instead
 	else
 	{
-		std::cout << "first: " << got->first << "second " << got->second << std::endl;
+		std::string port;
+		size_t port_start = got->second.find(":");
+		this->_host = got->second.substr(1, (port_start - 1));
+		// if (server.getServerName() != this->_host)
+		// 	throw std::runtime_error("Expected host does not match requested host"); //this is only temporary -> set error page instead
+		if (got->second.find(":") != STREND)
+			this->_port = got->second.substr(port_start + 1);
+		if (this->_port == "")
+			this->_port = 80;
+		else
+		{
+			std::stringstream ss;
+			ss << server.getPort();
+			std::string port_str = ss.str();
+			// if (port_str != this->_port)
+			// 	throw std::runtime_error("Expected port does not match requested port"); //this is only temporary -> set error page instead
+		}
+		if (!this->_URI.find("http://"))
+		{
+			size_t path_start = _URI.find('/', 7);
+			if (_URI.find("?") != STREND)
+			{
+				size_t query_start = _URI.find('?', 7);
+				this->_path = _URI.substr(7, std::min(path_start, query_start) - 7);
+				this->_query = _URI.substr(query_start);
+			}
+			else
+				this->_path = _URI.substr(7);
+		}
+		else
+		{
+			size_t path_start = _URI.find('/');
+			size_t query_start = 0;
+			if (_URI.find('?') != STREND)
+			{
+				size_t query_start = _URI.find('?');
+				this->_query = _URI.substr(query_start);
+			}
+			this->_path = _URI.substr(std::min(path_start, query_start));
+		}
+		// std::cout << "HOST " << this->_host << std::endl;
+		// std::cout << "QURY " << _query << std::endl;
+		// std::cout << "PATH " << _path << std::endl;
+		// std::cout << "PORT " << this->_port << std::endl;
 	}
 }
