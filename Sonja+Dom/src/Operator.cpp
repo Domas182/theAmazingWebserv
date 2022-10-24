@@ -39,7 +39,7 @@ void requestReady(std::vector<unsigned char> request, Client& client, size_t byt
 		{
 			if (request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\r' && request[i+3] == '\n')
 			{
-				client.printRequest();
+				// client.printRequest();
 				client.setFlagT();
 				i += 4;
 				for (int k = 0; k < 2; k++)

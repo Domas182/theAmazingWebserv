@@ -129,8 +129,6 @@ class Server
 		int							setImg_Response();
 		int							setFavi_Content();
 		int							setFavi_Response();
-	
-		void						reserve_location();
 };
 
 #endif /* SERVER_HPP */

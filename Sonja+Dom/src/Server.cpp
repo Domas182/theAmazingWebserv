@@ -194,6 +194,7 @@ int Server::setF_Content()
 	std::ostringstream ss;
 	std::ifstream input_file;
 	input_file.open(_root + _index);
+	std::cout << "/////" << _root + _index << std::endl;
 	if (!input_file.is_open())
 		return (FAILURE);
 	ss << input_file.rdbuf();
@@ -207,6 +208,7 @@ int Server::setImg_Content()
 	std::ostringstream ss;
 	std::ifstream input_img;
 	input_img.open(_root + "cat.jpeg");
+	std::cout << "/////" << _root + "cat.jpeg" << std::endl;
 	if (!input_img.is_open())
 		return (FAILURE);
 	ss << input_img.rdbuf();
@@ -219,6 +221,7 @@ int Server::setFavi_Content()
 	std::ostringstream ss;
 	std::ifstream input_img;
 	input_img.open(_root + "favicon.ico");
+	std::cout << "/////" << _root + "favicon.ico" << std::endl;
 	if (!input_img.is_open())
 		return (FAILURE);
 	ss << input_img.rdbuf();
