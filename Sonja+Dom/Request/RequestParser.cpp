@@ -9,7 +9,7 @@
 RequestParser::RequestParser(std::vector<unsigned char> request)
 {
 	split_CRLF(request);
-	std::cout << *this  << std::endl; 
+	// std::cout << *this  << std::endl; 
 }
 
 // RequestParser::RequestParser( const RequestParser & src )
