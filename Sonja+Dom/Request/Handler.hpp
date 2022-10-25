@@ -35,8 +35,9 @@ class Handler
 		Handler(RequestParser RP);
 		~Handler();
 
-		void	start_handling(Server server);
-		void	change_path(Server server);
+		void	start_handling(Server & server);
+		void	change_path(Server & server);
+		void	handle_get(Server & server);
 };
 
 #endif /* HANDLER_HPP */
