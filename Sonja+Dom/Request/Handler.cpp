@@ -17,7 +17,24 @@ Handler::Handler(RequestParser RP)
 Handler::~Handler()
 {}
 
-void	Handler::start_handling(Server server)
+
+void	Handler::handle_get(Server & server)
+{
+	if (server.set_Content(this->_path))
+		throw std::invalid_argument("Error❗\nCould not open requested file");
+	if (server.setF_Content())
+		throw std::invalid_argument("Error❗\nCould not open index file");
+	if (server.setImg_Content())
+		throw std::invalid_argument("Error❗\nCould not open image file");
+	if (server.setFavi_Content())
+		throw std::invalid_argument("Error❗\nCould not open image file");
+	server.set_Response(this->_path);
+	server.setResponse();
+	server.setImg_Response();
+	server.setFavi_Response();
+}
+
+void	Handler::start_handling(Server & server)
 {
 	std::unordered_map<std::string, std::string>::const_iterator got = _requestH.find("Host");
 	if (got == _requestH.end())
@@ -74,9 +91,10 @@ void	Handler::start_handling(Server server)
 		std::cout << "URI " << this->_URI << std::endl;
 	}
 	change_path(server);
+	handle_get(server);
 }
 
-void	Handler::change_path(Server server)
+void	Handler::change_path(Server & server)
 {
 	_path = server.getRoot() + _path;
 	if (server.getLocation().empty())
@@ -94,10 +112,7 @@ void	Handler::change_path(Server server)
 			{
 				if (this->_URI == "/")
 				{
-					if (it->getRoot() != "/")
-						_path = _path + it->getRoot() + it->getIndex();
-					else
-						_path = _path + it->getIndex();
+					_path = _path + it->getIndex();
 					break;
 				}
 				_path = server.getRoot() + it->getRoot() + it->getIndex();

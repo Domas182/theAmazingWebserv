@@ -57,6 +57,7 @@ class Server
 {
 	private:
 		std::string					_server_name;
+		std::string					_content;
 		std::string					_f_content;
 		std::string					_img_content;
 		std::string					_ip_address;
@@ -107,6 +108,7 @@ class Server
 		const std::vector<std::string>	&getMethods() const;
 		uint32_t						getLimitBody() const;
 		const std::string				&getF_Content() const;
+		const std::string				&getContent() const;
 		const std::string				&getImg_Content() const;
 		const std::string				&getFavi_Content() const;
 		const std::string				&getResponse() const;
@@ -123,8 +125,10 @@ class Server
 		int							setIndex(std::string idnex);
 		int							setMethods(std::string methods);
 		int							setLimitBody(std::string limit);
+		int							set_Content(std::string path);
 		int							setF_Content();
 		int							setImg_Content();
+		int							set_Response(std::string path);
 		int							setResponse();
 		int							setImg_Response();
 		int							setFavi_Content();
