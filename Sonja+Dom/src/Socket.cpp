@@ -73,7 +73,7 @@ void ft_tsocket::socketSend(int fd, Client& client)
 
 std::vector<unsigned char> ft_tsocket::socketRecv(int i, PollFd &tPoll)
 {
-	std::vector<unsigned char> buf(10000);
+	std::vector<unsigned char> buf(65000);
 	nbytes = recv(tPoll.getPfd()[i].fd, &buf[0], sizeof(buf), MSG_DONTWAIT);
 	if (nbytes <= 0)
 	{
