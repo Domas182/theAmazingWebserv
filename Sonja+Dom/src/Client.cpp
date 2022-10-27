@@ -28,6 +28,11 @@ bool Client::getFlag()
 	return(_requestFlag);
 }
 
+bool Client::getBFlag()
+{
+	return(_bodyFlag);
+}
+
 void Client::setFlagT()
 {
 	_requestFlag = true;
@@ -126,6 +131,11 @@ void    Client::printRequest()
 		std::cout << std::endl;
 	}
     std::cout << std::endl;
+}
+
+size_t Client::getBodySize()
+{
+	return(_body.size());
 }
 
 void    Client::printBody()
