@@ -233,7 +233,7 @@ void Operator::check_data()
 		for (std::vector<Location>::const_iterator it2 = server.getLocation().begin(); it2 != server.getLocation().end(); it2++)
 		{
 			if (it2->getIndex().empty())
-				throw std::invalid_argument("Error❗\nIndex is missing in server block.");
+				throw std::invalid_argument("Error❗\nIndex is missing in location block.");
 		}
 		j++;
 	}

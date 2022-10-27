@@ -1,5 +1,6 @@
 
 #include "Socket.hpp"
+#include "../Request/RequestParser.hpp"
 
 ft_tsocket::ft_tsocket(){}
 
@@ -73,7 +74,7 @@ void ft_tsocket::socketSend(int fd, Client& client)
 
 std::vector<unsigned char> ft_tsocket::socketRecv(int i, PollFd &tPoll)
 {
-	std::vector<unsigned char> buf(65000);
+	std::vector<unsigned char> buf(65536);
 	nbytes = recv(tPoll.getPfd()[i].fd, &buf[0], sizeof(buf), MSG_DONTWAIT);
 	if (nbytes <= 0)
 	{
@@ -97,3 +98,4 @@ int ft_tsocket::getAddrlen()
 {
 	return (_addrlen);
 }
+

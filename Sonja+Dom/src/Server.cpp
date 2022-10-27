@@ -189,6 +189,18 @@ int Server::setLimitBody(std::string limit)
 	return (SUCCESS);
 }
 
+int Server::set_Content(std::string path)
+{
+	std::ostringstream ss;
+	std::ifstream input_file;
+	input_file.open(path);
+	if (!input_file.is_open())
+		return (FAILURE);
+	ss << input_file.rdbuf();
+	this->_content = ss.str();
+	return (SUCCESS);
+}
+
 int Server::setF_Content()
 {
 	std::ostringstream ss;
@@ -198,7 +210,6 @@ int Server::setF_Content()
 		return (FAILURE);
 	ss << input_file.rdbuf();
 	this->_f_content = ss.str();
-	std::cout << ">>>>> yoyoyo" << _f_content.size() << std::endl;
 	return (SUCCESS);
 }
 
@@ -223,7 +234,6 @@ int Server::setFavi_Content()
 		return (FAILURE);
 	ss << input_img.rdbuf();
 	this->_favi_content = ss.str();
-	std::cout << "this.>>>>>>" << _favi_content.size() << std::endl;
 	return (SUCCESS);
 }
 
@@ -233,6 +243,22 @@ int Server::setResponse()
 	response = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: text/html\nContent-Length: 151\n\r\n";
 	response.append(getF_Content());
 	this->_response = response;	
+	return (SUCCESS);
+}
+
+int Server::set_Response(std::string path)
+{
+	std::string response;
+
+	std::string content_type = path.substr(path.find(".") + 1);
+	uint32_t len = _content.length();
+	std::stringstream ss;
+	ss << len;
+	std::string content_len = ss.str();
+	response = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: "
+		+ content_type + "\nContent-Length: " + content_len + "\n\r\n";
+	response.append(getF_Content());
+	this->_response = response;
 	return (SUCCESS);
 }
 
@@ -289,6 +315,11 @@ uint32_t Server::getLimitBody() const
 	return (this->_limit_body);
 }
 
+const std::string &Server::getContent() const
+{
+	return (this->_content);
+}
+
 const std::string &Server::getF_Content() const
 {
 	return (this->_f_content);
@@ -332,7 +363,7 @@ void Location::setProxy(std::string proxy)
 {
 	proxy.erase(remove(proxy.begin(), proxy.end(), ';'));
 	_proxy = proxy;
-	_root = proxy;
+	// _root = proxy;
 }
 
 int Location::setLocMethods(std::string methods)

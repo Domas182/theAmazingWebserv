@@ -138,6 +138,11 @@ void    Client::printRequest()
     std::cout << std::endl;
 }
 
+size_t Client::getBodySize()
+{
+	return(_body.size());
+}
+
 void    Client::printBody()
 {
 	std::cout << LB << _body.size() << RESET;

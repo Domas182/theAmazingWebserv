@@ -11,16 +11,35 @@ Handler::Handler(RequestParser RP)
 	this->_path = "";
 	this->_query = "";
 	this->_port = "";
+	this->_error_code = 200;
 }
 
 Handler::~Handler()
 {}
 
-void	Handler::start_handling(Server server)
+
+void	Handler::handle_get(Server & server)
+{
+	if (server.set_Content(this->_path))
+		throw std::invalid_argument("Error❗\nCould not open requested file");
+	if (server.setF_Content())
+		throw std::invalid_argument("Error❗\nCould not open index file");
+	if (server.setImg_Content())
+		throw std::invalid_argument("Error❗\nCould not open image file");
+	if (server.setFavi_Content())
+		throw std::invalid_argument("Error❗\nCould not open image file");
+	server.set_Response(this->_path);
+	server.setResponse();
+	server.setImg_Response();
+	server.setFavi_Response();
+}
+
+void	Handler::start_handling(Server & server)
 {
 	std::unordered_map<std::string, std::string>::const_iterator got = _requestH.find("Host");
 	if (got == _requestH.end())
 		throw std::runtime_error("No Host in Request"); //this is only temporary -> set error page instead
+		// this->_error_code = 400;
 	else
 	{
 		std::string port;
@@ -63,9 +82,44 @@ void	Handler::start_handling(Server server)
 			}
 			this->_path = _URI.substr(std::min(path_start, query_start));
 		}
-		// std::cout << "HOST " << this->_host << std::endl;
-		// std::cout << "QURY " << _query << std::endl;
-		// std::cout << "PATH " << _path << std::endl;
-		// std::cout << "PORT " << this->_port << std::endl;
+		if (this->_path[0] == '/')
+			this->_path = this->_path.substr(1);
+		std::cout << "HOST " << this->_host << std::endl;
+		std::cout << "QURY " << _query << std::endl;
+		std::cout << "PATH " << _path << std::endl;
+		std::cout << "PORT " << this->_port << std::endl;
+		std::cout << "URI " << this->_URI << std::endl;
 	}
+	change_path(server);
+	handle_get(server);
 }
+
+void	Handler::change_path(Server & server)
+{
+	_path = server.getRoot() + _path;
+	if (server.getLocation().empty())
+	{
+		if (this->_URI == "/")
+			_path = _path + server.getIndex();
+	}
+	else
+	{
+		std::string tmp;
+		tmp = server.getRoot() + _path;
+		for (std::vector<Location>::const_iterator it = server.getLocation().begin(); it != server.getLocation().end(); it++)
+		{
+			if (this->_URI == it->getProxy())
+			{
+				if (this->_URI == "/")
+				{
+					_path = _path + it->getIndex();
+					break;
+				}
+				_path = server.getRoot() + it->getRoot() + it->getIndex();
+				break;
+			}
+		}
+	}
+	// std::cout << "{{{{{{{{{ " << _path << std::endl;
+}
+
