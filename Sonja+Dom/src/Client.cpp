@@ -32,7 +32,6 @@ bool Client::getBFlag()
 {
 	return(_bodyFlag);
 }
-
 void Client::setFlagT()
 {
 	_requestFlag = true;
@@ -45,12 +44,12 @@ void Client::setFlagF()
 
 void Client::setBFlagF()
 {
-	_requestFlag = false;
+	_bodyFlag = false;
 }
 
 void Client::setBFlagT()
 {
-	_requestFlag = true;
+	_bodyFlag = true;
 }
 
 int Client::getCnt()
@@ -111,6 +110,12 @@ std::string Client::getStatusCode()
 	return (_statCode);
 }
 
+RequestParser &		Client::getRP()
+{
+	return (_RP);
+}
+
+
 void    Client::pushRequest(unsigned char c)
 {
     _request.push_back(c);
@@ -140,6 +145,7 @@ size_t Client::getBodySize()
 
 void    Client::printBody()
 {
+	std::cout << LB << _body.size() << RESET;
     for (size_t i = 0; i < _body.size(); i++)
         std::cout << _body[i];
 	//for break condition
