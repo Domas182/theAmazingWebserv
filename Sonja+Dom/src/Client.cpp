@@ -110,10 +110,6 @@ std::string Client::getStatusCode()
 	return (_statCode);
 }
 
-RequestParser &		Client::getRP()
-{
-	return (_RP);
-}
 
 
 void    Client::pushRequest(unsigned char c)
@@ -145,7 +141,6 @@ size_t Client::getBodySize()
 
 void    Client::printBody()
 {
-	std::cout << LB << _body.size() << RESET;
     for (size_t i = 0; i < _body.size(); i++)
         std::cout << _body[i];
 	//for break condition
