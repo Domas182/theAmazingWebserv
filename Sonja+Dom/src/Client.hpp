@@ -15,6 +15,7 @@
 #include <sstream>
 #include <sys/wait.h>
 #include <vector>
+#include "../Colors.hpp"
 
 // ************************************************************************** //
 //                               Client Class                                 //
