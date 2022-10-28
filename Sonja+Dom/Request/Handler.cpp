@@ -22,16 +22,16 @@ void	Handler::handle_get(Server & server)
 {
 	if (server.set_Content(this->_path))
 		throw std::invalid_argument("Error❗\nCould not open requested file");
-	if (server.setF_Content())
-		throw std::invalid_argument("Error❗\nCould not open index file");
-	if (server.setImg_Content())
-		throw std::invalid_argument("Error❗\nCould not open image file");
-	if (server.setFavi_Content())
-		throw std::invalid_argument("Error❗\nCould not open image file");
 	server.set_Response(this->_path);
-	server.setResponse();
-	server.setImg_Response();
-	server.setFavi_Response();
+	// if (server.setF_Content())
+	// 	throw std::invalid_argument("Error❗\nCould not open index file");
+	// if (server.setImg_Content())
+	// 	throw std::invalid_argument("Error❗\nCould not open image file");
+	// if (server.setFavi_Content())
+	// 	throw std::invalid_argument("Error❗\nCould not open image file");
+	// server.setResponse();
+	// server.setImg_Response();
+	// server.setFavi_Response();
 }
 
 void	Handler::start_handling(Server & server)
@@ -91,35 +91,108 @@ void	Handler::start_handling(Server & server)
 		std::cout << "URI " << this->_URI << std::endl;
 	}
 	change_path(server);
-	handle_get(server);
+	if (this->_method == "GET")
+		handle_get(server);
 }
 
 void	Handler::change_path(Server & server)
 {
+	std::cout << "INDEX" << server.getIndex() << std::endl;
+	bool file_req = false;
+	std::cout << "PATH" << _path << std::endl;
 	_path = server.getRoot() + _path;
-	if (server.getLocation().empty())
+	if (_URI.find(".") != STREND)
 	{
-		if (this->_URI == "/")
-			_path = _path + server.getIndex();
+		size_t path_start = _URI.find ('.');
+		std::string type = _URI.substr(path_start + 1);
+		file_req = true;
 	}
-	else
+	if (server.getLocation().empty() && file_req == false)
+		_path = _path + server.getIndex();
+	if (!server.getLocation().empty())
 	{
 		std::string tmp;
-		tmp = server.getRoot() + _path;
 		for (std::vector<Location>::const_iterator it = server.getLocation().begin(); it != server.getLocation().end(); it++)
 		{
-			if (this->_URI == it->getProxy())
+			if (file_req == false)
 			{
-				if (this->_URI == "/")
+				if (this->_URI == it->getProxy())
 				{
-					_path = _path + it->getIndex();
-					break;
+					_path = server.getRoot() + it->getRoot() + it->getIndex();
+					return;
 				}
-				_path = server.getRoot() + it->getRoot() + it->getIndex();
-				break;
+				if (std::count(_URI.begin(), _URI.end(), '/') > 1)
+				{
+					tmp = _URI.substr(1);
+					size_t end = tmp.find('/');
+					tmp = _URI.substr(0, end + 1);
+					std::string tmp2 = _URI.substr(end + 2);
+					if (tmp == it->getProxy())
+						_path = server.getRoot() + it->getRoot() + tmp2 + it->getIndex();
+					// std::cout << "THIS:" << tmp << std::endl;
+					// std::cout << "THIS:" << tmp2 << std::endl;
+				}
+				_path = _path + server.getIndex();
+			}
+			else
+			{
+				if (std::count(_URI.begin(), _URI.end(), '/') > 1)
+				{
+					size_t start = _URI.rfind('/');
+					tmp = _URI.substr(start + 1);
+					_path = server.getRoot() + tmp;
+				}
 			}
 		}
 	}
-	// std::cout << "{{{{{{{{{ " << _path << std::endl;
+	std::cout << "{{{{{{{{{ " << _path << std::endl;
 }
 
+// void	Handler::change_path(Server & server)
+// {
+// 	size_t path_start = _URI.find('.');
+// 	std::string type = _URI.substr(path_start);
+// 	std::cout << "{{{{{{{{{ " << type << std::endl;
+
+
+
+
+
+	// _path = server.getRoot() + _path;
+	// if (server.getLocation().empty())
+	// {
+	// 	if (this->_URI == "/")
+	// 		_path = _path + server.getIndex();
+	// }
+	// else
+	// {
+	// 	std::string tmp;
+	// 	tmp = server.getRoot() + _path;
+	// 	std::cout << "****" << tmp << std::endl;
+	// 	for (std::vector<Location>::const_iterator it = server.getLocation().begin(); it != server.getLocation().end(); it++)
+	// 	{
+
+	// 		std::cout << "++++++" << it->getProxy() << std::endl;
+	// 		if (this->_URI == it->getProxy())
+	// 		{
+	// 			std::cout << "****" << this->_URI << std::endl;
+	// 			if (this->_URI == "/")
+	// 			{
+	// 				_path = _path + it->getIndex();
+	// 				break;
+	// 			}
+	// 			_path = server.getRoot() + it->getRoot() + it->getIndex();
+	// 			break;
+	// 		}
+	// 		if (it->getRoot() == it->getProxy())
+	// 			_path = it->getRoot() + _path;
+	// 		else
+	// 			tmp = server.getRoot() + it->getRoot() + it->getIndex();
+	// 		if (tmp.size() > _path.size())
+	// 			_path = tmp;
+	// 		std::cout << "------ " << _path << std::endl;
+	// 		break;
+	// 	}
+	// }
+	// std::cout << "{{{{{{{{{ " << _path << std::endl;
+// }

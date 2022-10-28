@@ -68,6 +68,7 @@ class Client
 		void		pushBody(unsigned char c);
         void 		printRequest();
         void 		printBody();
+		void		clearRequest();
 };
 
 

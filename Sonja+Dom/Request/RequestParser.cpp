@@ -9,7 +9,7 @@
 RequestParser::RequestParser(std::vector<unsigned char> request)
 {
 	split_CRLF(request);
-	std::cout << *this  << std::endl; 
+	// std::cout << *this  << std::endl; 
 }
 
 // RequestParser::RequestParser( const RequestParser & src )
@@ -176,12 +176,14 @@ void		RequestParser::parseRequestHeader()
 {
 
 	std::vector<std::string>::iterator it = _CRLF_split.begin();
+	std::cout << PINK << *it << RESET << std::endl;
 	it++;
 	std::string delimeter = ":";
 	//hier z.b. kann der User request ohne doppelpunkt eingeben?
 	//und sollte man deswegen beim : splitten?
 	for(; it != _CRLF_split.end(); it++)
 	{
+		std::cout << *it << std::endl;
 		size_t pos = 0;
 		pos = it->find(delimeter);
 		if (pos != std::string::npos)
@@ -194,10 +196,29 @@ void		RequestParser::parseRequestHeader()
 			a.clear();
 			b.clear();
 		}
-		else
-			throw std::runtime_error("RequestHeader parsing failed");
+		// else
+		// 	throw std::runtime_error("RequestHeader parsing failed");
 	}
+	setPort();
 }
+
+void RequestParser::setPort()
+{
+	// uint32_t p;
+	std::string tmp;
+	std::unordered_map<std::string, std::string>::iterator start = _requestH.find("Host");
+	if (start != _requestH.end())
+	{
+		tmp = start->second;
+		size_t i = tmp.find(':');
+		tmp = tmp.substr(i + 1);
+	}
+	// std::stringstream s(tmp);
+	// s >> p;
+	this->_port = atol(tmp.c_str());
+	std::cout << PINK << this->_port << RESET << std::endl;
+}
+
 
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
@@ -224,6 +245,10 @@ std::vector<std::string> const & RequestParser::getCRLF_split() const
 	return this->_CRLF_split;
 }
 
+uint32_t const & RequestParser::getPort() const
+{
+	return this->_port;
+}
 
 /* ************************************************************************** */
 

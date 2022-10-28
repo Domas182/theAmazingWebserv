@@ -53,6 +53,7 @@ class Operator
 
 	void	start_parsing();
 	void	start_process();
+	int		find_server(uint32_t port);
 };
 
 std::ostream	&operator<<(std::ostream &os, const Operator &Operator);

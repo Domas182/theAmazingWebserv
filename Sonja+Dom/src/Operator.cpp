@@ -150,20 +150,22 @@ void requestReady(std::vector<unsigned char> request, Client& client, size_t byt
 // 	}
 // }
 
+int	Operator::find_server(uint32_t port)
+{
+	int i = 0;
+	for (std::vector<Server>::const_iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
+		if (it->getPort() == port)
+			return (i);
+		i++;
+	}
+	return (i);
+}
+
 void Operator::start_process()
 {
 	for (size_t i = 0; i < _servers.size(); ++i)
 	{
-	// 	if (_servers[i].setF_Content())
-	// 		throw std::invalid_argument("Error❗\nCould not open index file");
-	// 	if (_servers[i].setImg_Content())
-	// 		throw std::invalid_argument("Error❗\nCould not open image file");
-	// 	if (_servers[i].setFavi_Content())
-	// 		throw std::invalid_argument("Error❗\nCould not open image file");
-	
-	// 	_servers[i].setResponse();
-	// 	_servers[i].setImg_Response();
-	// 	_servers[i].setFavi_Response();
 		_servers[i].bindPort();
 	}
 	std::string termin;
@@ -217,35 +219,18 @@ void Operator::start_process()
 						if (clients[k].getFlag() == true)
 						{
 							RequestParser RP(clients[k].getRequest());
-							clients[k].printBody();	
+							// clients[k].printBody();
+							int i = find_server(RP.getPort());
 							Handler H(RP);
-							H.start_handling(_servers[clients[k].getIndex()]);
-
-							// if (_servers[clients[k].getIndex()].setF_Content())
-							// 	throw std::invalid_argument("Error❗\nCould not open index file");
-							// if (_servers[clients[k].getIndex()].setImg_Content())
-							// 	throw std::invalid_argument("Error❗\nCould not open image file");
-							// if (_servers[clients[k].getIndex()].setFavi_Content())
-							// 	throw std::invalid_argument("Error❗\nCould not open image file");
-							// _servers[clients[k].getIndex()].setResponse();
-							// _servers[clients[k].getIndex()].setImg_Response();
-							// _servers[clients[k].getIndex()].setFavi_Response();
+							// H.start_handling(_servers[clients[k].getIndex()]);
+							H.start_handling(_servers[i]);
+							// clients[k].setResp(_servers[clients[k].getIndex()].getResponse());
+							clients[k].setResp(_servers[i].getResponse());
 
 
-							if (RP.getMethod() == "GET")
-							{
-								if (RP.getURI() == "/favicon.ico")
-									clients[k].setResp(_servers[clients[k].getIndex()].getFavi_Response());
-								else if (RP.getURI() == "/cat.jpeg")				
-									clients[k].setResp(_servers[clients[k].getIndex()].getImg_Response());
-								else if (RP.getURI() == "/")
-									clients[k].setResp(_servers[clients[k].getIndex()].getResponse());
-								clients[k].getRequest().clear();
-								clients[k].setFlagF();
-							} else {
-								clients[k].setResp("");
-								clients[k].setFlagF();
-							}
+							clients[k].setFlagF();
+							request.clear();
+							clients[k].clearRequest();
 						}
 					}
 				}

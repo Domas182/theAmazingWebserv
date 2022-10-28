@@ -114,7 +114,7 @@ class Server
 		const std::string				&getResponse() const;
 		const std::string				&getImg_Response() const;
 		const std::string				&getFavi_Response() const;
-
+		
 		int const						&getSockFd() const;
 
 		void						setLocation(std::vector<Location> location);
