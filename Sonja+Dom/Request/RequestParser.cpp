@@ -6,7 +6,7 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
-RequestParser::RequestParser(std::vector<unsigned char> request)
+RequestParser::RequestParser(std::vector<unsigned char>& request)
 {
 	split_CRLF(request);
 	// std::cout << *this  << std::endl; 
@@ -118,7 +118,7 @@ std::string &		RequestParser::RequestLineMethod(std::string &Method)
 			//noch die anderen typen einbauen
 			//put as post 
 		else
-			throw std::runtime_error("Wrong Method");
+			throw std::runtime_error("wrong Method");
 		Method.erase(0, pos + delimeter.length());
 		return (Method);
 		// pos = Method.find(delimeter);

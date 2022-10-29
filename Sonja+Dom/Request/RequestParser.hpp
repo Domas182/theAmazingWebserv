@@ -24,7 +24,7 @@ class RequestParser
 
 	public:
 
-		RequestParser(std::vector<unsigned char> request);
+		RequestParser(std::vector<unsigned char> &request);
 		// RequestParser( RequestParser const & src );
 		~RequestParser();
 

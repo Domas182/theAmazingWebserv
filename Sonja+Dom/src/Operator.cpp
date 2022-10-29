@@ -28,127 +28,64 @@ int lookClient(int fd, std::vector<Client> clients)
 	return (-1);
 }
 
-void requestReady(std::vector<unsigned char> request, Client& client, size_t bytes)
+size_t	findBodyLength(Client& client)
 {
-	size_t i = 0;
-	if (client.getFlag() == false)
+	if (client.getFlag() == true)	
 	{
-//		while (i < bytes && request[i] != '\0' && client.getFlag() != true)
+		RequestParser RP(client.getRequest());
+		std::unordered_map<std::string, std::string>::const_iterator got = RP.getRequestH().find("Content-Length");
+		std::unordered_map<std::string, std::string>::const_iterator endit = RP.getRequestH().end();
+		if (got != endit)
+		{
+			size_t contLen = atoi(got->second.c_str());
+			return (contLen);
+		}
+		std::unordered_map<std::string, std::string>::const_iterator ITE = RP.getRequestH().find("Transfer-Encoding");
+		if (ITE != endit)
+		{
+			return (-1);
+			//macro like transfer encoding for that
+		}
+	}
+	return (0);
+}
 
-		while (i < bytes && request[i] != '\0' && client.getFlag() == false)
+void extractBody(std::vector<unsigned char>& request, int index, size_t contLen, Client & client)
+{
+	for (size_t i = 0; i < contLen; i++)
+	{
+		client.pushBody(request[index + i]);
+	}
+	if (client.getBodySize() == contLen)
+		client.setBFlagT();
+}
+
+int getRequestReady(std::vector<unsigned char>& request, Client& client, size_t bytes)
+{
+		size_t i = 0;
+		for (; i < bytes; i++)
 		{
 			if (request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\r' && request[i+3] == '\n')
 			{
-				// client.printRequest();
-				client.setFlagT();
 				i += 4;
 				for (int k = 0; k < 2; k++)
 				{
 					client.pushRequest('\r');
 					client.pushRequest('\n');
-				}
-				// if (request[0] == 'P' && request[1] == 'O' && request[2] == 'S' && request[3] == 'T')
-				// {
-					std::cout << "ARE WE JERE??" << std::endl;
-					RequestParser RP(client.getRequest());
-					if (RP.getMethod() == "POST")
-					{
-						std::unordered_map<std::string, std::string>::const_iterator got = RP.getRequestH().find("Content-Length");
-						int contLen = atoi(got->second.c_str());
-						std::cout << contLen << std::endl;
-						for (int j = 0; j < contLen; j++)
-						{
-							client.pushBody(request[i]);
-							i++;
-						}
-					}
-					//RP._body = client._body
-			} else {
-				client.pushRequest(request[i++]);
+				}	
+				client.setFlagT();
+				size_t content = findBodyLength(client);
+				// if (content == -1)//macro for tansfer encoding!
+				// 	extractChunkedBody()
+				if (content > 0)
+					extractBody(request, i, content, client);
+				break;
 			}
+			client.pushRequest(request[i]);
 		}
-//		if (request[0] == 'P' && request[1] == 'O' && request[2] == 'S' && request[3] == 'T' && client.getFlag() == true)
-//		{
-//			client.setBFlagT();
-//			i += 4;
-//			std::vector<unsigned char>::iterator it = request.begin();
-//			std::advance(it, i);
-//			std::cout << *it << " << this is it || and this is i >> " << i << std::endl;
-//			while (it != request.end())
-//			{
-//				std::cout << request[i];
-//				client.pushBody(request[i]);
-//				it++;
-//				i++;
-//			}
-//			std::cout << "\n\n\n\n\n\n\nWe got post!" << std::endl;
-//		}
-	}
+		return (i);
 }
 
-// void requestReady(std::vector<unsigned char> request, Client& client, size_t bytes)
-// {
-// 	size_t i = 0;
-// 	if (client.getFlag() == false)
-// 	{
-// //		while (i < bytes && request[i] != '\0' && client.getFlag() != true)
-
-// 		while (i < bytes && request[i] != '\0' && client.getFlag() == false)
-// 		{
-// 			if (request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\r' && request[i+3] == '\n')
-// 			{
-// 				client.printRequest();
-// 				std::cout << "nbytes: " << bytes << "^^^^^^\n\n\n\n" << std::endl;
-// 				client.setFlagT();
-// 				i += 4;
-// 				for (int k = 0; k < 2; k++)
-// 				{
-// 					client.pushRequest('\r');
-// 					client.pushRequest('\n');
-// 				}
-// 				RequestParser RP(client.getRequest());
-// 				std::unordered_map<std::string, std::string>::const_iterator got = RP.getRequestH().find("Content-Length");
-// 				std::cout << "LEEEEEENGTH!!!!:" << got->second << std::endl;
-// 				int contLen = atoi(got->second.c_str());
-// 				std::cout << contLen << std::endl;
-// 				for (int j = 0; j < contLen; j++)
-// 				{
-// 					client.pushBody(request[i]);
-// 					i++;
-// 				}
-
-
-// 				// if (request[0] == 'P' && request[1] == 'O' && request[2] == 'S' && request[3] == 'T')
-// 				// {
-// 				// 	client.setBFlagT();
-// 				// 	i += 4;
-// 				// 	std::vector<unsigned char>::iterator it = request.begin();
-// 				// 	std::advance(it, i);
-
-// 				// }
-// 				// //break ;
-// 			} else {
-// 				client.pushRequest(request[i++]);
-// 			}
-// 		}
-// //		if (request[0] == 'P' && request[1] == 'O' && request[2] == 'S' && request[3] == 'T' && client.getFlag() == true)
-// //		{
-// //			client.setBFlagT();
-// //			i += 4;
-// //			std::vector<unsigned char>::iterator it = request.begin();
-// //			std::advance(it, i);
-// //			std::cout << *it << " << this is it || and this is i >> " << i << std::endl;
-// //			while (it != request.end())
-// //			{
-// //				std::cout << request[i];
-// //				client.pushBody(request[i]);
-// //				it++;
-// //				i++;
-// //			}
-// //			std::cout << "\n\n\n\n\n\n\nWe got post!" << std::endl;
-// //		}
-// 	}
-// }
 
 int	Operator::find_server(uint32_t port)
 {
@@ -168,14 +105,8 @@ void Operator::start_process()
 	{
 		_servers[i].bindPort();
 	}
-	std::string termin;
-	termin = "\r\n\r\n";
-
 	PollFd poFD;
-
 	std::vector<Client> clients;
-	//TODO:ASK SONJA 
-
 	while(1)
 	{
 		poll(poFD.getPfd().data(), poFD.getFdCount(), 0); 
@@ -215,9 +146,15 @@ void Operator::start_process()
 					}
 					else
 					{
-						requestReady(request, clients[k], _servers[clients[k].getIndex()].getNBytes());
-						if (clients[k].getFlag() == true)
+						if (clients[k].getFlag() == false && clients[k].getBFlag() == false)
 						{
+
+							getRequestReady(request, clients[k], _servers[clients[k].getIndex()].getNBytes());
+							clients[k].printRequest();
+							clients[k].printBody();
+							clients[k].setBFlagF();
+							clients[k].setFlagF();
+              //how to intehrate the RP??
 							RequestParser RP(clients[k].getRequest());
 							// clients[k].printBody();
 							int i = find_server(RP.getPort());
@@ -227,10 +164,10 @@ void Operator::start_process()
 							// clients[k].setResp(_servers[clients[k].getIndex()].getResponse());
 							clients[k].setResp(_servers[i].getResponse());
 
-
-							clients[k].setFlagF();
 							request.clear();
 							clients[k].clearRequest();
+
+
 						}
 					}
 				}
@@ -250,18 +187,7 @@ void Operator::start_process()
 							_servers[clients[k].getIndex()].sockSend(poFD.getPfd()[i].fd, clients[k]);
 							//std::cout << clients[k].getResponseSize() << std::endl;
 							clients[k].clearResponse();
-							//if (clients[k].getResponseSize() == 0)
-							//{
-							//	//somehow handle error status codes
-							//	if (clients[k].getStatusCode() == "420")
-							//	{
-							//		close(poFD.getPfd()[i].fd);
-							//		poFD.deleteFd(i);
-							//	}
-							//	if (clients[k].getStatusCode() == "69")
-							//		sleep(10);
-							//	clients[k].clearResponse();
-							//}
+
 						}
 					}
 				}

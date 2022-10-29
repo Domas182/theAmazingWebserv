@@ -15,6 +15,7 @@
 #include <sstream>
 #include <sys/wait.h>
 #include <vector>
+#include "../Colors.hpp"
 
 // ************************************************************************** //
 //                               Client Class                                 //
@@ -36,6 +37,7 @@ class Client
 		int							_bytesToSend;
 		std::vector<unsigned char> 	_request;
 		std::vector<unsigned char>	_body;
+		
 
 	public:
 		Client();
@@ -49,6 +51,7 @@ class Client
 		int					getIndex();
 		bool				getFlag();
 		bool				getBFlag();
+		size_t				getBodySize();
 		int					getCnt();
 		std::string			getResponse();
 		size_t				getResponseSize();
