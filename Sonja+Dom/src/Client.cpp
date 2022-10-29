@@ -146,3 +146,8 @@ void    Client::printBody()
 	//for break condition
     std::cout << std::endl;
 }
+
+void	Client::clearRequest()
+{
+	_request.clear();
+}

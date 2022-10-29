@@ -87,6 +87,18 @@ int getRequestReady(std::vector<unsigned char>& request, Client& client, size_t 
 }
 
 
+int	Operator::find_server(uint32_t port)
+{
+	int i = 0;
+	for (std::vector<Server>::const_iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
+		if (it->getPort() == port)
+			return (i);
+		i++;
+	}
+	return (i);
+}
+
 void Operator::start_process()
 {
 	for (size_t i = 0; i < _servers.size(); ++i)
@@ -136,11 +148,26 @@ void Operator::start_process()
 					{
 						if (clients[k].getFlag() == false && clients[k].getBFlag() == false)
 						{
+
 							getRequestReady(request, clients[k], _servers[clients[k].getIndex()].getNBytes());
 							clients[k].printRequest();
 							clients[k].printBody();
 							clients[k].setBFlagF();
 							clients[k].setFlagF();
+              //how to intehrate the RP??
+							RequestParser RP(clients[k].getRequest());
+							// clients[k].printBody();
+							int i = find_server(RP.getPort());
+							Handler H(RP);
+							// H.start_handling(_servers[clients[k].getIndex()]);
+							H.start_handling(_servers[i]);
+							// clients[k].setResp(_servers[clients[k].getIndex()].getResponse());
+							clients[k].setResp(_servers[i].getResponse());
+
+							request.clear();
+							clients[k].clearRequest();
+
+
 						}
 					}
 				}

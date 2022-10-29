@@ -251,13 +251,15 @@ int Server::set_Response(std::string path)
 	std::string response;
 
 	std::string content_type = path.substr(path.find(".") + 1);
+	std::cout << path << "<< ...path to file" << std::endl;
 	uint32_t len = _content.length();
+	std::cout << "LENGTH " << len << std::endl;
 	std::stringstream ss;
 	ss << len;
 	std::string content_len = ss.str();
 	response = "HTTP/1.1 200 OK\nDate: Thu. 20 May 2004 21:12:58 GMT\nConnection: close\nServer: Apache/1.3.27\nContent-Type: "
 		+ content_type + "\nContent-Length: " + content_len + "\n\r\n";
-	response.append(getF_Content());
+	response.append(getContent());
 	this->_response = response;
 	return (SUCCESS);
 }
