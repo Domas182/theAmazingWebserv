@@ -130,6 +130,7 @@ class Server
 		int							setImg_Content();
 		int							set_Response(std::string path);
 		int							setResponse();
+		//TODO:yo gys whats this ?! :DD
 		int							setImg_Response();
 		int							setFavi_Content();
 		int							setFavi_Response();

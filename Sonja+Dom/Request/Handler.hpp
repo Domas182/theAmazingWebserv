@@ -30,9 +30,10 @@ class Handler
 		std::string	_host;
 		int			_error_code; // 200 is default
 		std::unordered_map<std::string, std::string> _requestH;
+		std::vector<unsigned char> & _body;
 
 	public:
-		Handler(RequestParser RP);
+		Handler(RequestParser RP, Client & client);
 		~Handler();
 
 		void	start_handling(Server & server);

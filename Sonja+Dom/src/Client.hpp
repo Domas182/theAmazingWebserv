@@ -16,6 +16,7 @@
 #include <sys/wait.h>
 #include <vector>
 #include "../Colors.hpp"
+#include "../Request/RequestParser.hpp"
 
 // ************************************************************************** //
 //                               Client Class                                 //
@@ -57,6 +58,8 @@ class Client
 		size_t				getResponseSize();
 		std::string			getStatusCode();
 		std::vector<unsigned char> & getRequest();
+		std::vector<unsigned char> & getBody();
+
 
 		void		setFlagT();
 		void		setFlagF();
