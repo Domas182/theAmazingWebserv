@@ -55,6 +55,7 @@ void extractBody(std::vector<unsigned char>& request, int index, size_t contLen,
 	for (size_t i = 0; i < contLen; i++)
 	{
 		client.pushBody(request[index + i]);
+		//client.RP.pushBody()
 	}
 	if (client.getBodySize() == contLen)
 		client.setBFlagT();
@@ -150,19 +151,18 @@ void Operator::start_process()
 						{
 
 							getRequestReady(request, clients[k], _servers[clients[k].getIndex()].getNBytes());
-							clients[k].printRequest();
-							clients[k].printBody();
+							//would be cool, if requestready were to return the RP or again put RP in client, then we have it
+							// clients[k].printRequest();
+							// clients[k].printBody();
 							clients[k].setBFlagF();
 							clients[k].setFlagF();
-              //how to intehrate the RP??
 							RequestParser RP(clients[k].getRequest());
-							// clients[k].printBody();
+							//TODO:really not suer if we should instantiate it 2 times
 							int i = find_server(RP.getPort());
-							Handler H(RP);
-							// H.start_handling(_servers[clients[k].getIndex()]);
+							Handler H(RP, clients[k]);
 							H.start_handling(_servers[i]);
-							// clients[k].setResp(_servers[clients[k].getIndex()].getResponse());
 							clients[k].setResp(_servers[i].getResponse());
+							//TODO: if this is in the Handler, we can pack all the previous functions in the handler too :)
 
 							request.clear();
 							clients[k].clearRequest();

@@ -78,7 +78,10 @@ std::vector<unsigned char> & Client::getRequest()
 {
 	return (_request);
 }
-
+std::vector<unsigned char> & Client::getBody()
+{
+	return (_body);
+}
 
 void Client::setSentBytes(int bytes)
 {

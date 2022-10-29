@@ -1,7 +1,9 @@
 #include "Handler.hpp"
 #include "RequestParser.hpp"
+#include "../src/Client.hpp"
 
-Handler::Handler(RequestParser RP)
+
+Handler::Handler(RequestParser RP, Client & client): _body(client.getBody())
 {
 	this->_method = RP.getMethod();
 	this->_URI = RP.getURI();
@@ -12,7 +14,10 @@ Handler::Handler(RequestParser RP)
 	this->_query = "";
 	this->_port = "";
 	this->_error_code = 200;
+	// client.printBody();
+
 }
+//TODO:can we put start_handling in the constructor??
 
 Handler::~Handler()
 {}
