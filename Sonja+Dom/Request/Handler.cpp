@@ -14,7 +14,7 @@ Handler::Handler(RequestParser RP, Client & client): _body(client.getBody())
 	this->_query = "";
 	this->_port = "";
 	this->_error_code = 200;
-	// client.printBody();
+	client.printBody();
 
 }
 //TODO:can we put start_handling in the constructor??
@@ -28,15 +28,6 @@ void	Handler::handle_get(Server & server)
 	if (server.set_Content(this->_path))
 		throw std::invalid_argument("Error❗\nCould not open requested file");
 	server.set_Response(this->_path);
-	// if (server.setF_Content())
-	// 	throw std::invalid_argument("Error❗\nCould not open index file");
-	// if (server.setImg_Content())
-	// 	throw std::invalid_argument("Error❗\nCould not open image file");
-	// if (server.setFavi_Content())
-	// 	throw std::invalid_argument("Error❗\nCould not open image file");
-	// server.setResponse();
-	// server.setImg_Response();
-	// server.setFavi_Response();
 }
 
 void	Handler::start_handling(Server & server)
@@ -89,11 +80,11 @@ void	Handler::start_handling(Server & server)
 		}
 		if (this->_path[0] == '/')
 			this->_path = this->_path.substr(1);
-		std::cout << "HOST " << this->_host << std::endl;
-		std::cout << "QURY " << _query << std::endl;
-		std::cout << "PATH " << _path << std::endl;
-		std::cout << "PORT " << this->_port << std::endl;
-		std::cout << "URI " << this->_URI << std::endl;
+		// std::cout << "HOST " << this->_host << std::endl;
+		// std::cout << "QURY " << _query << std::endl;
+		// std::cout << "PATH " << _path << std::endl;
+		// std::cout << "PORT " << this->_port << std::endl;
+		// std::cout << "URI " << this->_URI << std::endl;
 	}
 	change_path(server);
 	if (this->_method == "GET")
@@ -102,9 +93,7 @@ void	Handler::start_handling(Server & server)
 
 void	Handler::change_path(Server & server)
 {
-	std::cout << "INDEX" << server.getIndex() << std::endl;
 	bool file_req = false;
-	std::cout << "PATH" << _path << std::endl;
 	_path = server.getRoot() + _path;
 	if (_URI.find(".") != STREND)
 	{
@@ -134,8 +123,6 @@ void	Handler::change_path(Server & server)
 					std::string tmp2 = _URI.substr(end + 2);
 					if (tmp == it->getProxy())
 						_path = server.getRoot() + it->getRoot() + tmp2 + it->getIndex();
-					// std::cout << "THIS:" << tmp << std::endl;
-					// std::cout << "THIS:" << tmp2 << std::endl;
 				}
 				_path = _path + server.getIndex();
 			}
@@ -152,52 +139,3 @@ void	Handler::change_path(Server & server)
 	}
 	std::cout << "{{{{{{{{{ " << _path << std::endl;
 }
-
-// void	Handler::change_path(Server & server)
-// {
-// 	size_t path_start = _URI.find('.');
-// 	std::string type = _URI.substr(path_start);
-// 	std::cout << "{{{{{{{{{ " << type << std::endl;
-
-
-
-
-
-	// _path = server.getRoot() + _path;
-	// if (server.getLocation().empty())
-	// {
-	// 	if (this->_URI == "/")
-	// 		_path = _path + server.getIndex();
-	// }
-	// else
-	// {
-	// 	std::string tmp;
-	// 	tmp = server.getRoot() + _path;
-	// 	std::cout << "****" << tmp << std::endl;
-	// 	for (std::vector<Location>::const_iterator it = server.getLocation().begin(); it != server.getLocation().end(); it++)
-	// 	{
-
-	// 		std::cout << "++++++" << it->getProxy() << std::endl;
-	// 		if (this->_URI == it->getProxy())
-	// 		{
-	// 			std::cout << "****" << this->_URI << std::endl;
-	// 			if (this->_URI == "/")
-	// 			{
-	// 				_path = _path + it->getIndex();
-	// 				break;
-	// 			}
-	// 			_path = server.getRoot() + it->getRoot() + it->getIndex();
-	// 			break;
-	// 		}
-	// 		if (it->getRoot() == it->getProxy())
-	// 			_path = it->getRoot() + _path;
-	// 		else
-	// 			tmp = server.getRoot() + it->getRoot() + it->getIndex();
-	// 		if (tmp.size() > _path.size())
-	// 			_path = tmp;
-	// 		std::cout << "------ " << _path << std::endl;
-	// 		break;
-	// 	}
-	// }
-	// std::cout << "{{{{{{{{{ " << _path << std::endl;
-// }
