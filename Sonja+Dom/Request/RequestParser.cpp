@@ -86,7 +86,10 @@ void		RequestParser::split_CRLF(std::vector<unsigned char> buffer)
 		CRLF.erase(0, pos + delimeter.length());
 	}
 	if (_CRLF_split.empty())
+	{
+		// std::cout << "*********** " << _CRLF_split.front() << std::endl;
 		throw std::runtime_error("Request syntax error");
+	}
 	//catch in the main
 	//general error catches on a higher level
 	//but do they need to be handled for the response?
@@ -183,7 +186,7 @@ void		RequestParser::parseRequestHeader()
 	//und sollte man deswegen beim : splitten?
 	for(; it != _CRLF_split.end(); it++)
 	{
-		std::cout << *it << std::endl;
+		// std::cout << *it << std::endl;
 		size_t pos = 0;
 		pos = it->find(delimeter);
 		if (pos != std::string::npos)

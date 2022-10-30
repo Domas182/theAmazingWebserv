@@ -137,7 +137,6 @@ void Operator::start_process()
 					int k;
 					k = lookClient(poFD.getPfd()[i].fd, clients);
 					request = _servers[clients[k].getIndex()].sockRecv(i, poFD);
-					// 	NOW THERES STUFF IN THE BUFFER TAHT HOLDS THE REQUEST
 					if (request.size() <= 0)
 					{
 						std::vector<Client>::iterator it(clients.begin());
@@ -147,27 +146,19 @@ void Operator::start_process()
 					}
 					else
 					{
-						if (clients[k].getFlag() == false && clients[k].getBFlag() == false)
+						getRequestReady(request, clients[k], _servers[clients[k].getIndex()].getNBytes());
+						if (clients[k].getFlag() == true)
 						{
-
-							getRequestReady(request, clients[k], _servers[clients[k].getIndex()].getNBytes());
-							//would be cool, if requestready were to return the RP or again put RP in client, then we have it
-							// clients[k].printRequest();
-							// clients[k].printBody();
-							clients[k].setBFlagF();
-							clients[k].setFlagF();
 							RequestParser RP(clients[k].getRequest());
-							//TODO:really not suer if we should instantiate it 2 times
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
 							H.start_handling(_servers[i]);
 							clients[k].setResp(_servers[i].getResponse());
 							//TODO: if this is in the Handler, we can pack all the previous functions in the handler too :)
-
+							clients[k].setBFlagF();
+							clients[k].setFlagF();
 							request.clear();
 							clients[k].clearRequest();
-
-
 						}
 					}
 				}
@@ -181,13 +172,8 @@ void Operator::start_process()
 					{
 						if (clients[k].getResponseSize() >= 0)
 						{
-							//new
-							
-
 							_servers[clients[k].getIndex()].sockSend(poFD.getPfd()[i].fd, clients[k]);
-							//std::cout << clients[k].getResponseSize() << std::endl;
 							clients[k].clearResponse();
-
 						}
 					}
 				}
