@@ -1,6 +1,6 @@
+
+
 #include "Handler.hpp"
-#include "RequestParser.hpp"
-#include "../src/Client.hpp"
 
 
 Handler::Handler(RequestParser RP, Client & client): _body(client.getBody())
@@ -27,9 +27,23 @@ void	Handler::handle_get(Server & server)
 {
 	if (server.set_Content(this->_path))
 		throw std::invalid_argument("Error❗\nCould not open requested file");
-	server.set_Response(this->_path);
+		//TODO:404
+	this->_RSP.createResponse(200);
+	// server.set_Response(this->_path);
+	//warum machen wir erst Server und dann Cleint extra?
+	// clients set response als string konstruiert aus server-set-response
 }
+void	Handler::handle_methods(Server & server)
+{
+	if (this->_method == "GET")
+		handle_get(server);
+	// else if (this->_method == "POST")
+	// 	handle_post(server);
+	// else if (this->_method == "DELETE")
+	// 	handle_delete(server);
+	
 
+}
 void	Handler::start_handling(Server & server)
 {
 	std::unordered_map<std::string, std::string>::const_iterator got = _requestH.find("Host");
@@ -87,8 +101,7 @@ void	Handler::start_handling(Server & server)
 		// std::cout << "URI " << this->_URI << std::endl;
 	}
 	change_path(server);
-	if (this->_method == "GET")
-		handle_get(server);
+	handle_methods(server);
 }
 
 void	Handler::change_path(Server & server)

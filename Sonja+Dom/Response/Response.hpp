@@ -24,7 +24,8 @@ class Response
 
 	public:
 
-		Response(int code);
+		Response();
+
 		~Response();
 
 		std::string const & getVersion() const;
@@ -33,6 +34,7 @@ class Response
 		std::unordered_map<std::string, std::string> const & getResponseH() const;
 		std::string const & getPayload() const;
 
+		void				createResponse(int code);
 		void				setVersion(std::string const & version);
 		void				setCodePhrase(int code);
 		void				setResponseH();

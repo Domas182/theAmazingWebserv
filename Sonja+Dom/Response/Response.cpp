@@ -3,8 +3,9 @@
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
+Response::Response(){}
 
-Response::Response(int code)
+void Response::createResponse (int code)
 {
 	createCodePhraseMap();
 	setVersion("HTTP/1.1");

@@ -4,7 +4,7 @@
 #include "Client.hpp"
 #include "stdlib.h"
 #include "../Request/RequestParser.hpp"
-#include "../Request/Handler.hpp"
+#include "../Handler/Handler.hpp"
 #include "../Response/Response.hpp"
 
 
@@ -43,8 +43,9 @@ size_t	findBodyLength(Client& client)
 		std::unordered_map<std::string, std::string>::const_iterator ITE = RP.getRequestH().find("Transfer-Encoding");
 		if (ITE != endit)
 		{
-			return (-1);
-			//macro like transfer encoding for that
+			client.setCFlagT();
+			// retmakurn (-1);
+		// if (RP.getRequestH().find("Transfer-Encoding")->second == "chunked")
 		}
 	}
 	return (0);
@@ -61,6 +62,8 @@ void extractBody(std::vector<unsigned char>& request, int index, size_t contLen,
 		client.setBFlagT();
 }
 
+// void extractChunkedBody()
+
 int getRequestReady(std::vector<unsigned char>& request, Client& client, size_t bytes)
 {
 		size_t i = 0;
@@ -76,8 +79,11 @@ int getRequestReady(std::vector<unsigned char>& request, Client& client, size_t 
 				}	
 				client.setFlagT();
 				size_t content = findBodyLength(client);
-				// if (content == -1)//macro for tansfer encoding!
-				// 	extractChunkedBody()
+				if (client.getCFlag() == true)
+				{
+					std::cout << PINK << "CHUNKED!!!" << RESET << std::endl;
+					// extractChunkedBody()
+				}
 				if (content > 0)
 					extractBody(request, i, content, client);
 				break;
@@ -86,7 +92,6 @@ int getRequestReady(std::vector<unsigned char>& request, Client& client, size_t 
 		}
 		return (i);
 }
-
 
 int	Operator::find_server(uint32_t port)
 {

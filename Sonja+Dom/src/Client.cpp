@@ -8,6 +8,7 @@ Client::Client(int index, int socket) : _socket(socket), _sIndex(index)
 	_statCode = '0';
 	_requestFlag = false;
 	_bodyFlag = false;
+	// _chunkFlag = false;
 	_tmpCnt = 0;
 }
 
@@ -32,6 +33,12 @@ bool Client::getBFlag()
 {
 	return(_bodyFlag);
 }
+
+bool Client::getCFlag()
+{
+	return(_chunkFlag);
+}
+
 void Client::setFlagT()
 {
 	_requestFlag = true;
@@ -51,6 +58,16 @@ void Client::setBFlagT()
 {
 	_bodyFlag = true;
 }
+void Client::setCFlagF()
+{
+	_chunkFlag = false;
+}
+
+void Client::setCFlagT()
+{
+	_chunkFlag = true;
+}
+
 
 int Client::getCnt()
 {
