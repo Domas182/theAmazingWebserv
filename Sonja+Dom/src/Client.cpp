@@ -8,7 +8,7 @@ Client::Client(int index, int socket) : _socket(socket), _sIndex(index)
 	_statCode = '0';
 	_requestFlag = false;
 	_bodyFlag = false;
-	// _chunkFlag = false;
+	_chunkFlag = false;
 	_tmpCnt = 0;
 }
 

@@ -157,9 +157,8 @@ void Operator::start_process()
 							RequestParser RP(clients[k].getRequest());
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
-							H.start_handling(_servers[i]);
-							clients[k].setResp(_servers[i].getResponse());
-							//TODO: if this is in the Handler, we can pack all the previous functions in the handler too :)
+							H.start_handling(_servers[i], clients[k]);
+							// clients[k].setResp(_servers[i].getResponse());
 							clients[k].setBFlagF();
 							clients[k].setFlagF();
 							request.clear();

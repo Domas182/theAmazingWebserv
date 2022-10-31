@@ -46,6 +46,7 @@ class Client
 		Client(int index, int socket);
 		~Client();
 
+		RequestParser 		RP;
 		void bytesEsize();
 		void clearResponse();
 

@@ -41,12 +41,12 @@ class Handler
 		Handler(RequestParser RP, Client & client);
 		~Handler();
 
-		void	start_handling(Server & server);
+		void	start_handling(Server & server, Client & client);
 		void	change_path(Server & server);
-		void	handle_get(Server & server);
+		void	handle_get(Server & server, Client & client);
 		// void	handle_post(Server & server);
 		// void	handle_delete(Server & server);
-		void	handle_methods(Server & server);
+		void	handle_methods(Server & server, Client & client);
 };
 
 #endif /* HANDLER_HPP */
