@@ -7,8 +7,12 @@
 #include <algorithm>
 #include <unordered_map>
 
-#include "RequestParser.hpp"
 #include "../src/Server.hpp"
+#include "../Response/Response.hpp"
+#include "../Request/RequestParser.hpp"
+#include "../src/Client.hpp"
+
+
 
 #define SUCCESS 0
 #define FAILURE 1
@@ -31,14 +35,18 @@ class Handler
 		int			_error_code; // 200 is default
 		std::unordered_map<std::string, std::string> _requestH;
 		std::vector<unsigned char> & _body;
+		Response  _RSP;
 
 	public:
 		Handler(RequestParser RP, Client & client);
 		~Handler();
 
-		void	start_handling(Server & server);
+		void	start_handling(Server & server, Client & client);
 		void	change_path(Server & server);
-		void	handle_get(Server & server);
+		void	handle_get(Server & server, Client & client);
+		// void	handle_post(Server & server);
+		// void	handle_delete(Server & server);
+		void	handle_methods(Server & server, Client & client);
 };
 
 #endif /* HANDLER_HPP */

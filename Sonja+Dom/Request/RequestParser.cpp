@@ -6,6 +6,8 @@
 ** ------------------------------- CONSTRUCTOR --------------------------------
 */
 
+RequestParser::RequestParser(){}
+
 RequestParser::RequestParser(std::vector<unsigned char>& request)
 {
 	split_CRLF(request);

@@ -119,7 +119,6 @@ class Server
 		int							setMethods(std::string methods);
 		int							setLimitBody(std::string limit);
 		int							set_Content(std::string path);
-		int							set_Response(std::string path);
 		int							setCgi(std::string cgi);
 };
 

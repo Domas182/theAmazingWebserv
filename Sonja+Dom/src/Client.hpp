@@ -33,6 +33,7 @@ class Client
 		int							_totalSentBytes;
 		bool						_requestFlag;
 		bool						_bodyFlag;
+		bool						_chunkFlag;
 		int							_tmpCnt;
 		std::string					_response;
 		int							_bytesToSend;
@@ -45,6 +46,7 @@ class Client
 		Client(int index, int socket);
 		~Client();
 
+		RequestParser 		RP;
 		void bytesEsize();
 		void clearResponse();
 
@@ -52,6 +54,7 @@ class Client
 		int					getIndex();
 		bool				getFlag();
 		bool				getBFlag();
+		bool				getCFlag();
 		size_t				getBodySize();
 		int					getCnt();
 		std::string			getResponse();
@@ -65,6 +68,8 @@ class Client
 		void		setFlagF();
 		void		setBFlagT();
 		void		setBFlagF();
+		void		setCFlagT();
+		void		setCFlagF();
 		void		setCnt(int i);
 		void		setResp(std::string resp);
 		void		setSentBytes(int bytes);

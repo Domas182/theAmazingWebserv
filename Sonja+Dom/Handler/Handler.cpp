@@ -1,7 +1,9 @@
-#include "Handler.hpp"
-#include "RequestParser.hpp"
-#include "../src/Client.hpp"
 
+
+#include "Handler.hpp"
+#include <iostream>
+#include <chrono>
+#include <ctime> 
 
 Handler::Handler(RequestParser RP, Client & client): _body(client.getBody())
 {
@@ -21,16 +23,36 @@ Handler::Handler(RequestParser RP, Client & client): _body(client.getBody())
 
 Handler::~Handler()
 {}
+   
 
-
-void	Handler::handle_get(Server & server)
+void time_function()
 {
-	if (server.set_Content(this->_path))
-		throw std::invalid_argument("Error❗\nCould not open requested file");
-	server.set_Response(this->_path);
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+    std::cout << "finished computation at " << std::ctime(&end_time);
 }
 
-void	Handler::start_handling(Server & server)
+void	Handler::handle_get(Server & server, Client & client)
+{
+
+	if (server.set_Content(this->_path))
+		throw std::invalid_argument("Error❗\nCould not open requested file");
+		//TODO:404
+	// this->_RSP.createResponse(200, server, this->_path, this->_version);
+	client.setResp(this->_RSP.createResponse(200, server, this->_path, this->_version));
+}
+void	Handler::handle_methods(Server & server, Client & client)
+{
+	if (this->_method == "GET")
+		handle_get(server, client);
+	// else if (this->_method == "POST")
+	// 	handle_post(server);
+	// else if (this->_method == "DELETE")
+	// 	handle_delete(server);
+	
+
+}
+void	Handler::start_handling(Server & server, Client & client)
 {
 	std::unordered_map<std::string, std::string>::const_iterator got = _requestH.find("Host");
 	if (got == _requestH.end())
@@ -87,8 +109,7 @@ void	Handler::start_handling(Server & server)
 		// std::cout << "URI " << this->_URI << std::endl;
 	}
 	change_path(server);
-	if (this->_method == "GET")
-		handle_get(server);
+	handle_methods(server, client);
 }
 
 void	Handler::change_path(Server & server)
