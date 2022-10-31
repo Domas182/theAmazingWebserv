@@ -6,13 +6,13 @@ Server::Server()
 	_limit_body = 10000000;
 	_port = 0;
 	sn = false;
-	ip = false;
 	p = false;
 	r = false;
 	i = false;
 	am = false;
 	lb = false;
 	l = false;
+	c = false;
 	open_bracket = true;
 	_allowed_methods.push_back("GET");
 	_allowed_methods.push_back("POST");
@@ -87,30 +87,6 @@ void Server::setServerName(std::string server_name)
 {
 	server_name.erase(remove(server_name.begin(), server_name.end(), ';'));
 	this->_server_name = server_name;
-}
-
-int Server::setIpAddress(std::string ip_address)
-{
-	int a = 999,b = 999,c = 999, d = 999;
-	char ch;
-
-	ip_address.erase(remove(ip_address.begin(), ip_address.end(), ';'));
-	if (count(ip_address.begin(), ip_address.end(), '.') != 3)
-		return (FAILURE);
-	std::string tmp = ip_address;
-	char *token = strtok(const_cast<char*>(tmp.c_str()), ".");
-	while (token != NULL)
-	{
-		if (check_uint32(token))
-			return (FAILURE);
-		token = strtok(NULL, ".");
-	}
-	std::stringstream s(tmp);
-	s >> a >> ch >> b >> ch >> c >> ch >> d;
-	if (a > 255 || a < 0 || b > 255 || b < 0 || c > 255 || c < 0 || d > 255 || d < 0)
-		return (FAILURE);
-	this->_ip_address = ip_address;
-	return (SUCCESS);
 }
 
 int Server::setPort(std::string port)
@@ -189,6 +165,15 @@ int Server::setLimitBody(std::string limit)
 	return (SUCCESS);
 }
 
+int Server::setCgi(std::string cgi)
+{
+	cgi.erase(remove(cgi.begin(), cgi.end(), ';'));
+	if (count(cgi.begin(), cgi.end(), '/') < 1)
+		return (FAILURE);
+	this->_cgi = cgi;
+	return (SUCCESS);
+}
+
 int Server::set_Content(std::string path)
 {
 	std::ostringstream ss;
@@ -201,15 +186,9 @@ int Server::set_Content(std::string path)
 	return (SUCCESS);
 }
 
-
 const std::string &Server::getServerName() const
 {
 	return (this->_server_name);
-}
-
-const std::string &Server::getIpAddress() const
-{
-	return (this->_ip_address);
 }
 
 uint32_t Server::getPort() const
@@ -235,6 +214,11 @@ const std::vector<std::string> &Server::getMethods() const
 uint32_t Server::getLimitBody() const
 {
 	return (this->_limit_body);
+}
+
+const std::string &Server::getCgi() const
+{
+	return (this->_cgi);
 }
 
 const std::string &Server::getContent() const
