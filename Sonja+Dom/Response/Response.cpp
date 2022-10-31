@@ -51,7 +51,6 @@ std::string Response::constructResponse() const
 	std::string response = getVersion() + " " + getCode() + " " + getPhrase() + "\n";
 	for (std::unordered_map<std::string, std::string>::const_iterator cit = getResponseH().begin() ; cit != getResponseH().end(); ++cit)
 		response += cit->first + "\t" + cit->second + "\n";
-	response += "\r\n";
 	response += getPayload();
 	return (response);
 }
