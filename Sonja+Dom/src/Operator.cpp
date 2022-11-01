@@ -4,7 +4,7 @@
 #include "Client.hpp"
 #include "stdlib.h"
 #include "../Request/RequestParser.hpp"
-#include "../Request/Handler.hpp"
+#include "../Handler/Handler.hpp"
 #include "../Response/Response.hpp"
 #include <fstream>
 #include <iostream>
@@ -85,34 +85,6 @@ void extractBody(std::vector<unsigned char>& request, int index, size_t contLen,
 	if (client.getBodySize() == contLen)
 		client.setBFlagT();
 }
-
-// int getRequestReady(std::vector<unsigned char>& request, Client& client, size_t bytes)
-// {
-// 		size_t i = 0;
-// 		for (; i < bytes; i++)
-// 		{
-// 			if (request[i] == '\r' && request[i+1] == '\n' && request[i+2] == '\r' && request[i+3] == '\n')
-// 			{
-// 				i += 4;
-// 				for (int k = 0; k < 2; k++)
-// 				{
-// 					client.pushRequest('\r');
-// 					client.pushRequest('\n');
-// 				}	
-// 				client.setFlagT();
-// 				client.printRequest();
-// 				size_t content = findBodyLength(client);
-// 				// if (content == -1)//macro for tansfer encoding!
-// 				// 	extractChunkedBody()
-// 				std::cout << "DO YOU GET HERE?" << std::endl;
-// 				if (content > 0)
-// 					extractBody(request, i, content, client);
-// 				break;
-// 			}
-// 			client.pushRequest(request[i]);
-// 		}
-// 		return (i);
-// }
 
 //new attempt
 void	RequestChecker(std::vector<unsigned char> request, Client& client, Server& server, size_t& bytes)
@@ -200,7 +172,6 @@ void bodyExtractor(Client& client)
 	}
 }
 
-
 int	Operator::find_server(uint32_t port)
 {
 	int i = 0;
@@ -283,15 +254,13 @@ void Operator::start_process()
 							RequestParser RP(clients[k].tmpReq);
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
-							H.start_handling(_servers[i]);
+              H.start_handling(_servers[i], clients[k]);
 							clients[k].setResp(_servers[i].getResponse());
-							
 							if (clients[k].getHBFlag())
 							{
 								//bodyExtractor(clients[k]);
 								write2file(clients[k].tmpBody, "test.png");
 							}
-
 							//TODO: if this is in the Handler, we can pack all the previous functions in the handler too :)
 							clients[k].setBFlagF();
 							clients[k].setFlagF();

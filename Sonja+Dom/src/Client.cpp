@@ -70,6 +70,16 @@ void Client::setBFlagT()
 {
 	_bodyFlag = true;
 }
+void Client::setCFlagF()
+{
+	_chunkFlag = false;
+}
+
+void Client::setCFlagT()
+{
+	_chunkFlag = true;
+}
+
 
 void Client::setRFlagF()
 {
@@ -189,6 +199,11 @@ void    Client::printRequest()
 size_t Client::getBodySize()
 {
 	return(_body.size());
+}
+
+RequestParser & Client::getRP()
+{
+	return (_RP);
 }
 
 void    Client::printBody()

@@ -37,12 +37,12 @@ class Client
 		bool						_readyFlag;
 		bool						_hasBody;
 		bool						_isChunked;
-
 		int							_tmpCnt;
 		std::string					_response;
 		int							_bytesToSend;
 		std::vector<unsigned char> 	_request;
 		std::vector<unsigned char>	_body;
+		RequestParser				_RP;
 		
 
 	public:
@@ -50,6 +50,7 @@ class Client
 		Client(int index, int socket);
 		~Client();
 
+		RequestParser 		RP;
 		void bytesEsize();
 		void clearResponse();
 
@@ -61,7 +62,6 @@ class Client
 		bool				getRFlag();
 		bool				getHBFlag();
 		bool				getCFlag();
-
 		size_t				getBodySize();
 		int					getCnt();
 		std::string			getResponse();
@@ -69,19 +69,24 @@ class Client
 		std::string			getStatusCode();
 		std::vector<unsigned char> & getRequest();
 		std::vector<unsigned char> & getBody();
+		RequestParser &		getRP();
 
 
 		void		setFlagT();
 		void		setFlagF();
+    
 		void		setBFlagT();
 		void		setBFlagF();
+    
 		void		setRFlagT();
 		void		setRFlagF();
+    
 		void		setHBFlagT();
 		void		setHBFlagF();
+    
 		void		setCFlagT();
 		void		setCFlagF();
-		
+    
 		void		setCnt(int i);
 		void		setResp(std::string resp);
 		void		setSentBytes(int bytes);

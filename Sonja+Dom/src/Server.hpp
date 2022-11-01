@@ -61,13 +61,13 @@ class Server
 		std::string					_content;
 		std::string					_f_content;
 		std::string					_img_content;
-		std::string					_ip_address;
 		std::string					_favi_content;
 		uint32_t					_port;
 		std::string					_root;
 		std::string					_index;
 		std::vector<std::string>	_allowed_methods;
 		uint32_t					_limit_body;
+		std::string					_cgi;
 		std::vector<Location>		_locations;
 
 		std::string					_response;
@@ -78,17 +78,16 @@ class Server
 
 	public:
 		Server();
-		// Server(int port); // muss ich irgendwo anders machen
 		~Server();
 
 		bool		sn;
-		bool		ip;
 		bool		p;
 		bool		r;
 		bool		i;
 		bool		am;
 		bool		lb;
 		bool		l;
+		bool		c;
 		
 		bool		open_bracket;
 
@@ -103,7 +102,6 @@ class Server
 
 		const std::vector<Location>		&getLocation() const;
 		const std::string				&getServerName() const;
-		const std::string				&getIpAddress() const;
 		uint32_t						getPort() const;
 		const std::string				&getRoot() const;
 		const std::string				&getIndex() const;
@@ -111,19 +109,19 @@ class Server
 		uint32_t						getLimitBody() const;
 		const std::string				&getContent() const;
 		const std::string				&getResponse() const;
+		const std::string				&getCgi() const;
 		
 		int const						&getSockFd() const;
 
 		void						setLocation(std::vector<Location> location);
 		void						setServerName(std::string server_name);
-		int							setIpAddress(std::string ip_address);
 		int							setPort(std::string port);
 		int							setRoot(std::string root);
 		int							setIndex(std::string idnex);
 		int							setMethods(std::string methods);
 		int							setLimitBody(std::string limit);
 		int							set_Content(std::string path);
-		int							set_Response(std::string path);
+		int							setCgi(std::string cgi);
 };
 
 #endif /* SERVER_HPP */
