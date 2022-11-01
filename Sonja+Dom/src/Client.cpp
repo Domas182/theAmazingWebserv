@@ -70,16 +70,6 @@ void Client::setBFlagT()
 {
 	_bodyFlag = true;
 }
-void Client::setCFlagF()
-{
-	_chunkFlag = false;
-}
-
-void Client::setCFlagT()
-{
-	_chunkFlag = true;
-}
-
 
 void Client::setRFlagF()
 {
