@@ -254,8 +254,8 @@ void Operator::start_process()
 							RequestParser RP(clients[k].tmpReq);
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
-              H.start_handling(_servers[i], clients[k]);
-							clients[k].setResp(_servers[i].getResponse());
+              				H.start_handling(_servers[i], clients[k]);
+							// clients[k].setResp(_servers[i].getResponse());
 							if (clients[k].getHBFlag())
 							{
 								//bodyExtractor(clients[k]);
