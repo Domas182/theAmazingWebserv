@@ -1,6 +1,6 @@
 CC = c++
-FLAGS = -std=c++98 -g -Wall -Wextra
-# FLAGS = -g -std=c++98
+# FLAGS = -std=c++98 -Werror -Wall -Wextra
+FLAGS = -g -std=c++98
 NAME = webserv
 
 SRC = src/main.cpp src/Config.cpp src/Operator.cpp src/Server.cpp src/Poller.cpp \

@@ -3,7 +3,7 @@
 Server::Server()
 {
 	_index = "index.html";
-	_limit_body = 10000000;
+	_limit_body = MAX_BODY;
 	_cgi = "no";
 	_port = 0;
 	sn = false;
@@ -50,7 +50,12 @@ std::vector<unsigned char> Server::sockRecv(int i, PollFd &oPoll)
 	return(_sock.socketRecv(i, oPoll));
 }
 
-size_t Server::getNBytes()
+std::vector<unsigned char> Server::testRecv(int i, PollFd &oPoll)
+{
+	return(_sock.testRecv(i, oPoll));
+}
+
+size_t &Server::getNBytes()
 {
 	return(_sock.nbytes);
 }
@@ -94,6 +99,7 @@ int Server::setPort(std::string port)
 {
 	uint32_t tmp;
 	port.erase(remove(port.begin(), port.end(), ';'));
+	this->_port_str = port;
 	std::stringstream s(port);
 	s >> tmp;
 	if (tmp > 65536 || tmp < 0 || check_uint32(port))
@@ -195,6 +201,11 @@ const std::string &Server::getServerName() const
 uint32_t Server::getPort() const
 {
 	return (this->_port);
+}
+
+const std::string &Server::getPortStr() const
+{
+	return (this->_port_str);
 }
 
 const std::string &Server::getRoot() const

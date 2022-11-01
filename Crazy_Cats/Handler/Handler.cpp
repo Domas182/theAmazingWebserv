@@ -26,9 +26,9 @@ Handler::~Handler()
 
 void time_function()
 {
-    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-    std::cout << "finished computation at " << std::ctime(&end_time);
+	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+	std::cout << "finished computation at " << std::ctime(&end_time);
 }
 
 void	Handler::handle_get(Server & server, Client & client)
@@ -70,10 +70,7 @@ void	Handler::start_handling(Server & server, Client & client)
 			this->_port = 80;
 		else
 		{
-			std::stringstream ss;
-			ss << server.getPort();
-			std::string port_str = ss.str();
-			// if (port_str != this->_port)
+			// if (server.getPortStr() != this->_port)
 			// 	throw std::runtime_error("Expected port does not match requested port"); //this is only temporary -> set error page instead
 		}
 		if (!this->_URI.find("http://"))
@@ -111,7 +108,7 @@ void	Handler::start_handling(Server & server, Client & client)
 	// if (server.getCgi() == "no")
 		handle_methods(server, client);
 	// else
-	// 	Cgi CGI(server, client, _path, _query, _method, _type);
+	// 	Cgi CGI(server, client, _path, _query, _type, _RP);
 }
 
 void	Handler::change_path(Server & server)
