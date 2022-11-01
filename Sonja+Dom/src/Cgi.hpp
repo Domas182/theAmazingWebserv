@@ -24,7 +24,7 @@
 class Cgi
 {
 	private:
-		std::map<std::string, std::string>	_env;
+		std::unordered_map<std::string, std::string>	_env;
 		std::string							_path_translated;
 		std::string							_path;
 		std::string							_query;
@@ -37,7 +37,7 @@ class Cgi
 		// FILE*								_infile; 
 
 	public:
-		Cgi(Server server, Client & client, std::string path, std::string query, std::string method, std::string type);
+		Cgi(Server server, Client & client, std::string path, std::string query, std::string type, RequestParser RP);
 		~Cgi();
 
 		void	set_Env(Server server);

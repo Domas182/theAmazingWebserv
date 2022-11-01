@@ -63,6 +63,7 @@ class Server
 		std::string					_img_content;
 		std::string					_favi_content;
 		uint32_t					_port;
+		std::string					_port_str;
 		std::string					_root;
 		std::string					_index;
 		std::vector<std::string>	_allowed_methods;
@@ -103,6 +104,7 @@ class Server
 		const std::vector<Location>		&getLocation() const;
 		const std::string				&getServerName() const;
 		uint32_t						getPort() const;
+		const std::string				&getPortStr() const;
 		const std::string				&getRoot() const;
 		const std::string				&getIndex() const;
 		const std::vector<std::string>	&getMethods() const;
