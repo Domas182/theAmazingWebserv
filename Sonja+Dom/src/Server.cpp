@@ -3,7 +3,7 @@
 Server::Server()
 {
 	_index = "index.html";
-	_limit_body = 10000000;
+	_limit_body = MAX_BODY;
 	_cgi = "no";
 	_port = 0;
 	sn = false;
@@ -50,7 +50,12 @@ std::vector<unsigned char> Server::sockRecv(int i, PollFd &oPoll)
 	return(_sock.socketRecv(i, oPoll));
 }
 
-size_t Server::getNBytes()
+std::vector<unsigned char> Server::testRecv(int i, PollFd &oPoll)
+{
+	return(_sock.testRecv(i, oPoll));
+}
+
+size_t &Server::getNBytes()
 {
 	return(_sock.nbytes);
 }
