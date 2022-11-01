@@ -31,8 +31,13 @@ class Client
 		std::string					_statCode;
 		int							_sentBytes;
 		int							_totalSentBytes;
+
 		bool						_requestFlag;
 		bool						_bodyFlag;
+		bool						_readyFlag;
+		bool						_hasBody;
+		bool						_isChunked;
+
 		int							_tmpCnt;
 		std::string					_response;
 		int							_bytesToSend;
@@ -50,8 +55,13 @@ class Client
 
 		int					getSock();
 		int					getIndex();
+
 		bool				getFlag();
 		bool				getBFlag();
+		bool				getRFlag();
+		bool				getHBFlag();
+		bool				getCFlag();
+
 		size_t				getBodySize();
 		int					getCnt();
 		std::string			getResponse();
@@ -65,6 +75,13 @@ class Client
 		void		setFlagF();
 		void		setBFlagT();
 		void		setBFlagF();
+		void		setRFlagT();
+		void		setRFlagF();
+		void		setHBFlagT();
+		void		setHBFlagF();
+		void		setCFlagT();
+		void		setCFlagF();
+		
 		void		setCnt(int i);
 		void		setResp(std::string resp);
 		void		setSentBytes(int bytes);
@@ -75,6 +92,11 @@ class Client
         void 		printRequest();
         void 		printBody();
 		void		clearRequest();
+
+		//temp request holder
+		std::vector<unsigned char> tmpReq;
+		std::vector<unsigned char> tmpBody;
+		std::vector<unsigned char> tmpExtract;
 };
 
 
