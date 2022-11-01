@@ -158,7 +158,6 @@ void Operator::start_process()
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
 							H.start_handling(_servers[i], clients[k]);
-							// clients[k].setResp(_servers[i].getResponse());
 							clients[k].setBFlagF();
 							clients[k].setFlagF();
 							request.clear();

@@ -1,3 +1,6 @@
+<?php
+phpinfo();
+?>
 <html>
  <head>
   <title>PHP Test</title>

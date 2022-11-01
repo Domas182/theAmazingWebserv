@@ -39,6 +39,7 @@ class Client
 		int							_bytesToSend;
 		std::vector<unsigned char> 	_request;
 		std::vector<unsigned char>	_body;
+		RequestParser				_RP;
 		
 
 	public:
@@ -62,6 +63,7 @@ class Client
 		std::string			getStatusCode();
 		std::vector<unsigned char> & getRequest();
 		std::vector<unsigned char> & getBody();
+		RequestParser &		getRP();
 
 
 		void		setFlagT();

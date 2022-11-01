@@ -11,6 +11,7 @@
 #include "../Response/Response.hpp"
 #include "../Request/RequestParser.hpp"
 #include "../src/Client.hpp"
+#include "../src/Cgi.hpp"
 
 
 
@@ -32,10 +33,12 @@ class Handler
 		std::string	_query;
 		std::string	_port;
 		std::string	_host;
+		std::string	_type;
 		int			_error_code; // 200 is default
 		std::unordered_map<std::string, std::string> _requestH;
 		std::vector<unsigned char> & _body;
 		Response  _RSP;
+		RequestParser	_RP;
 
 	public:
 		Handler(RequestParser RP, Client & client);

@@ -5,25 +5,24 @@
 #include <chrono>
 #include <ctime> 
 
-Handler::Handler(RequestParser RP, Client & client): _body(client.getBody())
+Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _RP(RP)
 {
-	this->_method = RP.getMethod();
-	this->_URI = RP.getURI();
+	this->_method = _RP.getMethod();
+	this->_URI = _RP.getURI();
 	// this->_URI = "http://www.w3.org/favicon.ico/?password=password";
-	this->_version = RP.getVersion();
-	this->_requestH = RP.getRequestH();
+	this->_version = _RP.getVersion();
+	this->_requestH = _RP.getRequestH();
 	this->_path = "";
 	this->_query = "";
 	this->_port = "";
 	this->_error_code = 200;
 	client.printBody();
-
 }
 //TODO:can we put start_handling in the constructor??
 
 Handler::~Handler()
 {}
-   
+
 
 void time_function()
 {
@@ -109,7 +108,10 @@ void	Handler::start_handling(Server & server, Client & client)
 		// std::cout << "URI " << this->_URI << std::endl;
 	}
 	change_path(server);
-	handle_methods(server, client);
+	// if (server.getCgi() == "no")
+		handle_methods(server, client);
+	// else
+	// 	Cgi CGI(server, client, _path, _query, _method, _type);
 }
 
 void	Handler::change_path(Server & server)
@@ -119,7 +121,7 @@ void	Handler::change_path(Server & server)
 	if (_URI.find(".") != STREND)
 	{
 		size_t path_start = _URI.find ('.');
-		std::string type = _URI.substr(path_start + 1);
+		_type = _URI.substr(path_start + 1);
 		file_req = true;
 	}
 	if (server.getLocation().empty() && file_req == false)
