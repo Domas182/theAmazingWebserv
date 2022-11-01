@@ -21,6 +21,7 @@
 #define FAILURE 1
 #define STREND std::string::npos
 
+
 // ************************************************************************** //
 //                               Location Struct                              //
 // ************************************************************************** //
@@ -62,6 +63,7 @@ class Server
 		std::string					_img_content;
 		std::string					_favi_content;
 		uint32_t					_port;
+		std::string					_port_str;
 		std::string					_root;
 		std::string					_index;
 		std::vector<std::string>	_allowed_methods;
@@ -94,13 +96,15 @@ class Server
 		bool						portAvailabe(std::vector<Server> servs, uint32_t port, int i);
 		int							sockAccept();
 		std::vector<unsigned char>	sockRecv(int i, PollFd &oPoll);
-		size_t						getNBytes();
+		std::vector<unsigned char>	testRecv(int i, PollFd &oPoll);
+		size_t						&getNBytes();
 		void						sockSend(int fd, Client& client);
 		void						bindPort();
 
 		const std::vector<Location>		&getLocation() const;
 		const std::string				&getServerName() const;
 		uint32_t						getPort() const;
+		const std::string				&getPortStr() const;
 		const std::string				&getRoot() const;
 		const std::string				&getIndex() const;
 		const std::vector<std::string>	&getMethods() const;
