@@ -94,6 +94,7 @@ int Server::setPort(std::string port)
 {
 	uint32_t tmp;
 	port.erase(remove(port.begin(), port.end(), ';'));
+	this->_port_str = port;
 	std::stringstream s(port);
 	s >> tmp;
 	if (tmp > 65536 || tmp < 0 || check_uint32(port))
@@ -195,6 +196,11 @@ const std::string &Server::getServerName() const
 uint32_t Server::getPort() const
 {
 	return (this->_port);
+}
+
+const std::string &Server::getPortStr() const
+{
+	return (this->_port_str);
 }
 
 const std::string &Server::getRoot() const
