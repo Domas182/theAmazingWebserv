@@ -159,6 +159,11 @@ size_t Client::getBodySize()
 	return(_body.size());
 }
 
+RequestParser & Client::getRP()
+{
+	return (_RP);
+}
+
 void    Client::printBody()
 {
     for (size_t i = 0; i < _body.size(); i++)

@@ -4,6 +4,7 @@ Server::Server()
 {
 	_index = "index.html";
 	_limit_body = 10000000;
+	_cgi = "no";
 	_port = 0;
 	sn = false;
 	p = false;
