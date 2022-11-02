@@ -11,7 +11,7 @@ RequestParser::RequestParser(){}
 RequestParser::RequestParser(std::vector<unsigned char>& request)
 {
 	split_CRLF(request);
-	std::cout << *this  << std::endl; 
+	// std::cout << *this  << std::endl; 
 }
 
 // RequestParser::RequestParser( const RequestParser & src )
@@ -181,7 +181,6 @@ void		RequestParser::parseRequestHeader()
 {
 
 	std::vector<std::string>::iterator it = _CRLF_split.begin();
-	std::cout << PINK << *it << RESET << std::endl;
 	it++;
 	std::string delimeter = ":";
 	//hier z.b. kann der User request ohne doppelpunkt eingeben?
@@ -209,7 +208,6 @@ void		RequestParser::parseRequestHeader()
 
 void RequestParser::setPort()
 {
-	// uint32_t p;
 	std::string tmp;
 	std::unordered_map<std::string, std::string>::iterator start = _requestH.find("Host");
 	if (start != _requestH.end())
@@ -218,10 +216,8 @@ void RequestParser::setPort()
 		size_t i = tmp.find(':');
 		tmp = tmp.substr(i + 1);
 	}
-	// std::stringstream s(tmp);
-	// s >> p;
 	this->_port = atol(tmp.c_str());
-	std::cout << PINK << this->_port << RESET << std::endl;
+	// std::cout << PINK << this->_port << RESET << std::endl;
 }
 
 

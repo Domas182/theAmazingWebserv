@@ -3,7 +3,16 @@
 #include "Handler.hpp"
 #include <iostream>
 #include <chrono>
-#include <ctime> 
+#include <ctime>
+
+
+
+void time_function()
+{
+	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+	std::cout << "finished computation at " << std::ctime(&end_time);
+}
 
 Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _RP(RP)
 {
@@ -23,14 +32,6 @@ Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _R
 Handler::~Handler()
 {}
 
-
-void time_function()
-{
-	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-	std::cout << "finished computation at " << std::ctime(&end_time);
-}
-
 void	Handler::handle_get(Server & server, Client & client)
 {
 
@@ -40,12 +41,109 @@ void	Handler::handle_get(Server & server, Client & client)
 	// this->_RSP.createResponse(200, server, this->_path, this->_version);
 	client.setResp(this->_RSP.createResponse(200, server, this->_path, this->_version));
 }
+
+
+void Handler::write_file(std::vector<unsigned char> & input, std::string filename)
+{
+	std::fstream file;
+	file.open(filename, std::ios_base::out);
+	//should we protect that?
+	for (size_t i = 0; i < input.size(); i++)
+		file << input[i];
+	file.close();
+}
+
+void Handler::pure_body(std::string & fileBody, Client& client)
+{
+	std::string rn = "\r\n\r\n";
+	size_t pos = 0;
+	if((pos = fileBody.find(rn)) != std::string::npos)
+	{
+		fileBody.erase(0, pos + rn.length());
+		std::string test;
+		rn = "\r\n";
+		if ((pos = fileBody.find(rn)) != std::string::npos)
+			test = fileBody.substr(0, pos);
+		std::copy(test.begin(), test.end(), std::back_inserter(client.tmpExtract));
+	}
+}
+void	Handler::get_file_info(std::string& fileBody)
+{
+	std::string rn = "\r\n";
+	size_t pos = 0;
+	size_t pos2 = 0;
+	while ((pos = fileBody.find(rn)) != std::string::npos)
+	{
+		std::string test = fileBody.substr(0, pos);
+		std::string delimeter = ":";
+		if ((pos2 = test.find(delimeter) != test.size()))
+		{
+			std::cout << LB<< ":::::::::::::::::" RESET << std::endl;
+			std::string key = test.substr(0, pos2);
+			if (key == "Content-Disposition:")
+			{
+
+				this->_bodyHeader.insert(std::pair<std::string, std::vector<std::string> >(key, std::vector<std::string>()));
+				//while loop der die ganzen atrtibute n die map parsed
+				test.erase(0, pos2 + delimeter.length());
+				delimeter = ";";
+				std::string value = "";
+				while((pos2 = test.find(delimeter)) != test.size())
+				{
+					std::string value = test.substr(0, pos2);
+					this->_bodyHeader[key].push_back(value);
+					test.erase(0, pos2 + delimeter.length());
+					std::cout << ORANGE << "keyvalues:" << value << RESET << std::endl;
+				}
+				delimeter = "=";
+				if ((pos2 = value.find(delimeter)) != value.size())
+				{
+					this->_filename = value.substr(pos2, value.size());
+				}
+			}
+			else if (key == "Content-Type:")
+			{
+					std::string value = test.substr(0, test.size());
+					this->_bodyHeader.insert(std::pair<std::string, std::vector<std::string> >(key, std::vector<std::string>()));
+					this->_bodyHeader[key].push_back(value);
+					std::cout << PINK << "keyvalues:" << value << RESET << std::endl;
+			}
+		}
+	}
+	// _bodyHeader["Content-Disposition:"]
+	//wie aknn cih das letzet element vom map vector accessen?
+}
+
+void Handler::body_extractor(Client& client)
+{
+	// for(size_t x = 0; x < client.tmpBody.size(); x++)
+	// {
+	// 	std::cout << PINK << client.tmpBody[x] << RESET;
+	// }
+	std::cout << std::endl;
+	std::string fileBody(client.tmpBody.begin(), client.tmpBody.end());
+	get_file_info(fileBody);
+	pure_body(fileBody, client);
+	for (size_t x = 0; x < client.tmpExtract.size(); x++)
+		std::cout << GREEN << client.tmpExtract[x] << RESET;
+
+}
+void	Handler::handle_post(Server & server, Client & client)
+{
+
+	if (client.getHBFlag())
+	{
+		body_extractor(client);
+		write_file(client.tmpExtract, this->_filename);
+	}
+}
+
 void	Handler::handle_methods(Server & server, Client & client)
 {
 	if (this->_method == "GET")
 		handle_get(server, client);
-	// else if (this->_method == "POST")
-	// 	handle_post(server);
+	else if (this->_method == "POST")
+		handle_post(server, client);
 	// else if (this->_method == "DELETE")
 	// 	handle_delete(server);
 	
