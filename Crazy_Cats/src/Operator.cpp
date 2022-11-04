@@ -81,7 +81,6 @@ void extractBody(std::vector<unsigned char>& request, int index, size_t contLen,
 		client.pushBody(request[index + i]);
 		//client.RP.pushBody()
 	}
-		std::cout << "DO YOU GETtyherere HERE?" << std::endl;
 	if (client.getBodySize() == contLen)
 		client.setBFlagT();
 }
@@ -120,7 +119,8 @@ void	RequestChecker(std::vector<unsigned char> request, Client& client, Server& 
 					client.setFlagT();
 					client.setRFlagT();
 				}
-			} else {
+			}
+			else {
 				client.tmpReq.push_back(request[i++]);
 			}
 		}
@@ -152,25 +152,39 @@ void	RequestChecker(std::vector<unsigned char> request, Client& client, Server& 
 			client.tmpBody.push_back(request[i]);
 			i++;
 		}
-		for (size_t x = 0; x < client.tmpBody.size(); x++)
-			std::cout << client.tmpBody[x];
+		// for (size_t x = 0; x < client.tmpBody.size(); x++)
+		// 	std::cout << client.tmpBody[x];
 	}
 }
 
-void bodyExtractor(Client& client)
-{
-	size_t i = 0;
-	while(client.tmpBody[i] != '\r' && client.tmpBody[i+1] != '\n' && client.tmpBody[i+2] != '\r' && client.tmpBody[i+3] != '\n')
-	{
-		i++;
-	}
-	i +=4;
-	while(client.tmpBody[i] != '\r' && client.tmpBody[i+1] != '\n')
-	{
-		client.tmpExtract.push_back(client.tmpBody[i]);
-		i++;
-	}
-}
+// void pureBody(std::string & fileBody, Client& client)
+// {
+// 	std::string rn = "\r\n\r\n";
+// 	size_t pos = 0;
+// 	if((pos = fileBody.find(rn)) != std::string::npos)
+// 	{
+// 		fileBody.erase(0, pos + rn.length());
+// 		std::string test;
+// 		rn = "\r\n";
+// 		if ((pos = fileBody.find(rn)) != std::string::npos)
+// 			test = fileBody.substr(0, pos);
+// 		std::copy(test.begin(), test.end(), std::back_inserter(client.tmpExtract));
+// 	}
+// }
+
+// void bodyExtractor(Client& client)
+// {
+// 	// for(size_t x = 0; x < client.tmpBody.size(); x++)
+// 	// {
+// 	// 	std::cout << PINK << client.tmpBody[x] << RESET;
+// 	// }
+// 	std::cout << std::endl;
+// 	std::string fileBody(client.tmpBody.begin(), client.tmpBody.end());
+// 	pureBody(fileBody, client);
+// 	for (size_t x = 0; x < client.tmpExtract.size(); x++)
+// 		std::cout << GREEN << client.tmpExtract[x] << RESET;
+
+// }
 
 int	Operator::find_server(uint32_t port)
 {
@@ -184,14 +198,15 @@ int	Operator::find_server(uint32_t port)
 	return (i);
 }
 
-void write2file(std::vector<unsigned char> input, std::string filename)
-{
-	std::fstream file;
-	file.open(filename, std::ios_base::out);
-	for (size_t i = 0; i < input.size(); i++)
-		file << input[i];
-	file.close();
-}
+// void write2file(std::vector<unsigned char> & input, std::string filename)
+// {
+// 	std::fstream file;
+// 	file.open(filename, std::ios_base::out);
+// 	//should we protect that?
+// 	for (size_t i = 0; i < input.size(); i++)
+// 		file << input[i];
+// 	file.close();
+// }
 
 void Operator::start_process()
 {
@@ -247,20 +262,11 @@ void Operator::start_process()
 						if (clients[k].getRFlag())
 						{
 							clients[k].printRequest();
-							for (size_t i = 0; i < clients[k].tmpBody.size(); i++)
-								std::cout << clients[k].tmpBody[i];
-							std::cout << "do you get here?\n";
-							//RequestParser RP(clients[k].getRequest());
 							RequestParser RP(clients[k].tmpReq);
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
               				H.start_handling(_servers[i], clients[k]);
 							// clients[k].setResp(_servers[i].getResponse());
-							if (clients[k].getHBFlag())
-							{
-								//bodyExtractor(clients[k]);
-								write2file(clients[k].tmpBody, "test.png");
-							}
 							//TODO: if this is in the Handler, we can pack all the previous functions in the handler too :)
 							clients[k].setBFlagF();
 							clients[k].setFlagF();
