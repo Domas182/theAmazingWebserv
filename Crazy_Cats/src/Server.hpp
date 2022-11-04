@@ -21,7 +21,6 @@
 #define FAILURE 1
 #define STREND std::string::npos
 
-
 // ************************************************************************** //
 //                               Location Struct                              //
 // ************************************************************************** //
@@ -68,6 +67,7 @@ class Server
 		std::string					_index;
 		std::vector<std::string>	_allowed_methods;
 		uint32_t					_limit_body;
+		std::string					_error_pages;
 		std::string					_cgi;
 		std::vector<Location>		_locations;
 
@@ -89,6 +89,7 @@ class Server
 		bool		lb;
 		bool		l;
 		bool		c;
+		bool		ep;
 		
 		bool		open_bracket;
 
@@ -111,6 +112,7 @@ class Server
 		uint32_t						getLimitBody() const;
 		const std::string				&getContent() const;
 		const std::string				&getResponse() const;
+		const std::string				&getErrorPages() const;
 		const std::string				&getCgi() const;
 		
 		int const						&getSockFd() const;
@@ -122,7 +124,8 @@ class Server
 		int							setIndex(std::string idnex);
 		int							setMethods(std::string methods);
 		int							setLimitBody(std::string limit);
-		int							set_Content(std::string path);
+		void						set_Content(std::string path, int check);
+		int							setErrorPages(std::string error_pages);
 		int							setCgi(std::string cgi);
 };
 

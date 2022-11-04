@@ -1,10 +1,13 @@
 #include "Server.hpp"
 
+extern int	g_error;
+
 Server::Server()
 {
 	_index = "index.html";
 	_limit_body = MAX_BODY;
 	_cgi = "no";
+	_error_pages = "error_pages/";
 	_port = 0;
 	sn = false;
 	p = false;
@@ -14,6 +17,7 @@ Server::Server()
 	lb = false;
 	l = false;
 	c = false;
+	ep = false;
 	open_bracket = true;
 	_allowed_methods.push_back("GET");
 	_allowed_methods.push_back("POST");
@@ -172,6 +176,15 @@ int Server::setLimitBody(std::string limit)
 	return (SUCCESS);
 }
 
+int Server::setErrorPages(std::string error_pages)
+{
+	error_pages.erase(remove(error_pages.begin(), error_pages.end(), ';'));
+	if (count(error_pages.begin(), error_pages.end(), '/') < 1)
+		return (FAILURE);
+	this->_error_pages = error_pages;
+	return (SUCCESS);
+}
+
 int Server::setCgi(std::string cgi)
 {
 	cgi.erase(remove(cgi.begin(), cgi.end(), ';'));
@@ -181,16 +194,21 @@ int Server::setCgi(std::string cgi)
 	return (SUCCESS);
 }
 
-int Server::set_Content(std::string path)
+void Server::set_Content(std::string path, int check)
 {
+	std::stringstream s;
+	s << check;
+	std::string str = s.str();
+	if (check != 1)
+		path = _root + _error_pages + str + ".html";
+	std::cout << path << std::endl;
 	std::ostringstream ss;
 	std::ifstream input_file;
 	input_file.open(path);
 	if (!input_file.is_open())
-		return (FAILURE);
+		g_error = 404;
 	ss << input_file.rdbuf();
 	this->_content = ss.str();
-	return (SUCCESS);
 }
 
 const std::string &Server::getServerName() const
@@ -226,6 +244,11 @@ const std::vector<std::string> &Server::getMethods() const
 uint32_t Server::getLimitBody() const
 {
 	return (this->_limit_body);
+}
+
+const std::string &Server::getErrorPages() const
+{
+	return (this->_error_pages);
 }
 
 const std::string &Server::getCgi() const
