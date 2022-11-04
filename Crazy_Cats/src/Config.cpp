@@ -193,7 +193,17 @@ void Operator::parse_server(Server &server)
 			else
 			{
 				server.setLimitBody(tokens.back());
-				server.am = true;
+				server.lb = true;
+			}
+		}
+		else if (!tokens.empty() && tokens.at(0) == "error_pages")
+		{
+			if (tokens.size() != 2 || server.setErrorPages(tokens.back()) || server.ep == true)
+				throw std::invalid_argument("Error❗\nInvalid information in Config file for cgi in line:\n " + line);
+			else
+			{
+				server.ep = true;
+				server.setErrorPages(tokens.back());
 			}
 		}
 		else if (!tokens.empty() && tokens.at(0) == "cgi")
@@ -298,7 +308,8 @@ std::ostream	&operator<<(std::ostream &os, const Operator &Operator) {
 		for (size_t i = 0; i < it->getMethods().size(); i++)
 			os << it->getMethods().at(i) << " ";
 		os << "\nLimit Body:	" << it->getLimitBody() << "\n";
-		os << "Cgi:		" << it->getCgi() << "\n";
+		os << "\nCgi:		" << it->getCgi() << "\n";
+		os << "Error Pages:	" << it->getErrorPages() << "\n";
 		Server server = Operator.getServer().at(j);
 		std::set<std::string>::const_iterator it2;
 		for (std::vector<Location>::const_iterator it2 = server.getLocation().begin(); it2 != server.getLocation().end(); it2++)

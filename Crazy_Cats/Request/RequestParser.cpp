@@ -1,6 +1,6 @@
 #include "RequestParser.hpp"
 
-
+extern int	g_error;
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -123,15 +123,14 @@ std::string &		RequestParser::RequestLineMethod(std::string &Method)
 			//noch die anderen typen einbauen
 			//put as post 
 		else
-			throw std::runtime_error("wrong Method");
+			throw std::runtime_error("wrong Method+");
 		Method.erase(0, pos + delimeter.length());
 		return (Method);
 		// pos = Method.find(delimeter);
 	}
-	throw std::runtime_error("Wrong Method");
+	throw std::runtime_error("Wrong Method-");
 	//what should we do if one request is bad? 
 	//still keep on with the others or stop the programm?
-	
 }
 
 
@@ -162,10 +161,10 @@ void		RequestParser::RequestLineVersion(std::string &version)
 		if (test_version.compare("HTTP/1.1") == 0)
 			this->_version = version.substr(0, pos);
 		else
-		throw std::runtime_error("Wrong version");
+			g_error = 505;
 	}
 	else
-		throw std::runtime_error("RequestLine parsing failed");
+		g_error = 400;
 	//TODO:handle return values!
 	
 

@@ -5,6 +5,8 @@
 #include <chrono>
 #include <ctime> 
 
+extern int	g_error;
+
 Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _RP(RP)
 {
 	this->_method = _RP.getMethod();
@@ -15,10 +17,8 @@ Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _R
 	this->_path = "";
 	this->_query = "";
 	this->_port = "";
-	this->_error_code = 200;
 	client.printBody();
 }
-//TODO:can we put start_handling in the constructor??
 
 Handler::~Handler()
 {}
@@ -33,13 +33,15 @@ void time_function()
 
 void	Handler::handle_get(Server & server, Client & client)
 {
-
-	if (server.set_Content(this->_path))
-		throw std::invalid_argument("Error❗\nCould not open requested file");
-		//TODO:404
-	// this->_RSP.createResponse(200, server, this->_path, this->_version);
-	client.setResp(this->_RSP.createResponse(200, server, this->_path, this->_version));
+	if (g_error == 200)
+		server.set_Content(this->_path, 1);
+	if (g_error != 200)
+		server.set_Content(this->_path, g_error);
+	client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
+	if (g_error != 200)
+		g_error = 200;
 }
+
 void	Handler::handle_methods(Server & server, Client & client)
 {
 	if (this->_method == "GET")
@@ -51,12 +53,32 @@ void	Handler::handle_methods(Server & server, Client & client)
 	
 
 }
+
+void	Handler::check_methods()
+{
+	bool check = false;
+	if (_file_req == false)
+	{
+		if (_method == "HEAD" || _method == "PUT" || _method == "CONNECT" || _method == "OPTIONS" || _method == "TRACE")
+		{
+			g_error = 501;
+			return ;
+		}
+		for (std::vector<std::string>::const_iterator it = _allowed_methods.begin(); it != _allowed_methods.end(); it++)
+		{
+			if (it->data() == _method)
+				check = true;
+		}
+		if (check == false)
+			g_error = 405;
+	}
+}
+
 void	Handler::start_handling(Server & server, Client & client)
 {
 	std::unordered_map<std::string, std::string>::const_iterator got = _requestH.find("Host");
 	if (got == _requestH.end())
-		throw std::runtime_error("No Host in Request"); //this is only temporary -> set error page instead
-		// this->_error_code = 400;
+		g_error = 400;
 	else
 	{
 		std::string port;
@@ -105,34 +127,40 @@ void	Handler::start_handling(Server & server, Client & client)
 		// std::cout << "URI " << this->_URI << std::endl;
 	}
 	change_path(server);
-	// if (server.getCgi() == "no")
+	check_methods();
+	if (server.getCgi() == "no")
 		handle_methods(server, client);
-	// else
-	// 	Cgi CGI(server, client, _path, _query, _type, _RP);
+	else
+		Cgi CGI(server, client, _path, _query, _type, _RP);
 }
 
 void	Handler::change_path(Server & server)
 {
-	bool file_req = false;
+	this->_allowed_methods = server.getMethods();
+	_file_req = false;
 	_path = server.getRoot() + _path;
 	if (_URI.find(".") != STREND)
 	{
 		size_t path_start = _URI.find ('.');
 		_type = _URI.substr(path_start + 1);
-		file_req = true;
+		_file_req = true;
 	}
-	if (server.getLocation().empty() && file_req == false)
+	if (server.getLocation().empty() && _file_req == false)
+	{
 		_path = _path + server.getIndex();
+		this->_allowed_methods = server.getMethods();
+	}
 	if (!server.getLocation().empty())
 	{
 		std::string tmp;
 		for (std::vector<Location>::const_iterator it = server.getLocation().begin(); it != server.getLocation().end(); it++)
 		{
-			if (file_req == false)
+			if (_file_req == false)
 			{
 				if (this->_URI == it->getProxy())
 				{
 					_path = server.getRoot() + it->getRoot() + it->getIndex();
+					this->_allowed_methods = it->getLocMethods();
 					return;
 				}
 				if (std::count(_URI.begin(), _URI.end(), '/') > 1)
@@ -142,7 +170,10 @@ void	Handler::change_path(Server & server)
 					tmp = _URI.substr(0, end + 1);
 					std::string tmp2 = _URI.substr(end + 2);
 					if (tmp == it->getProxy())
+					{
 						_path = server.getRoot() + it->getRoot() + tmp2 + it->getIndex();
+						this->_allowed_methods = it->getLocMethods();
+					}
 				}
 				_path = _path + server.getIndex();
 			}
@@ -153,9 +184,13 @@ void	Handler::change_path(Server & server)
 					size_t start = _URI.rfind('/');
 					tmp = _URI.substr(start + 1);
 					_path = server.getRoot() + tmp;
+					this->_allowed_methods = it->getLocMethods();
 				}
 			}
 		}
 	}
-	std::cout << "{{{{{{{{{ " << _path << std::endl;
+	std::ifstream input_file;
+	input_file.open(_path);
+	if (!input_file.is_open())
+		g_error = 404;
 }

@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 
+int	g_error;
 
 int fdServer(int fd, std::vector<Server> servers)
 {
@@ -127,10 +128,13 @@ void	RequestChecker(std::vector<unsigned char> request, Client& client, Server& 
 	}
 	if (client.getHBFlag() && client.getFlag() && !client.getRFlag() && !client.getBFlag() && !client.getCFlag())
 	{
+
+		// std::cout << "------------------------------" << contLen << std::endl;
+		// std::cout << "******************************" << server.getLimitBody() << std::endl;
 		if (contLen > server.getLimitBody())
 		{
-			std::cout << contLen << std::endl;
-			throw std::out_of_range("Error! \n Body size is higher than MAX_BODY.");
+			std::cout << "Error! \n Body size is higher than MAX_BODY." << contLen << std::endl;
+			g_error = 413;
 		}
 		if (!client.getRFlag())
 		{
@@ -195,6 +199,7 @@ void write2file(std::vector<unsigned char> input, std::string filename)
 
 void Operator::start_process()
 {
+	g_error = 200;
 	for (size_t i = 0; i < _servers.size(); ++i)
 	{
 		_servers[i].bindPort();
@@ -254,7 +259,7 @@ void Operator::start_process()
 							RequestParser RP(clients[k].tmpReq);
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
-              				H.start_handling(_servers[i], clients[k]);
+							H.start_handling(_servers[i], clients[k]);
 							// clients[k].setResp(_servers[i].getResponse());
 							if (clients[k].getHBFlag())
 							{
