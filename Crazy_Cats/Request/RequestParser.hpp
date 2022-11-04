@@ -11,6 +11,8 @@
 #define YELLOW "\033[1;33m"
 #define LB		"\033[1;34m"
 #define RED		"\033[1;31m"
+#define ORANGE  "\033[1;38m"
+
 #define RESET  "\033[0m"
 
 #define BLACK "\033[0;30m"
