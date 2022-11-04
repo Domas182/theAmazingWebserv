@@ -32,19 +32,11 @@ Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _R
 Handler::~Handler()
 {}
 
-void	Handler::handle_get(Server & server, Client & client)
-{
-
-	if (server.set_Content(this->_path))
-		throw std::invalid_argument("Error❗\nCould not open requested file");
-		//TODO:404
-	// this->_RSP.createResponse(200, server, this->_path, this->_version);
-	client.setResp(this->_RSP.createResponse(200, server, this->_path, this->_version));
-}
-
 
 void Handler::write_file(std::vector<unsigned char> & input, std::string filename)
 {
+	// for (size_t i = 0; i < input.size(); i++)
+	// 	std::cout << GREEN << input[i] << RESET;
 	std::fstream file;
 	file.open(filename, std::ios_base::out);
 	//should we protect that?
@@ -55,6 +47,7 @@ void Handler::write_file(std::vector<unsigned char> & input, std::string filenam
 
 void Handler::pure_body(std::string & fileBody, Client& client)
 {
+
 	std::string rn = "\r\n\r\n";
 	size_t pos = 0;
 	if((pos = fileBody.find(rn)) != std::string::npos)
@@ -75,35 +68,36 @@ void	Handler::get_file_info(std::string& fileBody)
 	while ((pos = fileBody.find(rn)) != std::string::npos)
 	{
 		std::string test = fileBody.substr(0, pos);
+		fileBody.erase(0, pos + rn.length());
 		std::string delimeter = ":";
-		if ((pos2 = test.find(delimeter) != test.size()))
+		if ((pos2 = test.find(delimeter)) != std::string::npos)
 		{
-			std::cout << LB<< ":::::::::::::::::" RESET << std::endl;
 			std::string key = test.substr(0, pos2);
-			if (key == "Content-Disposition:")
+			if (key == "Content-Disposition")
 			{
+				std::cout << LB<< key<<  RESET << std::endl;
 
 				this->_bodyHeader.insert(std::pair<std::string, std::vector<std::string> >(key, std::vector<std::string>()));
-				//while loop der die ganzen atrtibute n die map parsed
 				test.erase(0, pos2 + delimeter.length());
 				delimeter = ";";
 				std::string value = "";
-				while((pos2 = test.find(delimeter)) != test.size())
+				while((pos2 = test.find(delimeter)) != std::string::npos)
 				{
-					std::string value = test.substr(0, pos2);
+					value = test.substr(0, pos2);
 					this->_bodyHeader[key].push_back(value);
 					test.erase(0, pos2 + delimeter.length());
-					std::cout << ORANGE << "keyvalues:" << value << RESET << std::endl;
 				}
 				delimeter = "=";
-				if ((pos2 = value.find(delimeter)) != value.size())
+				if ((pos2 = test.find(delimeter)) != std::string::npos)
 				{
-					this->_filename = value.substr(pos2, value.size());
+					std::string testfile = test.substr((pos2 + 2), (test.size() - pos2 -3));
+					this->_filename = testfile;
+					std::cout << ORANGE << "keyvalues:" << this->_filename << RESET << std::endl;
 				}
 			}
-			else if (key == "Content-Type:")
+			else if (key == "Content-Type")
 			{
-					std::string value = test.substr(0, test.size());
+					std::string value = test.substr(pos2 + 1, test.size());
 					this->_bodyHeader.insert(std::pair<std::string, std::vector<std::string> >(key, std::vector<std::string>()));
 					this->_bodyHeader[key].push_back(value);
 					std::cout << PINK << "keyvalues:" << value << RESET << std::endl;
@@ -116,26 +110,34 @@ void	Handler::get_file_info(std::string& fileBody)
 
 void Handler::body_extractor(Client& client)
 {
-	// for(size_t x = 0; x < client.tmpBody.size(); x++)
-	// {
-	// 	std::cout << PINK << client.tmpBody[x] << RESET;
-	// }
-	std::cout << std::endl;
 	std::string fileBody(client.tmpBody.begin(), client.tmpBody.end());
 	get_file_info(fileBody);
-	pure_body(fileBody, client);
-	for (size_t x = 0; x < client.tmpExtract.size(); x++)
-		std::cout << GREEN << client.tmpExtract[x] << RESET;
+	std::string fileBody2(client.tmpBody.begin(), client.tmpBody.end());
+
+	pure_body(fileBody2, client);
 
 }
-void	Handler::handle_post(Server & server, Client & client)
-{
 
+void	Handler::handle_post(Server & server, Client & client)
+{	if (server.set_Content(this->_path))
+		throw std::invalid_argument("Error❗\nCould not open requested file");
+		//TODO:404
 	if (client.getHBFlag())
 	{
 		body_extractor(client);
+		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
 		write_file(client.tmpExtract, this->_filename);
 	}
+}
+
+void	Handler::handle_get(Server & server, Client & client)
+{
+
+	if (server.set_Content(this->_path))
+		throw std::invalid_argument("Error❗\nCould not open requested file");
+		//TODO:404
+	// this->_RSP.createResponse(200, server, this->_path, this->_version);
+	client.setResp(this->_RSP.createResponse(200, server, this->_path, this->_version));
 }
 
 void	Handler::handle_methods(Server & server, Client & client)

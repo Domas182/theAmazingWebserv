@@ -100,6 +100,7 @@ void		RequestParser::split_CRLF(std::vector<unsigned char> buffer)
 
 	// 	std::cout << RED <<_CRLF_split[i] << RESET << std::endl;
 	// }
+	std::cout << _CRLF_split.front() << std::endl;
 	parseRequestLine(_CRLF_split.front());
 	parseRequestHeader();
 	//body starts here

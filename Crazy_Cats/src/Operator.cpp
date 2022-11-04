@@ -119,7 +119,8 @@ void	RequestChecker(std::vector<unsigned char> request, Client& client, Server& 
 					client.setFlagT();
 					client.setRFlagT();
 				}
-			} else {
+			}
+			else {
 				client.tmpReq.push_back(request[i++]);
 			}
 		}
@@ -151,8 +152,8 @@ void	RequestChecker(std::vector<unsigned char> request, Client& client, Server& 
 			client.tmpBody.push_back(request[i]);
 			i++;
 		}
-		for (size_t x = 0; x < client.tmpBody.size(); x++)
-			std::cout << client.tmpBody[x];
+		// for (size_t x = 0; x < client.tmpBody.size(); x++)
+		// 	std::cout << client.tmpBody[x];
 	}
 }
 
@@ -261,14 +262,6 @@ void Operator::start_process()
 						if (clients[k].getRFlag())
 						{
 							clients[k].printRequest();
-							for (size_t i = 0; i < clients[k].tmpBody.size(); i++)
-								std::cout << clients[k].tmpBody[i];
-							//RequestParser RP(clients[k].getRequest());
-							// if (clients[k].getHBFlag())
-							// {
-							// 	bodyExtractor(clients[k]);
-							// 	write2file(clients[k].tmpExtract, "Upload.txt");
-							// }
 							RequestParser RP(clients[k].tmpReq);
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
