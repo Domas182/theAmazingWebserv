@@ -30,28 +30,6 @@ int lookClient(int fd, std::vector<Client> clients)
 	return (-1);
 }
 
-// size_t	findBodyLength(Client& client)
-// {
-// 	if (client.getFlag() == true)	
-// 	{
-// 		RequestParser RP(client.getRequest());
-// 		std::unordered_map<std::string, std::string>::const_iterator got = RP.getRequestH().find("Content-Length");
-// 		std::unordered_map<std::string, std::string>::const_iterator endit = RP.getRequestH().end();
-// 		if (got != endit)
-// 		{
-// 			size_t contLen = atoi(got->second.c_str());
-// 			return (contLen);
-// 		}
-// 		std::unordered_map<std::string, std::string>::const_iterator ITE = RP.getRequestH().find("Transfer-Encoding");
-// 		if (ITE != endit)
-// 		{
-// 			return (-1);
-// 			//macro like transfer encoding for that
-// 		}
-// 	}
-// 	return (0);
-// }
-
 int	findBodyLength(std::vector<unsigned char> request)
 {
 
@@ -72,103 +50,124 @@ int	findBodyLength(std::vector<unsigned char> request)
 	return (0);
 }
 
-
-void extractBody(std::vector<unsigned char>& request, int index, size_t contLen, Client & client)
+bool crlfBool(std::vector<unsigned char> data, size_t i)
 {
-	for (size_t i = 0; (i < contLen) && request[index + i]; i++)
-	{
-		std::cout << "ContLen: " << contLen << " i: " << i << std::endl;
-		client.pushBody(request[index + i]);
-		//client.RP.pushBody()
-	}
-		std::cout << "DO YOU GETtyherere HERE?" << std::endl;
-	if (client.getBodySize() == contLen)
-		client.setBFlagT();
+	if (data[i] == '\r' && data[i + 1] == '\n')
+		return true;
+	else
+		return false;
 }
 
-//new attempt
+void crlfPush(Client& client)
+{
+	client.tmpReq.push_back('\r');
+	client.tmpReq.push_back('\n');	
+}
+
+void chunkedHandler(Client& client, std::vector<unsigned char> request, size_t& i, size_t& bytes)
+{
+	while (i < bytes)
+	{
+		if (!client.chunkSizeSet)
+		{
+			while (!crlfBool(request, i) && i < bytes)
+				client.iHex.push_back(request[i++]);
+			if (request[i] == '\r')
+			{
+				while (crlfBool(request, i) && i < bytes)
+					i += 2;
+				client.chunkSize = std::stoi(client.iHex.c_str(), nullptr, 16);
+				client.chunkSizeSet = true;
+				client.iHex.clear();
+			}
+		}
+		if (client.chunkSizeSet)
+		{
+			if (client.chunkSize == 0){
+				client.setRFlagT();
+			} else {
+				while (client.tmpChunkedBody.size() < client.chunkSize && i < bytes)
+					client.tmpChunkedBody.push_back(request[i++]);
+				if (client.tmpChunkedBody.size() == client.chunkSize)
+				{
+					for (size_t x = 0; x < client.tmpChunkedBody.size(); x++)
+						client.tmpBody.push_back(client.tmpChunkedBody[x]);
+					client.chunkSizeSet = false;
+					client.tmpChunkedBody.clear();
+				}
+				while (crlfBool(request, i) && i < bytes)
+					i += 2;
+			}
+		}
+		// pass appropriate response codes
+	}	
+}
+
+void headerFlagSetter(Client& client, int len)
+{
+	if (len > 0){
+		client.setFlagT();
+		client.setHBFlagT();
+	}else if (len == -1 ){
+		client.setFlagT();
+		client.setCFlagT();
+		client.setHBFlagT();
+		client.chunkSizeSet = false;	
+	}else{
+		client.setFlagT();
+		client.setRFlagT();		
+	}
+}
+
+void headerCountAndFlags(Client& client, int& len)
+{
+	client.setFlagT();
+	len = findBodyLength(client.tmpReq);
+	headerFlagSetter(client, len);
+}
+
 void	RequestChecker(std::vector<unsigned char> request, Client& client, Server& server, size_t& bytes)
 {
 	size_t i = 0;
 	int contLen = 0;
-
 	if (!client.getFlag())
 	{
-		//while(!client.getFlag() && request[i] != '\0' && i < bytes)
 		while(!client.getFlag() && request[i] != '\0' && i < bytes)
 		{
-			if(request[i] == '\r' && request[i + 1] == '\n' && request[i + 2] == '\r' && request[i + 3] == '\n')
+			if(crlfBool(request, i) || request[i] == '\n')
 			{
-				i += 4;
-				client.setFlagT();
-				for (int x = 0; x < 2; x++)
+				if (request[i] == '\r')
 				{
-					client.tmpReq.push_back('\r');
-					client.tmpReq.push_back('\n');
+					i += 2;
+					crlfPush(client);
 				}
-				contLen = findBodyLength(client.tmpReq);
-				std::cout << " CONT LEN!!! ::: " << contLen << std::endl;
-
-				if (contLen > 0) {
-					client.setFlagT();
-					client.setHBFlagT();
-				}
-				else if (contLen == -1)	{
-					client.setFlagT();
-					client.setCFlagT();
-				} else	{
-					client.setFlagT();
-					client.setRFlagT();
+				else
+					i++;
+				if ((client.tmpReq.size() == 1 && request[0] == '\n') || client.tmpReq.size() == 0)	{
+					headerCountAndFlags(client, contLen);
+				} else if (crlfBool(request, i))
+				{
+					i += 2;
+					for (size_t j = 0; j < 2; j++)
+						crlfPush(client);
+				headerCountAndFlags(client, contLen);
 				}
 			} else {
 				client.tmpReq.push_back(request[i++]);
 			}
 		}
 	}
-	if (client.getHBFlag() && client.getFlag() && !client.getRFlag() && !client.getBFlag() && !client.getCFlag())
+	if (client.getHBFlag() && client.getFlag() && !client.getRFlag())
 	{
-		if (contLen > server.getLimitBody())
+		if (!client.getRFlag() && !client.getCFlag())
 		{
-			std::cout << contLen << std::endl;
-			throw std::out_of_range("Error! \n Body size is higher than MAX_BODY.");
-		}
-		if (!client.getRFlag())
-		{
-			while (client.tmpBody.size() < contLen)
-			{
-				client.tmpBody.push_back(request[i]);
-				i++;
-			}
+			while (client.tmpBody.size() < contLen && i < bytes)
+				client.tmpBody.push_back(request[i++]);
 			if (client.tmpBody.size() == contLen)
-			{
-				std::cout << "yes\n";
-				client.setBFlagT();
 				client.setRFlagT();
-			}
 		}
-	} else if (client.getFlag() && client.getCFlag()){
-		while (request[i])
-		{
-			client.tmpBody.push_back(request[i]);
-			i++;
-		}
-		for (size_t x = 0; x < client.tmpBody.size(); x++)
-			std::cout << client.tmpBody[x];
-	}
-}
-
-void bodyExtractor(Client& client)
-{
-	size_t i = 0;
-	while(client.tmpBody[i] != '\r' && client.tmpBody[i+1] != '\n' && client.tmpBody[i+2] != '\r' && client.tmpBody[i+3] != '\n')
-	{
-		i++;
-	}
-	i +=4;
-	while(client.tmpBody[i] != '\r' && client.tmpBody[i+1] != '\n')
-	{
-		client.tmpExtract.push_back(client.tmpBody[i]);
-		i++;
+		if (!client.getRFlag() && client.getCFlag())
+			chunkedHandler(client, request, i, bytes);
 	}
 }
 
@@ -231,7 +230,12 @@ void Operator::start_process()
 					std::vector<unsigned char> request;
 					request = _servers[clients[k].getIndex()].sockRecv(i, poFD);
 					//request = _servers[clients[k].getIndex()].testRecv(i, poFD);
-
+					// if (request.size() > 1)
+					// {
+					// 	for (int i = 0; i < request.size(); i++)
+					// 		std::cout << request[i];
+					// }
+					std::cout << "read loop get's here. size of tmpbody: " << clients[k].tmpBody.size() << std::endl;
 					
 					if (request.size() <= 0)
 					{
@@ -247,8 +251,9 @@ void Operator::start_process()
 						if (clients[k].getRFlag())
 						{
 							clients[k].printRequest();
-							for (size_t i = 0; i < clients[k].tmpBody.size(); i++)
-								std::cout << clients[k].tmpBody[i];
+							// for (size_t i = 0; i < clients[k].tmpBody.size(); i++)
+							// 	std::cout << clients[k].tmpBody[i];
+							std::cout << clients[k].tmpBody.size() << std::endl;
 							std::cout << "do you get here?\n";
 							//RequestParser RP(clients[k].getRequest());
 							RequestParser RP(clients[k].tmpReq);
@@ -258,8 +263,7 @@ void Operator::start_process()
 							// clients[k].setResp(_servers[i].getResponse());
 							if (clients[k].getHBFlag())
 							{
-								//bodyExtractor(clients[k]);
-								write2file(clients[k].tmpBody, "test.png");
+								write2file(clients[k].tmpBody, "test.txt");
 							}
 							//TODO: if this is in the Handler, we can pack all the previous functions in the handler too :)
 							clients[k].setBFlagF();
@@ -272,6 +276,11 @@ void Operator::start_process()
 							request.clear();
 							clients[k].clearRequest();
 						}
+
+						///random
+						request.clear();
+						///
+
 					}
 				}
 			}

@@ -102,6 +102,10 @@ class Client
 		std::vector<unsigned char> tmpReq;
 		std::vector<unsigned char> tmpBody;
 		std::vector<unsigned char> tmpExtract;
+		std::vector<unsigned char> tmpChunkedBody;
+		std::string iHex;
+		size_t chunkSize;
+		bool	chunkSizeSet;
 };
 
 

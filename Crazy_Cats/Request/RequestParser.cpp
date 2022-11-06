@@ -162,7 +162,7 @@ void		RequestParser::RequestLineVersion(std::string &version)
 		if (test_version.compare("HTTP/1.1") == 0)
 			this->_version = version.substr(0, pos);
 		else
-		throw std::runtime_error("Wrong version");
+			throw std::runtime_error("Wrong version");
 	}
 	else
 		throw std::runtime_error("RequestLine parsing failed");
