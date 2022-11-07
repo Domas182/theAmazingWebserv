@@ -1,10 +1,17 @@
 #include "Cgi.hpp"
 
+extern int	g_error;
+
 Cgi::Cgi(Server server, Client & client, std::string path, std::string query, std::string type, RequestParser RP) : 
 	_path(path), _query(query), _type(type), _RP(RP)
 {
 	_method = _RP.getMethod();
+	_exec_str = server.getCgi();
+	_response.clear();
+	in = tmpfile();
+	tmp = tmpfile();
 	set_Env(server);
+	CgiResponse(server, client);
 }
 
 Cgi::~Cgi()
@@ -60,7 +67,7 @@ void Cgi::set_Env(Server server)
 	// for(std::unordered_map<std::string, std::string>::const_iterator it = _env.begin();
 	// it != _env.end(); ++it)
 	// {
-	// 	std::cout << PINK << it->first << it->second << RESET << std::endl;
+	// 	std::cout << PINK << it->first << " " << it->second << RESET << std::endl;
 	// }
 
 	char ** env_str = (char **)calloc(sizeof(char *), _env.size() + 1);
@@ -85,38 +92,95 @@ void Cgi::set_Env(Server server)
 	// for (int i = 0; env_str[i] != '\0'; i++)
 	// 	std::cout << env_str[i] << std::endl;
 
-	// process(env_str);
+	process(env_str);
 }
+
 void Cgi::process(char ** env_str)
 {
+	int fin = fileno(in);
+	int fout = fileno(tmp);
+	char ** input_str = NULL;
 	pid_t pid = fork();
-	int fin = fileno(_infile);
-	int fout = fileno(_tmp);
-	int pipe_fd[2];
-	char ** input_str;
 
-	input_str = NULL;
-	// make a diffrence btw get und post 
 
-	if (pid < 0)
+	if (pid == -1)
 	{
-		//set error page to 500
-		throw std::runtime_error("Fork Cgi Error"); //temporary - maybe perror
+		perror("FORK ERROR");
+		g_error = 500;
 		close(fin);
 		close(fout);
 		return ;
 	}
-	if (pid == 0)
+	if (!pid)
 	{
+		if (dup2(fin, STDIN_FILENO) == -1)
+			g_error = 500;
 
+		if (dup2(fout, STDOUT_FILENO) == -1)
+			g_error = 500;
+		close(fin);
+		close(fout);
+		//lseek
+		if (execve(_exec_str.c_str(), input_str, env_str) == -1)
+			g_error = 500;
+		exit(1);
 	}
-	else
+	if (pid)
 	{
-
+		close(fin);
+		free_array(env_str);
+		free_array(input_str);
 	}
+	pid_t	ret = 0;
+	int		wait_child;
+	while (ret != -1)
+	{
+		ret = wait(&wait_child);
+		if (ret == -1)
+			break ;
+		else if (ret == pid)
+			WIFEXITED(wait_child);
+	}
+}
 
-	if (execve(_path.c_str(), input_str, env_str) == -1)
-		throw std::runtime_error("Cgi execve error"); //temporary for debugging
-	free_array(env_str);
-	exit(1);
+void	Cgi::CgiResponse(Server & server, Client & client)
+{
+	fseek(tmp, 0, SEEK_END);
+	long len = ftell(tmp);
+	rewind(tmp);
+	char *buf = (char*)calloc(len, sizeof(char));
+	if (buf == NULL)
+		g_error = 500;
+	long check = fread(buf, 1, len, tmp);
+	if (check != len)
+		g_error = 500;
+	std::string read = std::string(buf);
+	free(buf);
+	int fout = fileno(tmp);
+	close(fout);
+
+	if (g_error == 500)
+	{
+		std::string str = std::to_string(g_error);
+		std::string path = server.getRoot() + server.getErrorPages() + str + ".html";
+		std::ostringstream ss;
+		std::ifstream input_file;
+		input_file.open(path);
+		if (!input_file.is_open())
+			g_error = 404;
+		ss << input_file.rdbuf();
+		this->_response = ss.str();
+		return ;
+	}
+	size_t start = read.find("\r\n\r\n") + 4;
+	std::string	body = read.substr(start, std::string::npos);
+	this->_response = "HTTP/1.1 200 OK\r\nContent-Length: ";
+	this->_response += std::to_string(body.length());
+	this->_response += "\r\n\r\n";
+	this->_response += body;
+}
+
+std::string const & Cgi::getResponse() const
+{
+	return (this->_response);
 }

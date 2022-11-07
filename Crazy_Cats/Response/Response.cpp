@@ -5,7 +5,7 @@
 */
 Response::Response(){}
 
-std::string  Response::createResponse (int code, Server & server, std::string & path, std::string & version)
+std::string Response::createResponse (int code, Server & server, std::string & path, std::string & version)
 {
 	createCodePhraseMap();
 	setVersion(version);

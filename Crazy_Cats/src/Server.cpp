@@ -196,9 +196,7 @@ int Server::setCgi(std::string cgi)
 
 void Server::set_Content(std::string path, int check)
 {
-	std::stringstream s;
-	s << check;
-	std::string str = s.str();
+	std::string str = std::to_string(check);
 	if (check != 1)
 		path = _root + _error_pages + str + ".html";
 	std::cout << path << std::endl;

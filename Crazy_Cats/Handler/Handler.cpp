@@ -6,6 +6,7 @@
 #include <ctime>
 
 
+extern int	g_error;
 
 void time_function()
 {
@@ -13,8 +14,6 @@ void time_function()
 	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 	std::cout << "finished computation at " << std::ctime(&end_time);
 }
-
-extern int	g_error;
 
 Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _RP(RP)
 {
@@ -118,20 +117,21 @@ void Handler::body_extractor(Client& client)
 }
 
 void	Handler::handle_post(Server & server, Client & client)
-{	
-	std::cout << GREEN << client.getHBFlag() << "\t" << client.getCFlag() << RESET;
-	server.set_Content(this->_path, 1);
-		// throw std::invalid_argument("Error❗\nCould not open requested file");
-		// //TODO:404
+{	if (g_error == 200)
+		server.set_Content(this->_path, 1);
+	if (g_error != 200)
+		server.set_Content(this->_path, g_error);
 	if (client.getHBFlag() && !client.getCFlag())
 	{
 		body_extractor(client);
-		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
+		client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
 		write_file(client.tmpExtract, this->_filename);
 	} else if (client.getHBFlag() && client.getCFlag()){
 		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
 		write_file(client.tmpBody, "chunked.txt");		
 	}
+	if (g_error != 200)
+		g_error = 200;
 }
 
 void	Handler::handle_get(Server & server, Client & client)
@@ -234,10 +234,15 @@ void	Handler::start_handling(Server & server, Client & client)
 	}
 	change_path(server);
 	check_methods();
-	if (server.getCgi() == "no")
-		handle_methods(server, client);
-	else
+	if (server.getCgi() != "no" && _req_type == "php")
+	{
 		Cgi CGI(server, client, _path, _query, _type, _RP);
+		client.setResp(CGI.getResponse());
+		if (g_error != 200)
+			g_error = 200;
+	}
+	else
+		handle_methods(server, client);
 }
 
 void	Handler::change_path(Server & server)
@@ -267,6 +272,12 @@ void	Handler::change_path(Server & server)
 				{
 					_path = server.getRoot() + it->getRoot() + it->getIndex();
 					this->_allowed_methods = it->getLocMethods();
+					std::ifstream input_file;
+					input_file.open(_path);
+					if (!input_file.is_open())
+					g_error = 404;
+					size_t path_start = _path.find ('.');
+					_req_type = _path.substr(path_start + 1);
 					return;
 				}
 				if (std::count(_URI.begin(), _URI.end(), '/') > 1)
