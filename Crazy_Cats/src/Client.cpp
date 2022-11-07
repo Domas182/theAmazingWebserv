@@ -176,14 +176,9 @@ void    Client::pushBody(unsigned char c)
 
 void    Client::printRequest()
 {
-    for (size_t i = 0; i < _request.size(); i++)
-        std::cout << _request[i];
-	//for break condition
-// 	if (_request[5] == 'f')
-// 	{
-// 		std::cout << std::endl;
-// 	}
-//     std::cout << std::endl;
+    for (size_t i = 0; i < tmpReq.size(); i++)
+        std::cout << tmpReq[i];
+    std::cout << std::endl;
 }
 
 size_t Client::getBodySize()

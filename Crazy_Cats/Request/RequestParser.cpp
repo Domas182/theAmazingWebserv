@@ -1,6 +1,6 @@
 #include "RequestParser.hpp"
 
-
+extern int	g_error;
 
 /*
 ** ------------------------------- CONSTRUCTOR --------------------------------
@@ -11,7 +11,7 @@ RequestParser::RequestParser(){}
 RequestParser::RequestParser(std::vector<unsigned char>& request)
 {
 	split_CRLF(request);
-	std::cout << *this  << std::endl; 
+	// std::cout << *this  << std::endl; 
 }
 
 // RequestParser::RequestParser( const RequestParser & src )
@@ -100,6 +100,7 @@ void		RequestParser::split_CRLF(std::vector<unsigned char> buffer)
 
 	// 	std::cout << RED <<_CRLF_split[i] << RESET << std::endl;
 	// }
+	std::cout << _CRLF_split.front() << std::endl;
 	parseRequestLine(_CRLF_split.front());
 	parseRequestHeader();
 	//body starts here
@@ -123,15 +124,14 @@ std::string &		RequestParser::RequestLineMethod(std::string &Method)
 			//noch die anderen typen einbauen
 			//put as post 
 		else
-			throw std::runtime_error("wrong Method");
+			throw std::runtime_error("wrong Method+");
 		Method.erase(0, pos + delimeter.length());
 		return (Method);
 		// pos = Method.find(delimeter);
 	}
-	throw std::runtime_error("Wrong Method");
+	throw std::runtime_error("Wrong Method-");
 	//what should we do if one request is bad? 
 	//still keep on with the others or stop the programm?
-	
 }
 
 
@@ -162,13 +162,10 @@ void		RequestParser::RequestLineVersion(std::string &version)
 		if (test_version.compare("HTTP/1.1") == 0)
 			this->_version = version.substr(0, pos);
 		else
-			throw std::runtime_error("Wrong version");
+			g_error = 505;
 	}
 	else
-		throw std::runtime_error("RequestLine parsing failed");
-	//TODO:handle return values!
-	
-
+		g_error = 400;
 }
 
 void		RequestParser::parseRequestLine(std::string reqLine)
@@ -181,7 +178,6 @@ void		RequestParser::parseRequestHeader()
 {
 
 	std::vector<std::string>::iterator it = _CRLF_split.begin();
-	std::cout << PINK << *it << RESET << std::endl;
 	it++;
 	std::string delimeter = ":";
 	//hier z.b. kann der User request ohne doppelpunkt eingeben?
@@ -209,7 +205,6 @@ void		RequestParser::parseRequestHeader()
 
 void RequestParser::setPort()
 {
-	// uint32_t p;
 	std::string tmp;
 	std::unordered_map<std::string, std::string>::iterator start = _requestH.find("Host");
 	if (start != _requestH.end())
@@ -218,10 +213,8 @@ void RequestParser::setPort()
 		size_t i = tmp.find(':');
 		tmp = tmp.substr(i + 1);
 	}
-	// std::stringstream s(tmp);
-	// s >> p;
 	this->_port = atol(tmp.c_str());
-	std::cout << PINK << this->_port << RESET << std::endl;
+	// std::cout << PINK << this->_port << RESET << std::endl;
 }
 
 

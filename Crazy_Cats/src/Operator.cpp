@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 
+int	g_error;
 
 int fdServer(int fd, std::vector<Server> servers)
 {
@@ -183,17 +184,19 @@ int	Operator::find_server(uint32_t port)
 	return (i);
 }
 
-void write2file(std::vector<unsigned char> input, std::string filename)
-{
-	std::fstream file;
-	file.open(filename, std::ios_base::out);
-	for (size_t i = 0; i < input.size(); i++)
-		file << input[i];
-	file.close();
-}
+// void write2file(std::vector<unsigned char> & input, std::string filename)
+// {
+// 	std::fstream file;
+// 	file.open(filename, std::ios_base::out);
+// 	//should we protect that?
+// 	for (size_t i = 0; i < input.size(); i++)
+// 		file << input[i];
+// 	file.close();
+// }
 
 void Operator::start_process()
 {
+	g_error = 200;
 	for (size_t i = 0; i < _servers.size(); ++i)
 	{
 		_servers[i].bindPort();
@@ -251,20 +254,11 @@ void Operator::start_process()
 						if (clients[k].getRFlag())
 						{
 							clients[k].printRequest();
-							// for (size_t i = 0; i < clients[k].tmpBody.size(); i++)
-							// 	std::cout << clients[k].tmpBody[i];
-							std::cout << clients[k].tmpBody.size() << std::endl;
-							std::cout << "do you get here?\n";
-							//RequestParser RP(clients[k].getRequest());
 							RequestParser RP(clients[k].tmpReq);
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
-              				H.start_handling(_servers[i], clients[k]);
+							H.start_handling(_servers[i], clients[k]);
 							// clients[k].setResp(_servers[i].getResponse());
-							if (clients[k].getHBFlag())
-							{
-								write2file(clients[k].tmpBody, "test.txt");
-							}
 							//TODO: if this is in the Handler, we can pack all the previous functions in the handler too :)
 							clients[k].setBFlagF();
 							clients[k].setFlagF();
@@ -273,6 +267,8 @@ void Operator::start_process()
 							clients[k].setCFlagF();
 							clients[k].tmpReq.clear();
 							clients[k].tmpBody.clear();
+							clients[k].tmpExtract.clear();
+
 							request.clear();
 							clients[k].clearRequest();
 						}

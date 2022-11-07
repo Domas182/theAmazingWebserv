@@ -34,13 +34,15 @@ class Cgi
 		std::string							_path_info;
 		std::string							_content_type;
 		RequestParser						_RP;
-		// FILE*								_infile; 
+		FILE*								_infile;
+		FILE*								_tmp;
 
 	public:
 		Cgi(Server server, Client & client, std::string path, std::string query, std::string type, RequestParser RP);
 		~Cgi();
 
 		void	set_Env(Server server);
+		void	process(char ** env_str);
 };
 
 #endif /* CGI_HPP */

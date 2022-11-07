@@ -3,7 +3,18 @@
 #include "Handler.hpp"
 #include <iostream>
 #include <chrono>
-#include <ctime> 
+#include <ctime>
+
+
+
+void time_function()
+{
+	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+	std::cout << "finished computation at " << std::ctime(&end_time);
+}
+
+extern int	g_error;
 
 Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _RP(RP)
 {
@@ -15,48 +26,158 @@ Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _R
 	this->_path = "";
 	this->_query = "";
 	this->_port = "";
-	this->_error_code = 200;
 	client.printBody();
 }
-//TODO:can we put start_handling in the constructor??
 
 Handler::~Handler()
 {}
 
 
-void time_function()
+void Handler::write_file(std::vector<unsigned char> & input, std::string filename)
 {
-	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-	std::cout << "finished computation at " << std::ctime(&end_time);
+	// for (size_t i = 0; i < input.size(); i++)
+	// 	std::cout << GREEN << input[i] << RESET;
+	std::fstream file;
+	file.open(filename, std::ios_base::out);
+	//should we protect that?
+	for (size_t i = 0; i < input.size(); i++)
+		file << input[i];
+	file.close();
+}
+
+void Handler::pure_body(std::string & fileBody, Client& client)
+{
+
+	std::string rn = "\r\n\r\n";
+	size_t pos = 0;
+	if((pos = fileBody.find(rn)) != std::string::npos)
+	{
+		fileBody.erase(0, pos + rn.length());
+		std::string test;
+		rn = "\r\n";
+		if ((pos = fileBody.find(rn)) != std::string::npos)
+			test = fileBody.substr(0, pos);
+		std::copy(test.begin(), test.end(), std::back_inserter(client.tmpExtract));
+	}
+}
+void	Handler::get_file_info(std::string& fileBody)
+{
+	std::string rn = "\r\n";
+	size_t pos = 0;
+	size_t pos2 = 0;
+	while ((pos = fileBody.find(rn)) != std::string::npos)
+	{
+		std::string test = fileBody.substr(0, pos);
+		fileBody.erase(0, pos + rn.length());
+		std::string delimeter = ":";
+		if ((pos2 = test.find(delimeter)) != std::string::npos)
+		{
+			std::string key = test.substr(0, pos2);
+			if (key == "Content-Disposition")
+			{
+				std::cout << LB<< key<<  RESET << std::endl;
+
+				this->_bodyHeader.insert(std::pair<std::string, std::vector<std::string> >(key, std::vector<std::string>()));
+				test.erase(0, pos2 + delimeter.length());
+				delimeter = ";";
+				std::string value = "";
+				while((pos2 = test.find(delimeter)) != std::string::npos)
+				{
+					value = test.substr(0, pos2);
+					this->_bodyHeader[key].push_back(value);
+					test.erase(0, pos2 + delimeter.length());
+				}
+				delimeter = "=";
+				if ((pos2 = test.find(delimeter)) != std::string::npos)
+				{
+					std::string testfile = test.substr((pos2 + 2), (test.size() - pos2 -3));
+					this->_filename = testfile;
+					std::cout << ORANGE << "keyvalues:" << this->_filename << RESET << std::endl;
+				}
+			}
+			else if (key == "Content-Type")
+			{
+					std::string value = test.substr(pos2 + 1, test.size());
+					this->_bodyHeader.insert(std::pair<std::string, std::vector<std::string> >(key, std::vector<std::string>()));
+					this->_bodyHeader[key].push_back(value);
+					std::cout << PINK << "keyvalues:" << value << RESET << std::endl;
+			}
+		}
+	}
+	// _bodyHeader["Content-Disposition:"]
+	//wie aknn cih das letzet element vom map vector accessen?
+}
+
+void Handler::body_extractor(Client& client)
+{
+	std::string fileBody(client.tmpBody.begin(), client.tmpBody.end());
+	get_file_info(fileBody);
+	std::string fileBody2(client.tmpBody.begin(), client.tmpBody.end());
+
+	pure_body(fileBody2, client);
+
+}
+
+void	Handler::handle_post(Server & server, Client & client)
+{	server.set_Content(this->_path, 1);
+		// throw std::invalid_argument("Error❗\nCould not open requested file");
+		// //TODO:404
+	if (client.getHBFlag())
+	{
+		body_extractor(client);
+		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
+		write_file(client.tmpExtract, this->_filename);
+	}
 }
 
 void	Handler::handle_get(Server & server, Client & client)
 {
-
-	if (server.set_Content(this->_path))
-		throw std::invalid_argument("Error❗\nCould not open requested file");
-		//TODO:404
-	// this->_RSP.createResponse(200, server, this->_path, this->_version);
-	client.setResp(this->_RSP.createResponse(200, server, this->_path, this->_version));
+	if (g_error == 200)
+		server.set_Content(this->_path, 1);
+	if (g_error != 200)
+		server.set_Content(this->_path, g_error);
+	client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
+	if (g_error != 200)
+		g_error = 200;
 }
+
 void	Handler::handle_methods(Server & server, Client & client)
 {
 	if (this->_method == "GET")
 		handle_get(server, client);
-	// else if (this->_method == "POST")
-	// 	handle_post(server);
+	else if (this->_method == "POST")
+		handle_post(server, client);
 	// else if (this->_method == "DELETE")
 	// 	handle_delete(server);
 	
 
 }
+
+void	Handler::check_methods()
+{
+	bool check = false;
+	if (_file_req == false)
+	{
+		if (_method == "HEAD" || _method == "PUT" || _method == "CONNECT" || _method == "OPTIONS" || _method == "TRACE")
+		{
+			g_error = 501;
+			return ;
+		}
+		for (std::vector<std::string>::const_iterator it = _allowed_methods.begin(); it != _allowed_methods.end(); it++)
+		{
+			if (it->data() == _method)
+				check = true;
+		}
+		if (check == false)
+			g_error = 405;
+	}
+}
+
 void	Handler::start_handling(Server & server, Client & client)
 {
 	std::unordered_map<std::string, std::string>::const_iterator got = _requestH.find("Host");
 	if (got == _requestH.end())
-		throw std::runtime_error("No Host in Request"); //this is only temporary -> set error page instead
-		// this->_error_code = 400;
+		g_error = 400;
 	else
 	{
 		std::string port;
@@ -105,34 +226,40 @@ void	Handler::start_handling(Server & server, Client & client)
 		// std::cout << "URI " << this->_URI << std::endl;
 	}
 	change_path(server);
-	// if (server.getCgi() == "no")
+	check_methods();
+	if (server.getCgi() == "no")
 		handle_methods(server, client);
-	// else
-	// 	Cgi CGI(server, client, _path, _query, _type, _RP);
+	else
+		Cgi CGI(server, client, _path, _query, _type, _RP);
 }
 
 void	Handler::change_path(Server & server)
 {
-	bool file_req = false;
+	this->_allowed_methods = server.getMethods();
+	_file_req = false;
 	_path = server.getRoot() + _path;
 	if (_URI.find(".") != STREND)
 	{
 		size_t path_start = _URI.find ('.');
 		_type = _URI.substr(path_start + 1);
-		file_req = true;
+		_file_req = true;
 	}
-	if (server.getLocation().empty() && file_req == false)
+	if (server.getLocation().empty() && _file_req == false)
+	{
 		_path = _path + server.getIndex();
+		this->_allowed_methods = server.getMethods();
+	}
 	if (!server.getLocation().empty())
 	{
 		std::string tmp;
 		for (std::vector<Location>::const_iterator it = server.getLocation().begin(); it != server.getLocation().end(); it++)
 		{
-			if (file_req == false)
+			if (_file_req == false)
 			{
 				if (this->_URI == it->getProxy())
 				{
 					_path = server.getRoot() + it->getRoot() + it->getIndex();
+					this->_allowed_methods = it->getLocMethods();
 					return;
 				}
 				if (std::count(_URI.begin(), _URI.end(), '/') > 1)
@@ -142,7 +269,10 @@ void	Handler::change_path(Server & server)
 					tmp = _URI.substr(0, end + 1);
 					std::string tmp2 = _URI.substr(end + 2);
 					if (tmp == it->getProxy())
+					{
 						_path = server.getRoot() + it->getRoot() + tmp2 + it->getIndex();
+						this->_allowed_methods = it->getLocMethods();
+					}
 				}
 				_path = _path + server.getIndex();
 			}
@@ -153,9 +283,13 @@ void	Handler::change_path(Server & server)
 					size_t start = _URI.rfind('/');
 					tmp = _URI.substr(start + 1);
 					_path = server.getRoot() + tmp;
+					this->_allowed_methods = it->getLocMethods();
 				}
 			}
 		}
 	}
-	std::cout << "{{{{{{{{{ " << _path << std::endl;
+	std::ifstream input_file;
+	input_file.open(_path);
+	if (!input_file.is_open())
+		g_error = 404;
 }
