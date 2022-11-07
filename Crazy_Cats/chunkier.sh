@@ -1,1 +1,1 @@
-curl -H "Transfer-Encoding: chunked" --data-binary @larger.txt http://localhost:9999
+curl -H "Transfer-Encoding: chunked" --data-binary @testdir/trail.jpg http://localhost:9999

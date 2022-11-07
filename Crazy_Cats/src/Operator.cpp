@@ -125,6 +125,7 @@ void headerCountAndFlags(Client& client, int& len)
 	client.setFlagT();
 	len = findBodyLength(client.tmpReq);
 	headerFlagSetter(client, len);
+	client.tmpLen = len;
 }
 
 void	RequestChecker(std::vector<unsigned char> request, Client& client, Server& server, size_t& bytes)
@@ -162,10 +163,13 @@ void	RequestChecker(std::vector<unsigned char> request, Client& client, Server& 
 	{
 		if (!client.getRFlag() && !client.getCFlag())
 		{
-			while (client.tmpBody.size() < contLen && i < bytes)
+			while (i < bytes)
 				client.tmpBody.push_back(request[i++]);
-			if (client.tmpBody.size() == contLen)
+			if (client.tmpBody.size() == client.tmpLen)
+			{
 				client.setRFlagT();
+				client.tmpLen = 0;
+			}
 		}
 		if (!client.getRFlag() && client.getCFlag())
 			chunkedHandler(client, request, i, bytes);
@@ -255,6 +259,7 @@ void Operator::start_process()
 						{
 							clients[k].printRequest();
 							RequestParser RP(clients[k].tmpReq);
+							std::cout << YELLOW << RP.getMethod()<< RESET << std::endl;
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
 							H.start_handling(_servers[i], clients[k]);
