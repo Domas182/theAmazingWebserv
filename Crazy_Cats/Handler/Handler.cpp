@@ -35,7 +35,6 @@ Handler::~Handler()
 void Handler::write_file(std::vector<unsigned char> & input, std::string filename)
 {
 	// for (size_t i = 0; i < input.size(); i++)
-	// 	std::cout << GREEN << input[i] << RESET;
 	std::fstream file;
 	file.open(filename, std::ios_base::out);
 	//should we protect that?
@@ -122,11 +121,14 @@ void	Handler::handle_post(Server & server, Client & client)
 		server.set_Content(this->_path, 1);
 	if (g_error != 200)
 		server.set_Content(this->_path, g_error);
-	if (client.getHBFlag())
+	if (client.getHBFlag() && !client.getCFlag())
 	{
 		body_extractor(client);
 		client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
 		write_file(client.tmpExtract, this->_filename);
+	} else if (client.getHBFlag() && client.getCFlag()){
+		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
+		write_file(client.tmpBody, "chunked.txt");		
 	}
 	if (g_error != 200)
 		g_error = 200;
@@ -145,10 +147,13 @@ void	Handler::handle_get(Server & server, Client & client)
 
 void	Handler::handle_methods(Server & server, Client & client)
 {
+	std::cout << GREEN << this->_method << RESET;
 	if (this->_method == "GET")
 		handle_get(server, client);
 	else if (this->_method == "POST")
+	{
 		handle_post(server, client);
+	}
 	// else if (this->_method == "DELETE")
 	// 	handle_delete(server);
 	
