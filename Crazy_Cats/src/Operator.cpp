@@ -280,6 +280,7 @@ void Operator::start_process()
 							clients[k].setCFlagF();
 							clients[k].tmpReq.clear();
 							clients[k].tmpBody.clear();
+							clients[k].tmpExtract.clear();
 							request.clear();
 							clients[k].clearRequest();
 						}

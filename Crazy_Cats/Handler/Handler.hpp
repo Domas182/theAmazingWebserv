@@ -37,6 +37,7 @@ class Handler
 		std::string	_port;
 		std::string	_host;
 		std::string	_type;
+		std::string	_req_type;
 		std::string _filename;
 		std::unordered_map<std::string, std::string> _requestH;
 		std::vector<unsigned char> & _body;

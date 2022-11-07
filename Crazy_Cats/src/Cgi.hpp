@@ -25,7 +25,7 @@ class Cgi
 {
 	private:
 		std::unordered_map<std::string, std::string>	_env;
-		std::string							_path_translated;
+		std::string							_exec_str;
 		std::string							_path;
 		std::string							_query;
 		std::string							_method;
@@ -34,15 +34,22 @@ class Cgi
 		std::string							_path_info;
 		std::string							_content_type;
 		RequestParser						_RP;
-		FILE*								_infile;
-		FILE*								_tmp;
+		std::string							_version;
+
+
+		FILE *								in; 
+		FILE *								tmp;
+		std::string							_response;
 
 	public:
-		Cgi(Server server, Client & client, std::string path, std::string query, std::string type, RequestParser RP);
+		Cgi(Server server, Client & client, std::string path, std::string query,
+			std::string type, RequestParser RP);
 		~Cgi();
 
-		void	set_Env(Server server);
-		void	process(char ** env_str);
+		void		set_Env(Server server);
+		void		process(char ** env_str);
+		void		CgiResponse(Server & server, Client & client);
+		std::string	const & getResponse() const;
 };
 
 #endif /* CGI_HPP */
