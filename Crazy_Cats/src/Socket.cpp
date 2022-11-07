@@ -76,8 +76,8 @@ void ft_tsocket::socketSend(int fd, Client& client)
 std::vector<unsigned char> ft_tsocket::socketRecv(int i, PollFd &tPoll)
 {
 	//std::vector<unsigned char> buf(150728640);
-	//std::vector<unsigned char> buf(65536);
-	std::vector<unsigned char> buf(8192);
+	std::vector<unsigned char> buf(65536);
+	// std::vector<unsigned char> buf(8192);
 	//std::vector<unsigned char> buf(8192);
 	//TODO:buf(x) == our maxread size is not the same as maxbody size == still missing!
 	nbytes = recv(tPoll.getPfd()[i].fd, &buf[0], buf.size(), MSG_DONTWAIT);

@@ -105,6 +105,7 @@ class Client
 		std::vector<unsigned char> tmpChunkedBody;
 		std::string iHex;
 		size_t chunkSize;
+		int		tmpLen;
 		bool	chunkSizeSet;
 };
 
