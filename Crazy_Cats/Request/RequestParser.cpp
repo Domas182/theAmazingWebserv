@@ -166,9 +166,6 @@ void		RequestParser::RequestLineVersion(std::string &version)
 	}
 	else
 		g_error = 400;
-	//TODO:handle return values!
-	
-
 }
 
 void		RequestParser::parseRequestLine(std::string reqLine)
