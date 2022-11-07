@@ -119,9 +119,9 @@ void Handler::body_extractor(Client& client)
 }
 
 void	Handler::handle_post(Server & server, Client & client)
-{	if (server.set_Content(this->_path))
-		throw std::invalid_argument("Error❗\nCould not open requested file");
-		//TODO:404
+{	server.set_Content(this->_path, 1);
+		// throw std::invalid_argument("Error❗\nCould not open requested file");
+		// //TODO:404
 	if (client.getHBFlag())
 	{
 		body_extractor(client);
