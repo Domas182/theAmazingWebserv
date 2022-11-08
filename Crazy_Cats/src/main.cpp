@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 	{
 		Operator operate(file);
 		operate.start_parsing();
-		std::cout << operate << std::endl;
+		// std::cout << operate << std::endl;
 		operate.start_process();
 	}
 	catch (const std::exception& e)
