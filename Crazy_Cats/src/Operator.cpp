@@ -236,14 +236,7 @@ void Operator::start_process()
 					k = lookClient(poFD.getPfd()[i].fd, clients);
 					std::vector<unsigned char> request;
 					request = _servers[clients[k].getIndex()].sockRecv(i, poFD);
-					//request = _servers[clients[k].getIndex()].testRecv(i, poFD);
-					// if (request.size() > 1)
-					// {
-					// 	for (int i = 0; i < request.size(); i++)
-					// 		std::cout << request[i];
-					// }
-					std::cout << "read loop get's here. size of tmpbody: " << clients[k].tmpBody.size() << std::endl;
-					
+					// std::cout << "read loop get's here. size of tmpbody: " << clients[k].tmpBody.size() << std::endl;
 					if (request.size() <= 0)
 					{
 						std::vector<Client>::iterator it(clients.begin());
@@ -253,18 +246,14 @@ void Operator::start_process()
 					}
 					else
 					{
-						//getRequestReady(request, clients[k], _servers[clients[k].getIndex()].getNBytes());
 						RequestChecker(request, clients[k], _servers[clients[k].getIndex()], _servers[clients[k].getIndex()].getNBytes());
 						if (clients[k].getRFlag())
 						{
-							clients[k].printRequest();
+							// clients[k].printRequest();
 							RequestParser RP(clients[k].tmpReq);
-							std::cout << YELLOW << RP.getMethod()<< RESET << std::endl;
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
 							H.start_handling(_servers[i], clients[k]);
-							// clients[k].setResp(_servers[i].getResponse());
-							//TODO: if this is in the Handler, we can pack all the previous functions in the handler too :)
 							clients[k].setBFlagF();
 							clients[k].setFlagF();
 							clients[k].setHBFlagF();

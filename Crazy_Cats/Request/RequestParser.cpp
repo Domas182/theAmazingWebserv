@@ -56,7 +56,7 @@ std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
 	for(std::unordered_map<std::string, std::string>::const_iterator itnew = r.getRequestH().begin();
     itnew != r.getRequestH().end(); ++itnew)
 	{
-    	std::cout << YELLOW << "MAP	" << itnew->first << " " << itnew->second << RESET << "\n";
+    	o << YELLOW << "MAP	" << itnew->first << " " << itnew->second << RESET << "\n";
 	}
 	return o;
 }
@@ -88,19 +88,7 @@ void		RequestParser::split_CRLF(std::vector<unsigned char> buffer)
 		CRLF.erase(0, pos + delimeter.length());
 	}
 	if (_CRLF_split.empty())
-	{
-		// std::cout << "*********** " << _CRLF_split.front() << std::endl;
 		throw std::runtime_error("Request syntax error");
-	}
-	//catch in the main
-	//general error catches on a higher level
-	//but do they need to be handled for the response?
-	// for (size_t i = 0; i < _CRLF_split.size(); i++)
-	// {
-
-	// 	std::cout << RED <<_CRLF_split[i] << RESET << std::endl;
-	// }
-	std::cout << _CRLF_split.front() << std::endl;
 	parseRequestLine(_CRLF_split.front());
 	parseRequestHeader();
 	//body starts here
@@ -120,18 +108,13 @@ std::string &		RequestParser::RequestLineMethod(std::string &Method)
 		else if (this->_method.compare("POST") == 0)
 			std::cout << RED << "POST" << RESET << std::endl;
 		else if (this->_method.compare("DELETE") == 0)
-			std::cout << RED << "DELETE" << RESET << std::endl;	
-			//noch die anderen typen einbauen
-			//put as post 
+			std::cout << RED << "DELETE" << RESET << std::endl;	 
 		else
-			throw std::runtime_error("wrong Method+");
+			throw std::runtime_error("wrong Method");
 		Method.erase(0, pos + delimeter.length());
 		return (Method);
-		// pos = Method.find(delimeter);
 	}
 	throw std::runtime_error("Wrong Method-");
-	//what should we do if one request is bad? 
-	//still keep on with the others or stop the programm?
 }
 
 
@@ -184,7 +167,6 @@ void		RequestParser::parseRequestHeader()
 	//und sollte man deswegen beim : splitten?
 	for(; it != _CRLF_split.end(); it++)
 	{
-		// std::cout << *it << std::endl;
 		size_t pos = 0;
 		pos = it->find(delimeter);
 		if (pos != std::string::npos)
@@ -214,7 +196,6 @@ void RequestParser::setPort()
 		tmp = tmp.substr(i + 1);
 	}
 	this->_port = atol(tmp.c_str());
-	// std::cout << PINK << this->_port << RESET << std::endl;
 }
 
 
