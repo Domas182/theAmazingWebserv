@@ -71,11 +71,11 @@ void chunkedHandler(Client& client, std::vector<unsigned char> request, size_t& 
 	{
 		if (!client.chunkSizeSet)
 		{
-			while (!crlfBool(request, i) && i < bytes)
+			while (i < bytes && !crlfBool(request, i))
 				client.iHex.push_back(request[i++]);
 			if (request[i] == '\r')
 			{
-				while (crlfBool(request, i) && i < bytes)
+				while (i < bytes && crlfBool(request, i))
 					i += 2;
 				client.chunkSize = std::stoi(client.iHex.c_str(), nullptr, 16);
 				client.chunkSizeSet = true;
@@ -96,7 +96,7 @@ void chunkedHandler(Client& client, std::vector<unsigned char> request, size_t& 
 					client.chunkSizeSet = false;
 					client.tmpChunkedBody.clear();
 				}
-				while (crlfBool(request, i) && i < bytes)
+				while (i < bytes && crlfBool(request, i))
 					i += 2;
 			}
 		}

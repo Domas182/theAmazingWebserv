@@ -34,10 +34,9 @@ Handler::~Handler()
 
 void Handler::write_file(std::vector<unsigned char> & input, std::string filename)
 {
-	// for (size_t i = 0; i < input.size(); i++)
 	std::fstream file;
 	file.open(filename, std::ios_base::out);
-	//should we protect that?
+	//TODO:should we protect that?
 	for (size_t i = 0; i < input.size(); i++)
 		file << input[i];
 	file.close();
@@ -111,7 +110,6 @@ void Handler::body_extractor(Client& client)
 	std::string fileBody(client.tmpBody.begin(), client.tmpBody.end());
 	get_file_info(fileBody);
 	std::string fileBody2(client.tmpBody.begin(), client.tmpBody.end());
-
 	pure_body(fileBody2, client);
 
 }
