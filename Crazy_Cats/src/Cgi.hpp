@@ -34,7 +34,6 @@ class Cgi
 		std::string							_path_info;
 		std::string							_content_type;
 		RequestParser						_RP;
-		std::string							_version;
 
 
 		FILE *								in; 
@@ -42,14 +41,16 @@ class Cgi
 		std::string							_response;
 
 	public:
-		Cgi(Server server, Client & client, std::string path, std::string query,
-			std::string type, RequestParser RP);
+		Cgi(Server & server, Client & client, std::string path, std::string query,
+			std::string type, RequestParser & RP);
 		~Cgi();
 
-		void		set_Env(Server server);
+		void		set_Env(Server & server);
 		void		process(char ** env_str);
 		void		CgiResponse(Server & server, Client & client);
+		void		create_Response(Server & server, std::string read);
 		std::string	const & getResponse() const;
+		std::string set_time();
 };
 
 #endif /* CGI_HPP */

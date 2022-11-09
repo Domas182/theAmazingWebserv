@@ -10,6 +10,7 @@ RequestParser::RequestParser(){}
 
 RequestParser::RequestParser(std::vector<unsigned char>& request)
 {
+	this->_oldLocation = "";
 	split_CRLF(request);
 	// std::cout << *this  << std::endl; 
 }
@@ -200,6 +201,11 @@ void		RequestParser::parseRequestHeader()
 		// else
 		// 	throw std::runtime_error("RequestHeader parsing failed");
 	}
+	std::unordered_map<std::string, std::string>::const_iterator got = this->_requestH.find("Referer");
+	std::unordered_map<std::string, std::string>::const_iterator endit = this->_requestH.end();
+	if (got != endit)
+		this->_oldLocation = got->second;
+	std::cout << PINK << this->_oldLocation << RESET << std::endl;
 	setPort();
 }
 
@@ -246,6 +252,11 @@ std::vector<std::string> const & RequestParser::getCRLF_split() const
 uint32_t const & RequestParser::getPort() const
 {
 	return this->_port;
+}
+
+std::string const & RequestParser::getOldLocation() const
+{
+	return this->_oldLocation;
 }
 
 /* ************************************************************************** */
