@@ -249,7 +249,7 @@ void Operator::start_process()
 						RequestChecker(request, clients[k], _servers[clients[k].getIndex()], _servers[clients[k].getIndex()].getNBytes());
 						if (clients[k].getRFlag())
 						{
-							// clients[k].printRequest();
+							clients[k].printRequest();
 							RequestParser RP(clients[k].tmpReq);
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
