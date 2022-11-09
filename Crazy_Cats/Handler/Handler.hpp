@@ -39,6 +39,7 @@ class Handler
 		std::string	_type;
 		std::string	_req_type;
 		std::string _filename;
+		std::string	_oldLocation;
 		std::string _webkit;
 		std::unordered_map<std::string, std::string> _requestH;
 		std::vector<unsigned char> & _body;
@@ -46,6 +47,7 @@ class Handler
 		Response  _RSP;
 		RequestParser	_RP;
 		bool		_file_req;
+		int			_loc;
 
 	public:
 		Handler(RequestParser RP, Client & client);
@@ -55,6 +57,8 @@ class Handler
 		void		check_methods();
 		void		start_handling(Server & server, Client & client);
 		void		change_path(Server & server);
+		void		check_listing(Server & server);
+		void		check_oldLocation(Server & server);
 		void		handle_methods(Server & server, Client & client);
 		void		handle_get(Server & server, Client & client);
 		void		handle_post(Server & server, Client & client);

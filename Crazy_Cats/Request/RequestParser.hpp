@@ -36,6 +36,7 @@ class RequestParser
 		std::string const & getURI() const;
 		std::string const & getVersion() const;
 		uint32_t const & getPort() const;
+		std::string const & getOldLocation() const;
 		// std::size_t const & getLineCount() const;
 		//not sure if needed
 		std::unordered_map<std::string, std::string> const & getRequestH() const;
@@ -59,6 +60,7 @@ class RequestParser
 		uint32_t	_port;
 		//maybe not const, maybe needs to be modified?
 		std::string	_version;
+		std::string	_oldLocation;
 		std::vector<std::string> _CRLF_split;
 		std::unordered_map<std::string, std::string> _requestH;
 		// std::size_t				_line_count = _requestH.size();

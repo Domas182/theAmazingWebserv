@@ -21,9 +21,11 @@ Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _R
 	// this->_URI = "http://www.w3.org/favicon.ico/?password=password";
 	this->_version = _RP.getVersion();
 	this->_requestH = _RP.getRequestH();
+	this->_oldLocation = _RP.getOldLocation();
 	this->_path = "";
 	this->_query = "";
 	this->_port = "";
+	this->_loc = 0;
 	client.printBody();
 }
 
@@ -238,22 +240,25 @@ void	Handler::start_handling(Server & server, Client & client)
 			{
 				size_t query_start = _URI.find('?');
 				this->_query = _URI.substr(query_start);
+				_URI = _URI.substr(0, (_URI.length() - _query.length()));
 			}
 			this->_path = _URI.substr(std::min(path_start, query_start));
 		}
 		if (this->_path[0] == '/')
 			this->_path = this->_path.substr(1);
-		// std::cout << "HOST " << this->_host << std::endl;
-		// std::cout << "QURY " << _query << std::endl;
-		// std::cout << "PATH " << _path << std::endl;
-		// std::cout << "PORT " << this->_port << std::endl;
-		// std::cout << "URI " << this->_URI << std::endl;
+		std::cout << "HOST " << this->_host << std::endl;
+		std::cout << "QURY " << _query << std::endl;
+		std::cout << "PATH " << _path << std::endl;
+		std::cout << "PORT " << this->_port << std::endl;
+		std::cout << "URI " << this->_URI << std::endl;
 	}
 	change_path(server);
+	check_oldLocation(server);
+	check_listing(server);
 	check_methods();
 	if (server.getCgi() != "no" && _req_type == "php")
 	{
-		Cgi CGI(server, client, _path, _query, _type, _RP);
+		Cgi CGI(server, client, _path, _query, _req_type, _RP);
 		client.setResp(CGI.getResponse());
 		if (g_error != 200)
 			g_error = 200;
@@ -281,6 +286,7 @@ void	Handler::change_path(Server & server)
 	if (!server.getLocation().empty())
 	{
 		std::string tmp;
+		int i = 0;
 		for (std::vector<Location>::const_iterator it = server.getLocation().begin(); it != server.getLocation().end(); it++)
 		{
 			if (_file_req == false)
@@ -292,9 +298,10 @@ void	Handler::change_path(Server & server)
 					std::ifstream input_file;
 					input_file.open(_path);
 					if (!input_file.is_open())
-					g_error = 404;
+						g_error = 404;
 					size_t path_start = _path.find ('.');
 					_req_type = _path.substr(path_start + 1);
+					this->_loc = i;
 					return;
 				}
 				if (std::count(_URI.begin(), _URI.end(), '/') > 1)
@@ -307,9 +314,11 @@ void	Handler::change_path(Server & server)
 					{
 						_path = server.getRoot() + it->getRoot() + tmp2 + it->getIndex();
 						this->_allowed_methods = it->getLocMethods();
+						this->_loc = i;
 					}
 				}
-				_path = _path + server.getIndex();
+				if (i == 0)
+					_path = _path + server.getIndex();
 			}
 			else
 			{
@@ -319,13 +328,68 @@ void	Handler::change_path(Server & server)
 					tmp = _URI.substr(start + 1);
 					_path = server.getRoot() + tmp;
 					this->_allowed_methods = it->getLocMethods();
+					this->_loc = i;
 				}
 			}
+			i++;
 		}
 	}
-	std::cout << LB << this->_path << RESET << std::endl;
+	if (_path.rfind('?') != std::string::npos)
+	{
+		size_t end = _path.rfind('?');
+		_path = _path.substr(0, end + 1);
+	}
 	std::ifstream input_file;
 	input_file.open(_path);
 	if (!input_file.is_open())
 		g_error = 404;
+}
+
+void	Handler::check_listing(Server & server)
+{
+	if (!server.getLocation().empty())
+	{
+		if (server.getLocation().at(_loc).getDirectoryListing() == true && _file_req == false)
+		{
+			size_t end = _path.rfind('/');
+			std::string tmp = _path.substr(end + 1);
+			_path = _path.substr(0, tmp.length());
+			_path = _path + "/listing.php";
+			_req_type = "php";
+		}
+		return ;
+	}
+}
+
+void	Handler::check_oldLocation(Server & server)
+{
+	if (!server.getLocation().empty() && _URI != "/")
+	{
+		if (_oldLocation != "")
+		{
+			size_t start = _oldLocation.rfind('/');
+			std::string tmp = _oldLocation.substr(start);
+			if (tmp.rfind('.') == std::string::npos && tmp != "/" && tmp.rfind('?') == std::string::npos)
+			{
+				for (std::vector<Location>::const_iterator it = server.getLocation().begin(); it != server.getLocation().end(); it++)
+				{
+					if (tmp == it->getProxy() && it->getDirectoryListing() == true)
+					{
+						if (std::count(_URI.begin(), _URI.end(), '/') > 0)
+						{
+							size_t start = _URI.rfind('/');
+							tmp = _URI.substr(start + 1);
+							_path = server.getRoot() + it->getRoot() + tmp;
+							std::ifstream input_file;
+							input_file.open(_path);
+							if (!input_file.is_open())
+								g_error = 404;
+							else
+								g_error = 200;
+						}
+					}
+				}
+			}
+		}
+	}
 }

@@ -2,7 +2,7 @@
 
 extern int	g_error;
 
-Cgi::Cgi(Server server, Client & client, std::string path, std::string query, std::string type, RequestParser RP) : 
+Cgi::Cgi(Server & server, Client & client, std::string path, std::string query, std::string type, RequestParser & RP) : 
 	_path(path), _query(query), _type(type), _RP(RP)
 {
 	_method = _RP.getMethod();
@@ -10,6 +10,7 @@ Cgi::Cgi(Server server, Client & client, std::string path, std::string query, st
 	_response.clear();
 	in = tmpfile();
 	tmp = tmpfile();
+	std::cout << "PATH " << _path << std::endl;
 	set_Env(server);
 	CgiResponse(server, client);
 }
@@ -32,7 +33,7 @@ void free_array(char **input)
 	input = NULL;
 }
 
-void Cgi::set_Env(Server server)
+void Cgi::set_Env(Server & server)
 {
 	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	_env["PATH_INFO"] =_path;
@@ -172,10 +173,23 @@ void	Cgi::CgiResponse(Server & server, Client & client)
 		this->_response = ss.str();
 		return ;
 	}
+	create_Response(server, read);
+}
+
+void	Cgi::create_Response(Server & server, std::string read)
+{
 	size_t start = read.find("\r\n\r\n") + 4;
 	std::string	body = read.substr(start, std::string::npos);
 	this->_response = "HTTP/1.1 200 OK\r\nContent-Length: ";
 	this->_response += std::to_string(body.length());
+	this->_response += "\nContent-Type: ";
+	this->_response += _type;
+	this->_response += "\nLocation: ";
+	this->_response += _path;
+	this->_response += "\nServer: ";
+	this->_response += server.getServerName();
+	this->_response += "\nDate: ";
+	this->_response += this->set_time();
 	this->_response += "\r\n\r\n";
 	this->_response += body;
 }
@@ -183,4 +197,12 @@ void	Cgi::CgiResponse(Server & server, Client & client)
 std::string const & Cgi::getResponse() const
 {
 	return (this->_response);
+}
+
+std::string Cgi::set_time()
+{
+	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+	std::string s(std::ctime(&end_time));
+	return (s);
 }
