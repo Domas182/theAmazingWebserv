@@ -114,7 +114,11 @@ void Handler::body_extractor(Client& client)
 }
 
 void	Handler::handle_post(Server & server, Client & client)
-{	if (g_error == 200)
+{
+	std::cout << server.getLimitBody() << std::endl;
+	if ( client.tmpBody.size() > server.getLimitBody())
+		g_error = 413;
+	if (g_error == 200)
 		server.set_Content(this->_path, 1);
 	if (g_error != 200)
 		server.set_Content(this->_path, g_error);
@@ -135,8 +139,25 @@ void	Handler::handle_get(Server & server, Client & client)
 {
 	if (g_error == 200)
 		server.set_Content(this->_path, 1);
-	if (g_error != 200)
+	else if (g_error != 200)
 		server.set_Content(this->_path, g_error);
+	client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
+	if (g_error != 200)
+		g_error = 200;
+}
+
+void	Handler::handle_delete(Server & server, Client & client)
+{
+	if (g_error == 200)
+	{
+		std::remove(this->_path.c_str());
+		if (std::ifstream(this->_path))
+			g_error = 409;
+		else
+			server.set_Content(this->_path, 1);
+	}
+	if (g_error != 200)
+			server.set_Content(this->_path, g_error);
 	client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
 	if (g_error != 200)
 		g_error = 200;
@@ -144,14 +165,14 @@ void	Handler::handle_get(Server & server, Client & client)
 
 void	Handler::handle_methods(Server & server, Client & client)
 {
+	std::cout << RED << g_error <<  RESET << std::endl;
+
 	if (this->_method == "GET")
 		handle_get(server, client);
 	else if (this->_method == "POST")
-	{
 		handle_post(server, client);
-	}
-	// else if (this->_method == "DELETE")
-	// 	handle_delete(server);
+	else if (this->_method == "DELETE")
+		handle_delete(server, client);
 	
 
 }
@@ -302,6 +323,7 @@ void	Handler::change_path(Server & server)
 			}
 		}
 	}
+	std::cout << LB << this->_path << RESET << std::endl;
 	std::ifstream input_file;
 	input_file.open(_path);
 	if (!input_file.is_open())
