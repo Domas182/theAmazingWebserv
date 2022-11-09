@@ -12,7 +12,6 @@ void time_function()
 {
 	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
 	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-	std::cout << "finished computation at " << std::ctime(&end_time);
 }
 
 Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _RP(RP)
@@ -36,10 +35,9 @@ Handler::~Handler()
 
 void Handler::write_file(std::vector<unsigned char> & input, std::string filename)
 {
-	// for (size_t i = 0; i < input.size(); i++)
 	std::fstream file;
 	file.open(filename, std::ios_base::out);
-	//should we protect that?
+	//TODO:should we protect that?
 	for (size_t i = 0; i < input.size(); i++)
 		file << input[i];
 	file.close();
@@ -54,7 +52,7 @@ void Handler::pure_body(std::string & fileBody, Client& client)
 	{
 		fileBody.erase(0, pos + rn.length());
 		std::string test;
-		rn = "\r\n";
+		rn = this->_webkit;
 		if ((pos = fileBody.find(rn)) != std::string::npos)
 			test = fileBody.substr(0, pos);
 		std::copy(test.begin(), test.end(), std::back_inserter(client.tmpExtract));
@@ -65,9 +63,13 @@ void	Handler::get_file_info(std::string& fileBody)
 	std::string rn = "\r\n";
 	size_t pos = 0;
 	size_t pos2 = 0;
+	int counter = 0;
 	while ((pos = fileBody.find(rn)) != std::string::npos)
 	{
 		std::string test = fileBody.substr(0, pos);
+		if (counter == 0)
+			this->_webkit = test;
+		counter++;
 		fileBody.erase(0, pos + rn.length());
 		std::string delimeter = ":";
 		if ((pos2 = test.find(delimeter)) != std::string::npos)
@@ -75,8 +77,6 @@ void	Handler::get_file_info(std::string& fileBody)
 			std::string key = test.substr(0, pos2);
 			if (key == "Content-Disposition")
 			{
-				std::cout << LB<< key<<  RESET << std::endl;
-
 				this->_bodyHeader.insert(std::pair<std::string, std::vector<std::string> >(key, std::vector<std::string>()));
 				test.erase(0, pos2 + delimeter.length());
 				delimeter = ";";
@@ -92,7 +92,6 @@ void	Handler::get_file_info(std::string& fileBody)
 				{
 					std::string testfile = test.substr((pos2 + 2), (test.size() - pos2 -3));
 					this->_filename = testfile;
-					std::cout << ORANGE << "keyvalues:" << this->_filename << RESET << std::endl;
 				}
 			}
 			else if (key == "Content-Type")
@@ -100,7 +99,6 @@ void	Handler::get_file_info(std::string& fileBody)
 					std::string value = test.substr(pos2 + 1, test.size());
 					this->_bodyHeader.insert(std::pair<std::string, std::vector<std::string> >(key, std::vector<std::string>()));
 					this->_bodyHeader[key].push_back(value);
-					std::cout << PINK << "keyvalues:" << value << RESET << std::endl;
 			}
 		}
 	}
@@ -113,13 +111,16 @@ void Handler::body_extractor(Client& client)
 	std::string fileBody(client.tmpBody.begin(), client.tmpBody.end());
 	get_file_info(fileBody);
 	std::string fileBody2(client.tmpBody.begin(), client.tmpBody.end());
-
 	pure_body(fileBody2, client);
 
 }
 
 void	Handler::handle_post(Server & server, Client & client)
-{	if (g_error == 200)
+{
+	std::cout << server.getLimitBody() << std::endl;
+	if ( client.tmpBody.size() > server.getLimitBody())
+		g_error = 413;
+	if (g_error == 200)
 		server.set_Content(this->_path, 1);
 	if (g_error != 200)
 		server.set_Content(this->_path, g_error);
@@ -140,8 +141,25 @@ void	Handler::handle_get(Server & server, Client & client)
 {
 	if (g_error == 200)
 		server.set_Content(this->_path, 1);
-	if (g_error != 200)
+	else if (g_error != 200)
 		server.set_Content(this->_path, g_error);
+	client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
+	if (g_error != 200)
+		g_error = 200;
+}
+
+void	Handler::handle_delete(Server & server, Client & client)
+{
+	if (g_error == 200)
+	{
+		std::remove(this->_path.c_str());
+		if (std::ifstream(this->_path))
+			g_error = 409;
+		else
+			server.set_Content(this->_path, 1);
+	}
+	if (g_error != 200)
+			server.set_Content(this->_path, g_error);
 	client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
 	if (g_error != 200)
 		g_error = 200;
@@ -149,15 +167,14 @@ void	Handler::handle_get(Server & server, Client & client)
 
 void	Handler::handle_methods(Server & server, Client & client)
 {
-	std::cout << GREEN << this->_method << RESET;
+	std::cout << RED << g_error <<  RESET << std::endl;
+
 	if (this->_method == "GET")
 		handle_get(server, client);
 	else if (this->_method == "POST")
-	{
 		handle_post(server, client);
-	}
-	// else if (this->_method == "DELETE")
-	// 	handle_delete(server);
+	else if (this->_method == "DELETE")
+		handle_delete(server, client);
 	
 
 }
@@ -317,7 +334,6 @@ void	Handler::change_path(Server & server)
 			i++;
 		}
 	}
-	std::cout << "PATH2 " << _path << std::endl;
 	if (_path.rfind('?') != std::string::npos)
 	{
 		size_t end = _path.rfind('?');

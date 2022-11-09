@@ -195,7 +195,6 @@ void    Client::printBody()
 {
     for (size_t i = 0; i < _body.size(); i++)
         std::cout << _body[i];
-	//for break condition
     std::cout << std::endl;
 }
 

@@ -199,7 +199,6 @@ void Server::set_Content(std::string path, int check)
 	std::string str = std::to_string(check);
 	if (check != 1)
 		path = _root + _error_pages + str + ".html";
-	std::cout << path << std::endl;
 	std::ostringstream ss;
 	std::ifstream input_file;
 	input_file.open(path);

@@ -40,6 +40,7 @@ class Handler
 		std::string	_req_type;
 		std::string _filename;
 		std::string	_oldLocation;
+		std::string _webkit;
 		std::unordered_map<std::string, std::string> _requestH;
 		std::vector<unsigned char> & _body;
 		std::map<std::string, std::vector<std::string> > _bodyHeader;
@@ -53,21 +54,20 @@ class Handler
 		~Handler();
 
 
-		void	check_methods();
+		void		check_methods();
 		void		start_handling(Server & server, Client & client);
 		void		change_path(Server & server);
 		void		check_listing(Server & server);
 		void		check_oldLocation(Server & server);
+		void		handle_methods(Server & server, Client & client);
 		void		handle_get(Server & server, Client & client);
 		void		handle_post(Server & server, Client & client);
+		void		handle_delete(Server & server,  Client & client);
 		void 		body_extractor(Client& client);
 		void		get_file_info(std::string& fileBody);
 		void 		pure_body(std::string & fileBody, Client& client);
 		void 		write_file(std::vector<unsigned char> & input, std::string filename);
 
-		// void	handle_post(Server & server);
-		// void	handle_delete(Server & server);
-		void	handle_methods(Server & server, Client & client);
 };
 
 #endif /* HANDLER_HPP */

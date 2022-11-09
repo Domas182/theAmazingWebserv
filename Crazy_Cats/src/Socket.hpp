@@ -14,7 +14,7 @@
 #include <sstream>
 #include <sys/wait.h>
 #include <vector>
-#define MAX_BODY 9999999
+#define MAX_BODY 50000
 
 #include "Poller.hpp"
 #include "Client.hpp"
