@@ -44,7 +44,7 @@ void ft_tsocket::socketBind()
 
 void ft_tsocket::socketListen()
 {
-	listen(_socketFd, 10);
+	listen(_socketFd, 100);
 	std::cout << "Port: " << _port << " is listening." << std::endl;
 }
 
@@ -66,6 +66,7 @@ void ft_tsocket::socketSend(int fd, Client& client)
 {
 	int sBytes = 0;
 	std::string temp = client.getResponse();
+	//std::cout << "get? size: " << client.getResponseSize() << std::endl;
 	sBytes = send(fd, &client.getResponse()[0], client.getResponseSize(), 0);
 	//sBytes = send(fd, &client.getResponse(), client.getResponseSize(), MSG_NOSIGNAL);
 	client.setSentBytes(sBytes);

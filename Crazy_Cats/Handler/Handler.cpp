@@ -18,14 +18,14 @@ Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _R
 {
 	this->_method = _RP.getMethod();
 	this->_URI = _RP.getURI();
-	// this->_URI = "http://www.w3.org/favicon.ico/?password=password";
 	this->_version = _RP.getVersion();
 	this->_requestH = _RP.getRequestH();
 	this->_oldLocation = _RP.getOldLocation();
 	this->_path = "";
 	this->_query = "";
 	this->_port = "";
-	this->_loc = 0;
+	this->_loc = 20;
+	this->_listing = false;
 	client.printBody();
 }
 
@@ -102,8 +102,6 @@ void	Handler::get_file_info(std::string& fileBody)
 			}
 		}
 	}
-	// _bodyHeader["Content-Disposition:"]
-	//wie aknn cih das letzet element vom map vector accessen?
 }
 
 void Handler::body_extractor(Client& client)
@@ -168,6 +166,7 @@ void	Handler::handle_delete(Server & server, Client & client)
 void	Handler::handle_methods(Server & server, Client & client)
 {
 	std::cout << RED << g_error <<  RESET << std::endl;
+	std::cout << PINK << _path <<  RESET << std::endl;
 
 	if (this->_method == "GET")
 		handle_get(server, client);
@@ -209,16 +208,14 @@ void	Handler::start_handling(Server & server, Client & client)
 		std::string port;
 		size_t port_start = got->second.find(":");
 		this->_host = got->second.substr(1, (port_start - 1));
-		// if (server.getServerName() != this->_host)
-		// 	throw std::runtime_error("Expected host does not match requested host"); //this is only temporary -> set error page instead
 		if (got->second.find(":") != STREND)
 			this->_port = got->second.substr(port_start + 1);
 		if (this->_port == "")
 			this->_port = 80;
 		else
 		{
-			// if (server.getPortStr() != this->_port)
-			// 	throw std::runtime_error("Expected port does not match requested port"); //this is only temporary -> set error page instead
+			if (server.getPortStr() != this->_port)
+				g_error = 400;
 		}
 		if (!this->_URI.find("http://"))
 		{
@@ -246,19 +243,25 @@ void	Handler::start_handling(Server & server, Client & client)
 		}
 		if (this->_path[0] == '/')
 			this->_path = this->_path.substr(1);
-		std::cout << "HOST " << this->_host << std::endl;
-		std::cout << "QURY " << _query << std::endl;
-		std::cout << "PATH " << _path << std::endl;
-		std::cout << "PORT " << this->_port << std::endl;
-		std::cout << "URI " << this->_URI << std::endl;
+		// std::cout << "HOST " << this->_host << std::endl;
+		// std::cout << "QURY " << _query << std::endl;
+		// std::cout << "PATH " << _path << std::endl;
+		// std::cout << "PORT " << this->_port << std::endl;
+		// std::cout << "URI " << this->_URI << std::endl;
 	}
 	change_path(server);
 	check_oldLocation(server);
 	check_listing(server);
 	check_methods();
-	if (server.getCgi() != "no" && _req_type == "php")
+	if (_req_type == "php" || _listing == true)
 	{
+		_req_type = "php";
 		Cgi CGI(server, client, _path, _query, _req_type, _RP);
+		if (CGI.getError() == true)
+		{
+			handle_methods(server, client);
+			return ;
+		}
 		client.setResp(CGI.getResponse());
 		if (g_error != 200)
 			g_error = 200;
@@ -326,7 +329,11 @@ void	Handler::change_path(Server & server)
 				{
 					size_t start = _URI.rfind('/');
 					tmp = _URI.substr(start + 1);
-					_path = server.getRoot() + tmp;
+					std::string tmp2 = _URI.substr(0, start);
+					if (tmp2 == it->getProxy())
+						_path = server.getRoot() + it->getRoot() + tmp;
+					else
+						_path = server.getRoot() + tmp;
 					this->_allowed_methods = it->getLocMethods();
 					this->_loc = i;
 				}
@@ -347,25 +354,33 @@ void	Handler::change_path(Server & server)
 
 void	Handler::check_listing(Server & server)
 {
+	std::cout << PINK << _loc << RESET << std::endl;
 	if (!server.getLocation().empty())
 	{
-		if (server.getLocation().at(_loc).getDirectoryListing() == true && _file_req == false)
+		if (_loc != 20)
 		{
-			size_t end = _path.rfind('/');
-			std::string tmp = _path.substr(end + 1);
-			_path = _path.substr(0, tmp.length());
-			_path = _path + "/listing.php";
-			_req_type = "php";
+			if (server.getLocation().at(_loc).getDirectoryListing() == true && _file_req == false)
+			{
+				size_t end = _path.rfind('/');
+				std::string tmp = _path.substr(end + 1);
+				_path = _path.substr(0, tmp.length());
+				_path = _path + "/listing.php";
+				_req_type = "php";
+				_listing = true;
+			}
+			return ;
 		}
-		return ;
 	}
 }
 
 void	Handler::check_oldLocation(Server & server)
 {
+	std::cout << YELLOW << _path << RESET << std::endl;
+	if (_URI == "/")
+		std::cout << YELLOW << _path << "URI " << _URI << RESET << std::endl;
 	if (!server.getLocation().empty() && _URI != "/")
 	{
-		if (_oldLocation != "")
+		if (_oldLocation != "" && _file_req == true && _URI != "/500_cat.jpeg")
 		{
 			size_t start = _oldLocation.rfind('/');
 			std::string tmp = _oldLocation.substr(start);

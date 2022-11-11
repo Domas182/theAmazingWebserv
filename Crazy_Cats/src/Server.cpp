@@ -6,7 +6,7 @@ Server::Server()
 {
 	_index = "index.html";
 	_limit_body = MAX_BODY;
-	_cgi = "no";
+	_cgi = "docs/cgi/php-cgi";
 	_error_pages = "error_pages/";
 	_port = 0;
 	sn = false;

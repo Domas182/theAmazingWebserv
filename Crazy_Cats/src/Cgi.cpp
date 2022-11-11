@@ -8,9 +8,9 @@ Cgi::Cgi(Server & server, Client & client, std::string path, std::string query, 
 	_method = _RP.getMethod();
 	_exec_str = server.getCgi();
 	_response.clear();
+	_error = false;
 	in = tmpfile();
 	tmp = tmpfile();
-	std::cout << "PATH " << _path << std::endl;
 	set_Env(server);
 	CgiResponse(server, client);
 }
@@ -92,7 +92,6 @@ void Cgi::set_Env(Server & server)
 
 	// for (int i = 0; env_str[i] != '\0'; i++)
 	// 	std::cout << env_str[i] << std::endl;
-
 	process(env_str);
 }
 
@@ -123,7 +122,11 @@ void Cgi::process(char ** env_str)
 		close(fout);
 		//lseek
 		if (execve(_exec_str.c_str(), input_str, env_str) == -1)
+		// if (execve("hjasdhjs", input_str, env_str) == -1)
+		{
 			g_error = 500;
+			exit(-1);
+		}
 		exit(1);
 	}
 	if (pid)
@@ -134,13 +137,19 @@ void Cgi::process(char ** env_str)
 	}
 	pid_t	ret = 0;
 	int		wait_child;
+	int 	child_exit_status;
 	while (ret != -1)
 	{
 		ret = wait(&wait_child);
 		if (ret == -1)
 			break ;
 		else if (ret == pid)
+		{
 			WIFEXITED(wait_child);
+			child_exit_status = WEXITSTATUS(wait_child);
+			if (child_exit_status == 255)
+				g_error = 500;
+		}
 	}
 }
 
@@ -159,8 +168,7 @@ void	Cgi::CgiResponse(Server & server, Client & client)
 	free(buf);
 	int fout = fileno(tmp);
 	close(fout);
-
-	if (g_error == 500)
+	if (g_error != 200)
 	{
 		std::string str = std::to_string(g_error);
 		std::string path = server.getRoot() + server.getErrorPages() + str + ".html";
@@ -171,32 +179,40 @@ void	Cgi::CgiResponse(Server & server, Client & client)
 			g_error = 404;
 		ss << input_file.rdbuf();
 		this->_response = ss.str();
-		return ;
+		_error = true;
 	}
 	create_Response(server, read);
 }
 
 void	Cgi::create_Response(Server & server, std::string read)
 {
-	size_t start = read.find("\r\n\r\n") + 4;
-	std::string	body = read.substr(start, std::string::npos);
-	this->_response = "HTTP/1.1 200 OK\r\nContent-Length: ";
-	this->_response += std::to_string(body.length());
-	this->_response += "\nContent-Type: ";
-	this->_response += _type;
-	this->_response += "\nLocation: ";
-	this->_response += _path;
-	this->_response += "\nServer: ";
-	this->_response += server.getServerName();
-	this->_response += "\nDate: ";
-	this->_response += this->set_time();
-	this->_response += "\r\n\r\n";
-	this->_response += body;
+	if (_error != true)
+	{
+		size_t start = read.find("\r\n\r\n") + 4;
+		std::string	body = read.substr(start, std::string::npos);
+		this->_response = "HTTP/1.1 200 OK\r\nContent-Length: ";
+		this->_response += std::to_string(body.length());
+		this->_response += "\nContent-Type: ";
+		this->_response += _type;
+		this->_response += "\nLocation: ";
+		this->_response += _path;
+		this->_response += "\nServer: ";
+		this->_response += server.getServerName();
+		this->_response += "\nDate: ";
+		this->_response += this->set_time();
+		this->_response += "\r\n\r\n";
+		this->_response += body;
+	}
 }
 
 std::string const & Cgi::getResponse() const
 {
 	return (this->_response);
+}
+
+bool const & Cgi::getError() const
+{
+	return (this->_error);
 }
 
 std::string Cgi::set_time()
