@@ -113,6 +113,7 @@ void Client::setCnt(int i)
 
 void Client::setResp(std::string resp)
 {
+	// std::cout << resp << std::endl;
 	_response = resp;
 	_bytesToSend = _response.size();
 	_totalSentBytes = 0;

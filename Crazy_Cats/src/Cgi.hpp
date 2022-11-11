@@ -34,6 +34,7 @@ class Cgi
 		std::string							_path_info;
 		std::string							_content_type;
 		RequestParser						_RP;
+		bool								_error;
 
 
 		FILE *								in; 
@@ -50,6 +51,7 @@ class Cgi
 		void		CgiResponse(Server & server, Client & client);
 		void		create_Response(Server & server, std::string read);
 		std::string	const & getResponse() const;
+		bool		const & getError() const;
 		std::string set_time();
 };
 

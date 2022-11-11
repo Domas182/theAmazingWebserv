@@ -3,7 +3,7 @@ if ($handle = opendir('.')) {
     while (false !== ($file = readdir($handle)))
     {
         if (($file != ".") 
-         && ($file != ".."))
+         && ($file != "..") && ($file != "listing.php"))
         {
             $thelist .= '<LI><a href="'.$file.'">'.$file.'</a>';
         }

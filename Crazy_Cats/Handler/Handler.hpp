@@ -37,7 +37,7 @@ class Handler
 		std::string	_port;
 		std::string	_host;
 		std::string	_type;
-		std::string	_req_type;
+		std::string	_req_type;;
 		std::string _filename;
 		std::string	_oldLocation;
 		std::string _webkit;
@@ -48,6 +48,7 @@ class Handler
 		RequestParser	_RP;
 		bool		_file_req;
 		int			_loc;
+		bool		_listing;
 
 	public:
 		Handler(RequestParser RP, Client & client);
