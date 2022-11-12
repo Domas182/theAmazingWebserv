@@ -70,13 +70,6 @@ std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
 
 void		RequestParser::split_CRLF(std::vector<unsigned char> buffer)
 {
-
-	// std::vector<char> input({ 'a', 'b', 'c' });//buffer
-    // std::string s(input.begin(), input.end());
-    // std::cout << s;
-
-	//TODO:wird der v immer neuen speicher allocieren? bzw wie kann ich am Anfang reserven??
-	// std::string CRLF = buffer;
 	std::string CRLF(buffer.begin(), buffer.end());
 	//different syntax due to namespace?
 	std::string delimeter = "\r\n";

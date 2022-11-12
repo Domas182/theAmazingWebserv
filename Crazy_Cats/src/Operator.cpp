@@ -159,10 +159,14 @@ void	RequestChecker(std::vector<unsigned char> request, Client& client, Server& 
 			}
 		}
 	}
+	if ( client.tmpLen > server.getLimitBody())
+		client.setRFlagT();
 	if (client.getHBFlag() && client.getFlag() && !client.getRFlag())
 	{
 		if (!client.getRFlag() && !client.getCFlag())
 		{
+			//hier vlt check für den client.statcode?, DAMIT DASS dann gleich weiter geht?
+			
 			while (i < bytes)
 				client.tmpBody.push_back(request[i++]);
 			if (client.tmpBody.size() == client.tmpLen)
@@ -280,10 +284,16 @@ void Operator::start_process()
 					int k;
 					if ((k = lookClient(poFD.getPfd()[i].fd, clients)) != -1)
 					{
-						if (clients[k].getResponseSize() >= 0)
+						if (clients[k].getResponseSize() > 0)
 						{
 							_servers[clients[k].getIndex()].sockSend(poFD.getPfd()[i].fd, clients[k]);
+							if (clients[k].getStatusCode() == "413")
+							{
+								close(poFD.getPfd()[i].fd);
+								poFD.deleteFd(i);
+							}
 							clients[k].clearResponse();
+							
 						}
 					}
 				}
