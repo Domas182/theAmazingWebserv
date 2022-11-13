@@ -92,6 +92,7 @@ void Cgi::set_Env(Server & server)
 
 	// for (int i = 0; env_str[i] != '\0'; i++)
 	// 	std::cout << env_str[i] << std::endl;
+	std::cout << _path << std::endl;
 	process(env_str);
 }
 
