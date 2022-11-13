@@ -1,5 +1,4 @@
 
-
 #include "Handler.hpp"
 #include <iostream>
 #include <chrono>
@@ -146,7 +145,8 @@ void	Handler::handle_get(Server & server, Client & client)
 	if (g_error == 200)
 		server.set_Content(this->_path, 1);
 	else if (g_error != 200)
-		server.set_Content(this->_path, g_error);
+		this->_path = server.set_Content(this->_path, g_error);
+	std::cout << "HANDLER PATH" << _path << std::endl;
 	client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
 	if (g_error != 200)
 		g_error = 200;
@@ -171,7 +171,6 @@ void	Handler::handle_delete(Server & server, Client & client)
 
 void	Handler::handle_methods(Server & server, Client & client)
 {
-	std::cout << RED << g_error <<  RESET << std::endl;
 	std::cout << PINK << _path <<  RESET << std::endl;
 	if (this->_method == "GET")
 		handle_get(server, client);
@@ -338,11 +337,17 @@ void	Handler::change_path(Server & server)
 					tmp = _URI.substr(start + 1);
 					std::string tmp2 = _URI.substr(0, start);
 					if (tmp2 == it->getProxy())
+					{
 						_path = server.getRoot() + it->getRoot() + tmp;
-					else
+						this->_allowed_methods = it->getLocMethods();
+						this->_loc = i;
+					}
+					else if (tmp == it->getProxy())
+					{
 						_path = server.getRoot() + tmp;
-					this->_allowed_methods = it->getLocMethods();
-					this->_loc = i;
+						this->_allowed_methods = it->getLocMethods();
+						this->_loc = i;
+					}
 				}
 			}
 			i++;
@@ -353,15 +358,26 @@ void	Handler::change_path(Server & server)
 		size_t end = _path.rfind('?');
 		_path = _path.substr(0, end + 1);
 	}
+	std::cout << GREEN << _path <<  RESET << std::endl;
+	detect_error_img(server);
 	std::ifstream input_file;
 	input_file.open(_path);
 	if (!input_file.is_open())
 		g_error = 404;
 }
 
+void	Handler::detect_error_img(Server & server)
+{
+	size_t end = this->_path.rfind('/');
+	std::string tmp = this->_path.substr(end + 1);
+	if ((tmp == "400_cat.jpeg" || tmp == "403_cat.jpeg" || tmp == "404_cat.png" || tmp == "405_cat.jpeg"
+		|| tmp == "409_cat.jpg" || tmp == "413_cat.jpg" || tmp == "500_cat.jpeg" || tmp == "501_cat.jpeg"
+		|| tmp == "505_cat.jpeg") && _oldLocation != "")
+		this->_path = server.getRoot() + tmp;
+}
+
 void	Handler::check_listing(Server & server)
 {
-	std::cout << PINK << _loc << RESET << std::endl;
 	if (!server.getLocation().empty())
 	{
 		if (_loc != 20)
@@ -369,8 +385,7 @@ void	Handler::check_listing(Server & server)
 			if (server.getLocation().at(_loc).getDirectoryListing() == true && _file_req == false)
 			{
 				size_t end = _path.rfind('/');
-				std::string tmp = _path.substr(end + 1);
-				_path = _path.substr(0, tmp.length());
+				_path = _path.substr(0, end);
 				_path = _path + "/listing.php";
 				_req_type = "php";
 				_listing = true;
@@ -382,12 +397,9 @@ void	Handler::check_listing(Server & server)
 
 void	Handler::check_oldLocation(Server & server)
 {
-	std::cout << YELLOW << _path << RESET << std::endl;
-	if (_URI == "/")
-		std::cout << YELLOW << _path << "URI " << _URI << RESET << std::endl;
 	if (!server.getLocation().empty() && _URI != "/")
 	{
-		if (_oldLocation != "" && _file_req == true && _URI != "/500_cat.jpeg")
+		if (_oldLocation != "" && _URI != "/500_cat.jpeg")
 		{
 			size_t start = _oldLocation.rfind('/');
 			std::string tmp = _oldLocation.substr(start);
@@ -401,14 +413,17 @@ void	Handler::check_oldLocation(Server & server)
 						{
 							size_t start = _URI.rfind('/');
 							tmp = _URI.substr(start + 1);
-							_path = server.getRoot() + it->getRoot() + tmp;
-							std::ifstream input_file;
-							input_file.open(_path);
-							if (!input_file.is_open())
-								g_error = 404;
-							else
-								g_error = 200;
+							if (_file_req == true)
+							{
+								_path = server.getRoot() + it->getRoot() + tmp;
+							}
 						}
+						std::ifstream input_file;
+						input_file.open(_path);
+						if (!input_file.is_open())
+							g_error = 404;
+						else
+							g_error = 200;
 					}
 				}
 			}

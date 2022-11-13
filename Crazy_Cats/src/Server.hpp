@@ -124,7 +124,7 @@ class Server
 		int							setIndex(std::string idnex);
 		int							setMethods(std::string methods);
 		int							setLimitBody(std::string limit);
-		void						set_Content(std::string path, int check);
+		std::string					set_Content(std::string path, int check);
 		int							setErrorPages(std::string error_pages);
 		int							setCgi(std::string cgi);
 };
