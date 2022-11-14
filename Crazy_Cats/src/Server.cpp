@@ -6,7 +6,6 @@ Server::Server()
 {
 	_index = "index.html";
 	_limit_body = MAX_BODY;
-	_cgi = "docs/cgi/php-cgi";
 	_error_pages = "error_pages/";
 	_port = 0;
 	sn = false;
@@ -185,14 +184,49 @@ int Server::setErrorPages(std::string error_pages)
 	return (SUCCESS);
 }
 
+// int Server::setCgi(std::string cgi)
+// {
+// 	cgi.erase(remove(cgi.begin(), cgi.end(), ';'));
+// 	if (count(cgi.begin(), cgi.end(), '/') < 1)
+// 		return (FAILURE);
+// 	this->_cgi = cgi;
+// 	return (SUCCESS);
+// }
+
 int Server::setCgi(std::string cgi)
 {
 	cgi.erase(remove(cgi.begin(), cgi.end(), ';'));
-	if (count(cgi.begin(), cgi.end(), '/') < 1)
-		return (FAILURE);
-	this->_cgi = cgi;
+	// for (int i = 0; i < 3; i++)
+	// 	_cgi.at(i).clear();
+	// _cgi.clear();
+	std::string tmp = cgi;
+	char *token = strtok(const_cast<char*>(tmp.c_str()), ",");
+	char *tmp2 = token;
+	char *tmp3 = NULL;
+	while (token != NULL)
+	{
+		if ((strcmp(token, "php") == 0) || (strcmp(token, "py") == 0))
+		{
+			_cgi.push_back(token);
+			token = strtok(NULL, ",");
+			if (token)
+			{
+				if (strcmp(tmp2, token) == 0)
+					return (FAILURE);
+				if (tmp3)
+				{
+					if (strcmp(tmp3, token) == 0)
+						return (FAILURE);
+				}
+				tmp3 = token;
+			}
+		}
+		else
+			return (FAILURE);
+	}
 	return (SUCCESS);
 }
+
 
 std::string Server::set_Content(std::string path, int check)
 {
@@ -248,7 +282,7 @@ const std::string &Server::getErrorPages() const
 	return (this->_error_pages);
 }
 
-const std::string &Server::getCgi() const
+const std::vector<std::string> &Server::getCgi() const
 {
 	return (this->_cgi);
 }

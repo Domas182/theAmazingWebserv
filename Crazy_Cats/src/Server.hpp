@@ -66,9 +66,10 @@ class Server
 		std::string					_root;
 		std::string					_index;
 		std::vector<std::string>	_allowed_methods;
+		std::vector<std::string>	_cgi;
 		uint32_t					_limit_body;
 		std::string					_error_pages;
-		std::string					_cgi;
+		// std::string					_cgi;
 		std::vector<Location>		_locations;
 
 		std::string					_response;
@@ -113,7 +114,7 @@ class Server
 		const std::string				&getContent() const;
 		const std::string				&getResponse() const;
 		const std::string				&getErrorPages() const;
-		const std::string				&getCgi() const;
+		const std::vector<std::string>	&getCgi() const;
 		
 		int const						&getSockFd() const;
 

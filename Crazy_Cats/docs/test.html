@@ -8,6 +8,29 @@
 <a href="index.html">Another link</a>
 </body><br><br>
 <img src="pink_cat.jpeg">
-
+<br>
+<br>
+<form action = "cgi/hello.py" method = "get">
+    Name: <input type = "text" name = "name" />
+    
+    <input type = "submit" value = "Submit" />
+    </form>
+<br>
+<br>
+<form action = "cgi/zodiac.py" method = "get">
+<label for="zodiac">Please select your zodiac sign:</label>
+<select name="zodiac" id="zodiac">
+    <option value="aquarius">Aquarius</option>
+    <option value="pisces">Pisces</option>
+    <option value="aries">Aries</option>
+    <option value="gemini">Gemini</option>
+    <option value="cancer">Cancer</option>
+    <option value="leo">Leo</option>
+    <option value="libra">Libra</option>
+    <option value="scorpio">Scorpio</option>
+    <option value="sagittarius">Sagittarius</option>
+    <input type = "submit" value = "Submit" />
+</form>
+</select>
 </body>
 </html>

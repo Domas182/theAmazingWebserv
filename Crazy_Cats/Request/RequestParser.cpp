@@ -108,10 +108,7 @@ std::string &		RequestParser::RequestLineMethod(std::string &Method)
 		else if (this->_method.compare("DELETE") == 0)
 			std::cout << RED << "DELETE" << RESET << std::endl;	 
 		else
-		{
 			g_error = 405;
-			throw std::runtime_error("wrong Method");
-		}
 		Method.erase(0, pos + delimeter.length());
 		return (Method);
 	}

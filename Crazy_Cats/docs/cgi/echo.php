@@ -10,4 +10,4 @@
 </body>
 </html>
 
-&name=Kitty&colour=black
+<!-- ?&name=Kitty&colour=black -->

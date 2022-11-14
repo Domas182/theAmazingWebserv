@@ -47,6 +47,7 @@ class Cgi
 		~Cgi();
 
 		void		set_Env(Server & server);
+		void		set_exec_str(Server & server);
 		void		process(char ** env_str);
 		void		CgiResponse(Server & server, Client & client);
 		void		create_Response(Server & server, std::string read);

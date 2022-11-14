@@ -6,11 +6,12 @@ Cgi::Cgi(Server & server, Client & client, std::string path, std::string query, 
 	_path(path), _query(query), _type(type), _RP(RP)
 {
 	_method = _RP.getMethod();
-	_exec_str = server.getCgi();
+	// _exec_str = server.getCgi();
 	_response.clear();
 	_error = false;
 	in = tmpfile();
 	tmp = tmpfile();
+	set_exec_str(server);
 	set_Env(server);
 	CgiResponse(server, client);
 }
@@ -31,6 +32,22 @@ void free_array(char **input)
 	}
 	free(input);
 	input = NULL;
+}
+
+void Cgi::set_exec_str(Server & server)
+{
+	if (_type == "php")
+		_exec_str = "docs/cgi/php-cgi";
+	else if (_type == "py")
+		_exec_str = _path;
+	if (_query != "")
+	{
+		if (_query.at(1) != '&')
+		{
+			std::string tmp = _query.substr(1);
+			_query = "?&" + tmp;
+		}
+	}
 }
 
 void Cgi::set_Env(Server & server)
@@ -92,7 +109,6 @@ void Cgi::set_Env(Server & server)
 
 	// for (int i = 0; env_str[i] != '\0'; i++)
 	// 	std::cout << env_str[i] << std::endl;
-	std::cout << _path << std::endl;
 	process(env_str);
 }
 
@@ -103,10 +119,8 @@ void Cgi::process(char ** env_str)
 	char ** input_str = NULL;
 	pid_t pid = fork();
 
-
 	if (pid == -1)
 	{
-		perror("FORK ERROR");
 		g_error = 500;
 		close(fin);
 		close(fout);
@@ -123,7 +137,6 @@ void Cgi::process(char ** env_str)
 		close(fout);
 		//lseek
 		if (execve(_exec_str.c_str(), input_str, env_str) == -1)
-		// if (execve("hjasdhjs", input_str, env_str) == -1)
 		{
 			g_error = 500;
 			exit(-1);

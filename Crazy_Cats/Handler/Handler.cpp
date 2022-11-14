@@ -134,7 +134,7 @@ void	Handler::handle_post(Server & server, Client & client)
 	else if (client.getHBFlag() && client.getCFlag())
 	{
 		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
-		write_file(client.tmpBody, "chunked.txt");		
+		write_file(client.tmpBody, "chunked.txt");
 	}
 	if (g_error != 200)
 		g_error = 200;
@@ -147,7 +147,6 @@ void	Handler::handle_get(Server & server, Client & client)
 		server.set_Content(this->_path, 1);
 	else if (g_error != 200)
 		this->_path = server.set_Content(this->_path, g_error);
-	std::cout << "HANDLER PATH" << _path << std::endl;
 	client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
 	if (g_error != 200)
 		g_error = 200;
@@ -260,9 +259,12 @@ void	Handler::start_handling(Server & server, Client & client)
 	check_oldLocation(server);
 	check_listing(server);
 	check_methods();
-	if (_req_type == "php" || _listing == true)
+	if (_req_type == "php" || _req_type == "py" || _listing == true || _type == "py")
 	{
-		_req_type = "php";
+		if (_listing == true)
+			_req_type = "php";
+		if (_type == "py")
+			_req_type = "py";
 		Cgi CGI(server, client, _path, _query, _req_type, _RP);
 		if (CGI.getError() == true)
 		{
@@ -359,7 +361,6 @@ void	Handler::change_path(Server & server)
 		size_t end = _path.rfind('?');
 		_path = _path.substr(0, end + 1);
 	}
-	std::cout << GREEN << _path <<  RESET << std::endl;
 	detect_error_img(server);
 	std::ifstream input_file;
 	input_file.open(_path);
