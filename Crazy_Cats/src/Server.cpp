@@ -194,7 +194,7 @@ int Server::setCgi(std::string cgi)
 	return (SUCCESS);
 }
 
-void Server::set_Content(std::string path, int check)
+std::string Server::set_Content(std::string path, int check)
 {
 	std::cout << PINK << path << RESET <<std::endl;
 	std::string str = std::to_string(check);
@@ -203,10 +203,9 @@ void Server::set_Content(std::string path, int check)
 	std::ostringstream ss;
 	std::ifstream input_file;
 	input_file.open(path);
-	if (!input_file.is_open())
-		g_error = 404;
 	ss << input_file.rdbuf();
 	this->_content = ss.str();
+	return (path);
 }
 
 const std::string &Server::getServerName() const
