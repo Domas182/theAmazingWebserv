@@ -140,6 +140,7 @@ void	Handler::handle_post(Server & server, Client & client)
 	if (g_error != 200)
 		g_error = 200;
 }
+//TODO: can't we make the g_error set back in the operator??
 
 void	Handler::handle_get(Server & server, Client & client)
 {
@@ -171,8 +172,8 @@ void	Handler::handle_delete(Server & server, Client & client)
 
 void	Handler::handle_methods(Server & server, Client & client)
 {
-	std::cout << RED << g_error <<  RESET << std::endl;
-	std::cout << PINK << _path <<  RESET << std::endl;
+	// std::cout << RED << g_error <<  RESET << std::endl;
+	// std::cout << PINK << _path <<  RESET << std::endl;
 	if (this->_method == "GET")
 		handle_get(server, client);
 	else if (this->_method == "POST")
@@ -361,7 +362,7 @@ void	Handler::change_path(Server & server)
 
 void	Handler::check_listing(Server & server)
 {
-	std::cout << PINK << _loc << RESET << std::endl;
+	// std::cout << PINK << _loc << RESET << std::endl;
 	if (!server.getLocation().empty())
 	{
 		if (_loc != 20)

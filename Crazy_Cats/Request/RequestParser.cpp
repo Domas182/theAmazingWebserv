@@ -70,8 +70,9 @@ std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
 
 void		RequestParser::split_CRLF(std::vector<unsigned char> buffer)
 {
+
+	// buffer.clear();
 	std::string CRLF(buffer.begin(), buffer.end());
-	//different syntax due to namespace?
 	std::string delimeter = "\r\n";
 	size_t pos = 0;
 	while ((pos = CRLF.find(delimeter)) != std::string::npos)
@@ -82,7 +83,10 @@ void		RequestParser::split_CRLF(std::vector<unsigned char> buffer)
 		CRLF.erase(0, pos + delimeter.length());
 	}
 	if (_CRLF_split.empty())
-		throw std::runtime_error("Request syntax error");
+	{
+		g_error = 400;
+		throw std::runtime_error("We know what you try here\nOur Webserv is puuuuuurrrrfect though!");
+	}
 	parseRequestLine(_CRLF_split.front());
 	parseRequestHeader();
 	//body starts here
@@ -104,14 +108,19 @@ std::string &		RequestParser::RequestLineMethod(std::string &Method)
 		else if (this->_method.compare("DELETE") == 0)
 			std::cout << RED << "DELETE" << RESET << std::endl;	 
 		else
+		{
 			g_error = 405;
-			// throw std::runtime_error("wrong Method");
+			throw std::runtime_error("wrong Method");
+		}
 		Method.erase(0, pos + delimeter.length());
 		return (Method);
 	}
-	g_error = 405;
+	else
+	{
+		throw std::runtime_error("Wrong requestline syntax");
+		g_error = 400;
+	}
 	return (Method);
-	// throw std::runtime_error("Wrong Method-");
 }
 
 
@@ -128,8 +137,12 @@ std::string &		RequestParser::RequestLineURI(std::string &URI)
 		return (URI);
 	}
 	else
+	{
+		g_error = 400;
 		throw std::runtime_error("Wrong URI");
+	}
 }
+//TODO:URI character check??
 
 void		RequestParser::RequestLineVersion(std::string &version)
 {
@@ -142,10 +155,16 @@ void		RequestParser::RequestLineVersion(std::string &version)
 		if (test_version.compare("HTTP/1.1") == 0)
 			this->_version = version.substr(0, pos);
 		else
+		{
 			g_error = 505;
+			throw std::runtime_error("HTTP Version Not Supported");
+		}
 	}
 	else
+	{
 		g_error = 400;
+		throw std::runtime_error("Wrong URI");
+	}
 }
 
 void		RequestParser::parseRequestLine(std::string reqLine)
@@ -176,14 +195,17 @@ void		RequestParser::parseRequestHeader()
 			a.clear();
 			b.clear();
 		}
-		// else
-		// 	throw std::runtime_error("RequestHeader parsing failed");
+		else
+		{
+			g_error = 400;
+			throw std::runtime_error("Wrong requestheaderfields synatx");
+		}
 	}
 	std::unordered_map<std::string, std::string>::const_iterator got = this->_requestH.find("Referer");
 	std::unordered_map<std::string, std::string>::const_iterator endit = this->_requestH.end();
 	if (got != endit)
 		this->_oldLocation = got->second;
-	std::cout << PINK << this->_oldLocation << RESET << std::endl;
+	// std::cout << PINK << this->_oldLocation << RESET << std::endl;
 	setPort();
 }
 
@@ -199,6 +221,8 @@ void RequestParser::setPort()
 	}
 	this->_port = atol(tmp.c_str());
 }
+//hier vielleicht den missing host mit ner exception einbauen
+//TODO: herausfinden welche Headerfields wirklich gebraucht sind
 
 
 /*
@@ -237,23 +261,3 @@ std::string const & RequestParser::getOldLocation() const
 }
 
 /* ************************************************************************** */
-
-/*
-#include <map>
-#include <string>
-#include <sstream>
-#include <iostream>
-
-std::map<std::string, std::string> mappify1(std::string const& s)
-{
-    std::map<std::string, std::string> m;
-
-    std::string key, val;
-    std::istringstream iss(s);
-
-    while(std::getline(std::getline(iss, key, ':') >> std::ws, val))
-        m[key] = val;
-
-    return m;
-}
-*/

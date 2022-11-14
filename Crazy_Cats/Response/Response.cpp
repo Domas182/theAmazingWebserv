@@ -12,8 +12,21 @@ std::string Response::createResponse (int code, Server & server, std::string & p
 	setCodePhrase(code);
 	setResponseH(server, path);
 	setPayload(server.getContent());
+	return(this->constructResponse());
+}
 
-	return( this->constructResponse());
+std::string Response::createErrorResponse (int code, Server & server)
+{
+	createCodePhraseMap();
+	setCodePhrase(code);
+	setErrorPayload(code);
+	setErrorResponseH(server);
+	std::string response = "HTTP/1.1";
+	response +=  " " + getCode() + " " + getPhrase() + "\n";
+	for (std::unordered_map<std::string, std::string>::const_iterator cit = getResponseH().begin() ; cit != getResponseH().end(); ++cit)
+		response += cit->first + "\t" + cit->second + "\n";
+	response += getPayload();
+	return(response);
 }
 
 // Response::Response( const Response & src )
@@ -102,6 +115,29 @@ void				Response::setPayload(std::string readFile)
 	this->_payload = readFile;
 }
 
+void				Response::setErrorPayload(int code)
+//readFile is the return of std::string readFileIntoString2(const std::string& path) 
+{
+	std::ostringstream ss;
+	std::ifstream input_file;
+	if (code == 400)
+	{
+		input_file.open("docs/error_pages/400.html");
+	//correct error path?
+	}
+	else if (code == 405)
+	{
+		input_file.open("docs/error_pages/405.html");
+	}
+	else if (code == 504)
+	{
+		input_file.open("docs/error_pages/504.html");
+	}
+	ss << input_file.rdbuf();
+	setPayload(ss.str());
+	// this->_payload = readFile;
+}
+
 std::string				Response::setContentLength(Server & server)
 {
 	uint32_t len = server.getContent().length();
@@ -110,6 +146,16 @@ std::string				Response::setContentLength(Server & server)
 	std::string content_len = ss.str();
 	return (content_len);
 }
+
+std::string				Response::setErrorContentLength()
+{
+	uint32_t len = this->_payload.length();
+	std::stringstream ss;
+	ss << len;
+	std::string content_len = ss.str();
+	return (content_len);
+}
+//hier statt server den error payload nehmen
 
 std::string Response::set_time()
 {
@@ -122,6 +168,7 @@ std::string Response::set_time()
 
 std::string Response::setContentType(std::string & path)
 {
+	// if (g_error == )
 	std::string content_type = path.substr(path.find(".") + 1);
 	return (content_type);
 }
@@ -133,6 +180,15 @@ void				Response::setResponseH(Server & server, std::string & path)
 	this->_responseH.insert(std::pair<std::string, std::string>("Content-Type:", this->setContentType(path)));
 	this->_responseH.insert(std::pair<std::string, std::string>("Server:", server.getServerName()));
 }
+
+void				Response::setErrorResponseH(Server & server)
+{
+	this->_responseH.insert(std::pair<std::string, std::string>("Date:", this->set_time()));
+	this->_responseH.insert(std::pair<std::string, std::string>("Content-Length:", this->setErrorContentLength()));
+	this->_responseH.insert(std::pair<std::string, std::string>("Content-Type:", "html"));
+	this->_responseH.insert(std::pair<std::string, std::string>("Server:", server.getServerName()));
+}
+
 
 void			Response::createCodePhraseMap()
 {
