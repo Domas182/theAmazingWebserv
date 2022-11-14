@@ -12,7 +12,10 @@ int	infile_format(std::string infile)
 	return (0);
 }
 
-
+// void checker()
+// {
+// 	system("leaks webserv");
+// }
 
 int main(int argc, char** argv)
 {
@@ -49,6 +52,6 @@ int main(int argc, char** argv)
 		std::cerr << e.what() << '\n';
 		return EXIT_FAILURE;
 	}
-	// system ("leaks webserv");
+	// atexit(checker);
 	return EXIT_SUCCESS;
 }

@@ -267,6 +267,7 @@ void Operator::start_process()
 						}
 
 						///random
+						// system ("leaks webserv");
 						request.clear();
 						///
 
@@ -280,7 +281,7 @@ void Operator::start_process()
 					int k;
 					if ((k = lookClient(poFD.getPfd()[i].fd, clients)) != -1)
 					{
-						if (clients[k].getResponseSize() >= 0)
+						if (clients[k].getResponseSize() > 0)
 						{
 							_servers[clients[k].getIndex()].sockSend(poFD.getPfd()[i].fd, clients[k]);
 							clients[k].clearResponse();

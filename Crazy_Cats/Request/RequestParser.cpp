@@ -71,6 +71,7 @@ std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
 void		RequestParser::split_CRLF(std::vector<unsigned char> buffer)
 {
 
+	// buffer.clear();
 	// std::vector<char> input({ 'a', 'b', 'c' });//buffer
     // std::string s(input.begin(), input.end());
     // std::cout << s;
@@ -89,6 +90,7 @@ void		RequestParser::split_CRLF(std::vector<unsigned char> buffer)
 		CRLF.erase(0, pos + delimeter.length());
 	}
 	if (_CRLF_split.empty())
+		// g_error = 400;
 		throw std::runtime_error("Request syntax error");
 	parseRequestLine(_CRLF_split.front());
 	parseRequestHeader();
@@ -112,13 +114,11 @@ std::string &		RequestParser::RequestLineMethod(std::string &Method)
 			std::cout << RED << "DELETE" << RESET << std::endl;	 
 		else
 			g_error = 405;
-			// throw std::runtime_error("wrong Method");
 		Method.erase(0, pos + delimeter.length());
 		return (Method);
 	}
 	g_error = 405;
 	return (Method);
-	// throw std::runtime_error("Wrong Method-");
 }
 
 

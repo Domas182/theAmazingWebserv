@@ -109,6 +109,7 @@ void Operator::parse_server(Server &server)
 {
 	std::string line;
 	std::string methods;
+	std::string cgi;
 
 	if (!_loc.empty())
 		_loc.clear();
@@ -208,12 +209,16 @@ void Operator::parse_server(Server &server)
 		}
 		else if (!tokens.empty() && tokens.at(0) == "cgi")
 		{
-			if (tokens.size() != 2 || server.setCgi(tokens.back()) || server.c == true)
+			if (tokens.size() < 2 || tokens.size() > 3 || server.c == true)
+			// if (tokens.size() < 2 || server.setCgi(tokens.back()) || server.c == true)
 				throw std::invalid_argument("Error❗\nInvalid information in Config file for cgi in line:\n " + line);
 			else
 			{
+				for (size_t i = 1; i < tokens.size(); i++)
+					cgi = cgi + "," + tokens.at(i);
+				if (server.setCgi(cgi))
+					throw std::invalid_argument("Error❗\nInvalid information in Config file for cgi in line:\n " + line);
 				server.c = true;
-				server.setCgi(tokens.back());
 			}
 		}
 		else if (!tokens.empty() && tokens.at(0) == "location")
@@ -308,8 +313,10 @@ std::ostream	&operator<<(std::ostream &os, const Operator &Operator) {
 		for (size_t i = 0; i < it->getMethods().size(); i++)
 			os << it->getMethods().at(i) << " ";
 		os << "\nLimit Body:	" << it->getLimitBody() << "\n";
-		os << "\nCgi:		" << it->getCgi() << "\n";
-		os << "Error Pages:	" << it->getErrorPages() << "\n";
+		os << "\nCgi:	";
+		for (size_t i = 0; i < it->getCgi().size(); i++)
+			os << it->getCgi().at(i) << " ";
+		os << "\nError Pages:	" << it->getErrorPages() << "\n";
 		Server server = Operator.getServer().at(j);
 		std::set<std::string>::const_iterator it2;
 		for (std::vector<Location>::const_iterator it2 = server.getLocation().begin(); it2 != server.getLocation().end(); it2++)
