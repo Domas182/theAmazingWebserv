@@ -36,14 +36,17 @@ class Response
 		std::string const & getPayload() const;
 
 		std::string 		createResponse(int code, Server & server, std::string & path, std::string & version);
+		std::string 		createErrorResponse (int code, Server & server);
 		std::string			set_time();
 		std::string			setContentLength(Server & server);
+		std::string			setErrorContentLength();
 		std::string			setContentType(std::string & path);
 		void				setVersion(std::string const & version);
 		void				setCodePhrase(int code);
 		void				setResponseH( Server & server,  std::string & path);
+		void				setErrorResponseH(Server & server);
 		void				setPayload(std::string readFile);
-		//maybe don't need them fi they are in the constructor already;
+		void				setErrorPayload(int code);
 		void				createCodePhraseMap();
 		std::string 		constructResponse() const;
 

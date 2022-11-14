@@ -139,6 +139,7 @@ void	Handler::handle_post(Server & server, Client & client)
 	if (g_error != 200)
 		g_error = 200;
 }
+//TODO: can't we make the g_error set back in the operator??
 
 void	Handler::handle_get(Server & server, Client & client)
 {
