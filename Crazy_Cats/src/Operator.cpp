@@ -307,8 +307,20 @@ void Operator::start_process()
 								close(poFD.getPfd()[i].fd);
 								poFD.deleteFd(i);
 							}
-							clients[k].clearResponse();
-							
+							if (clients[k].getResponseSize() == 0)
+							{
+								clients[k].tmpReq.clear();
+								clients[k].clearResponse();
+								clients[k].clearRequest();
+
+								clients[k].setBFlagF();
+								clients[k].setFlagF();
+								clients[k].setHBFlagF();
+								clients[k].setRFlagF();
+								clients[k].setCFlagF();
+								//clients[k].tmpReq.clear();
+								clients[k].tmpBody.clear();
+								clients[k].tmpExtract.clear();							}							
 						}
 					}
 				}

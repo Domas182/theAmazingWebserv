@@ -148,6 +148,11 @@ void Client::setTotalSentBytes()
 	_totalSentBytes += _sentBytes;
 }
 
+void Client::eraseSentBit()
+{
+	_response.erase(_response.begin(), _response.begin() + _sentBytes);
+}
+
 void Client::clearResponse()
 {
 	_response.clear();

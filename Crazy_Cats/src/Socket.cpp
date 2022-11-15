@@ -71,7 +71,7 @@ void ft_tsocket::socketSend(int fd, Client& client)
 	//sBytes = send(fd, &client.getResponse(), client.getResponseSize(), MSG_NOSIGNAL);
 	client.setSentBytes(sBytes);
 	client.setTotalSentBytes();
-	client.clearResponse();
+	client.eraseSentBit();
 }
 
 std::vector<unsigned char> ft_tsocket::socketRecv(int i, PollFd &tPoll)
