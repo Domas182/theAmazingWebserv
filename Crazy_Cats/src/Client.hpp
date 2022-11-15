@@ -99,6 +99,14 @@ class Client
         void 		printBody();
 		void		clearRequest();
 
+		void		crlfPush();
+		void		chunkedHandler(std::vector<unsigned char>& request, size_t& i, size_t bytes);
+		void		headerFlagSetter(int len);
+		int			findBodyLength(std::vector<unsigned char>& request);
+		void		headerCountAndFlags(int len);
+
+		void		resetClient();
+
 		//temp request holder
 		std::vector<unsigned char> tmpReq;
 		std::vector<unsigned char> tmpBody;
@@ -110,6 +118,6 @@ class Client
 		bool	chunkSizeSet;
 };
 
-
+bool crlfBool(std::vector<unsigned char>& data, size_t i);
 // TODO:integragte the requestParser in teh Client to make it better accesable!
 #endif /* CLIENT_HPP */
