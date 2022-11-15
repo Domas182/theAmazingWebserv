@@ -71,7 +71,7 @@ std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
 void		RequestParser::split_CRLF(std::vector<unsigned char> buffer)
 {
 
-	// buffer.clear();
+	buffer.clear();
 	std::string CRLF(buffer.begin(), buffer.end());
 	std::string delimeter = "\r\n";
 	size_t pos = 0;

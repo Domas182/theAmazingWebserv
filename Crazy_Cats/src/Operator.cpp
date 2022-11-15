@@ -256,24 +256,11 @@ void Operator::start_process()
 						}
 						catch(const std::exception& e)
 						{
-							//you need to hardcode a response
-							//than make it better
-							//but first try if that works at all!
-
 							Response tmpRSP;
 							clients[k].setResp(tmpRSP.createErrorResponse(g_error, _servers[clients[k].getIndex()]));
 							if (g_error != 200)
 								g_error = 200;
 							clients[k].clearRequest();
-							// g_error = 200;
-							// tmpRSP.createErrorResponse(g_error);
-							// int t = find_server(RP.getPort());
-							// //clients noch eine private port variable
-							// //to complicated , think small!
-							// // if (g_error != 504)
-							// else
-							// 	client[k].setResp(tmpRSP.createResponse(g_error, server[t], "text/html", "HTTP/1.1"));
-							// std::cerr << e.what() << '\n';
 						}
 						if (clients[k].getRFlag())
 						{
