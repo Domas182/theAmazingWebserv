@@ -54,7 +54,7 @@ class Client
 		void bytesEsize();
 		void clearResponse();
 
-		int					getSock();
+		int					&getSock();
 		int					getIndex();
 
 		bool				getFlag();

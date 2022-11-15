@@ -16,7 +16,7 @@ Client::Client(int index, int socket) : _socket(socket), _sIndex(index)
 
 Client::~Client(){}
 
-int Client::getSock()
+int &Client::getSock()
 {
 	return(_socket);
 }
