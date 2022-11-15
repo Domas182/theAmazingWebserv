@@ -194,9 +194,9 @@ RequestParser & Client::getRP()
 
 void    Client::printBody()
 {
-    for (size_t i = 0; i < _body.size(); i++)
-        std::cout << _body[i];
-    std::cout << std::endl;
+    for (size_t i = 0; i < tmpBody.size(); i++)
+        std::cout << LB << tmpBody[i];
+    std::cout << RESET << std::endl;
 }
 
 void	Client::clearRequest()
