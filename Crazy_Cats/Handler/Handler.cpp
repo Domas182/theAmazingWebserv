@@ -264,6 +264,12 @@ void	Handler::start_handling(Server & server, Client & client)
 			_req_type = "php";
 		if (_type == "py")
 			_req_type = "py";
+		if (this->_method == "POST")
+		{
+			std::string query(_body.begin(), _body.end());
+			_query = query;
+			// std::cout << _query << std::endl;
+		}
 		Cgi CGI(server, client, _path, _query, _req_type, _RP);
 		if (CGI.getError() == true)
 		{
