@@ -94,14 +94,16 @@ uint32_t check_uint32(std::string word)
 
 void Server::setServerName(std::string server_name)
 {
-	server_name.erase(remove(server_name.begin(), server_name.end(), ';'));
+	if (server_name.find(';') != std::string::npos)
+		server_name.erase(remove(server_name.begin(), server_name.end(), ';'));
 	this->_server_name = server_name;
 }
 
 int Server::setPort(std::string port)
 {
 	uint32_t tmp;
-	port.erase(remove(port.begin(), port.end(), ';'));
+	if (port.find(';') != std::string::npos)
+		port.erase(remove(port.begin(), port.end(), ';'));
 	this->_port_str = port;
 	std::stringstream s(port);
 	s >> tmp;
@@ -113,7 +115,8 @@ int Server::setPort(std::string port)
 
 int Server::setRoot(std::string root)
 {
-	root.erase(remove(root.begin(), root.end(), ';'));
+	if (root.find(';') != std::string::npos)
+		root.erase(remove(root.begin(), root.end(), ';'));
 	if (count(root.begin(), root.end(), '/') < 1)
 		return (FAILURE);
 	this->_root = root;
@@ -122,7 +125,8 @@ int Server::setRoot(std::string root)
 
 int Server::setIndex(std::string index)
 {
-	index.erase(remove(index.begin(), index.end(), ';'));
+	if (index.find(';') != std::string::npos)
+		index.erase(remove(index.begin(), index.end(), ';'));
 	if (count(index.begin(), index.end(), '.') != 1)
 		return (FAILURE);
 	this->_index = index;
@@ -131,7 +135,8 @@ int Server::setIndex(std::string index)
 
 int Server::setMethods(std::string methods)
 {
-	methods.erase(remove(methods.begin(), methods.end(), ';'));
+	if (methods.find(';') != std::string::npos)
+		methods.erase(remove(methods.begin(), methods.end(), ';'));
 	for (int i = 0; i < 3; i++)
 		_allowed_methods.at(i).clear();
 	_allowed_methods.clear();
@@ -166,7 +171,8 @@ int Server::setMethods(std::string methods)
 int Server::setLimitBody(std::string limit)
 {
 	uint32_t tmp;
-	limit.erase(remove(limit.begin(), limit.end(), ';'));
+	if (limit.find(';') != std::string::npos)
+		limit.erase(remove(limit.begin(), limit.end(), ';'));
 	std::stringstream s(limit);
 	s >> tmp;
 	if (tmp < 0 || check_uint32(limit))
@@ -177,28 +183,18 @@ int Server::setLimitBody(std::string limit)
 
 int Server::setErrorPages(std::string error_pages)
 {
-	error_pages.erase(remove(error_pages.begin(), error_pages.end(), ';'));
+	if (error_pages.find(';') != std::string::npos)
+		error_pages.erase(remove(error_pages.begin(), error_pages.end(), ';'));
 	if (count(error_pages.begin(), error_pages.end(), '/') < 1)
 		return (FAILURE);
 	this->_error_pages = error_pages;
 	return (SUCCESS);
 }
 
-// int Server::setCgi(std::string cgi)
-// {
-// 	cgi.erase(remove(cgi.begin(), cgi.end(), ';'));
-// 	if (count(cgi.begin(), cgi.end(), '/') < 1)
-// 		return (FAILURE);
-// 	this->_cgi = cgi;
-// 	return (SUCCESS);
-// }
-
 int Server::setCgi(std::string cgi)
 {
-	cgi.erase(remove(cgi.begin(), cgi.end(), ';'));
-	// for (int i = 0; i < 3; i++)
-	// 	_cgi.at(i).clear();
-	// _cgi.clear();
+	if (cgi.find(';') != std::string::npos)
+		cgi.erase(remove(cgi.begin(), cgi.end(), ';'));
 	std::string tmp = cgi;
 	char *token = strtok(const_cast<char*>(tmp.c_str()), ",");
 	char *tmp2 = token;
@@ -230,7 +226,6 @@ int Server::setCgi(std::string cgi)
 
 std::string Server::set_Content(std::string path, int check)
 {
-	std::cout << PINK << path << RESET <<std::endl;
 	std::string str = std::to_string(check);
 	if (check != 1)
 		path = _root + _error_pages + str + ".html";
@@ -309,14 +304,15 @@ const std::vector<Location>	&Server::getLocation() const { return _locations; }
 
 void Location::setProxy(std::string proxy)
 {
-	proxy.erase(remove(proxy.begin(), proxy.end(), ';'));
+	if (proxy.find(';') != std::string::npos)
+		proxy.erase(remove(proxy.begin(), proxy.end(), ';'));
 	_proxy = proxy;
-	// _root = proxy;
 }
 
 int Location::setLocMethods(std::string methods)
 {
-	methods.erase(remove(methods.begin(), methods.end(), ';'));
+	if (methods.find(';') != std::string::npos)
+		methods.erase(remove(methods.begin(), methods.end(), ';'));
 	std::string tmp = methods;
 	char *token = strtok(const_cast<char*>(tmp.c_str()), ",");
 	char *tmp2 = token;
@@ -347,7 +343,8 @@ int Location::setLocMethods(std::string methods)
 
 int Location::setIndex(std::string index)
 {
-	index.erase(remove(index.begin(), index.end(), ';'));
+	if (index.find(';') != std::string::npos)
+		index.erase(remove(index.begin(), index.end(), ';'));
 	if (count(index.begin(), index.end(), '.') != 1)
 		return (FAILURE);
 	this->_index = index;
@@ -356,7 +353,8 @@ int Location::setIndex(std::string index)
 
 int Location::setRoot(std::string root)
 {
-	root.erase(remove(root.begin(), root.end(), ';'));
+	if (root.find(';') != std::string::npos)
+		root.erase(remove(root.begin(), root.end(), ';'));
 	if (count(root.begin(), root.end(), '/') < 1)
 		return (FAILURE);
 	this->_root = root;
@@ -365,7 +363,8 @@ int Location::setRoot(std::string root)
 
 int Location::setDirectoryListing(std::string listing)
 {
-	listing.erase(remove(listing.begin(), listing.end(), ';'));
+	if (listing.find(';') != std::string::npos)
+		listing.erase(remove(listing.begin(), listing.end(), ';'));
 	if (listing == "on")
 	{
 		this->_dir_list = true;

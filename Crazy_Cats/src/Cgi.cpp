@@ -6,7 +6,6 @@ Cgi::Cgi(Server & server, Client & client, std::string path, std::string query, 
 	_path(path), _query(query), _type(type), _RP(RP)
 {
 	_method = _RP.getMethod();
-	// _exec_str = server.getCgi();
 	_response.clear();
 	_error = false;
 	in = tmpfile();
@@ -42,10 +41,15 @@ void Cgi::set_exec_str(Server & server)
 		_exec_str = _path;
 	if (_query != "")
 	{
-		if (_query.at(1) != '&')
+		if (_method == "POST")
+			_query = "?&" + _query;
+		else
 		{
-			std::string tmp = _query.substr(1);
-			_query = "?&" + tmp;
+			if (_query.at(1) != '&')
+			{
+				std::string tmp = _query.substr(1);
+				_query = "?&" + tmp;
+			}
 		}
 	}
 }
@@ -61,16 +65,6 @@ void Cgi::set_Env(Server & server)
 	_env["SERVER_NAME"] = server.getServerName();
 	_env["SERVER_PORT"] = server.getPortStr();
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-
-	if (_method == "POST")
-	{
-		uint32_t len = server.getContent().length();
-		std::stringstream ss;
-		ss << len;
-		_content_len = ss.str();
-		_env["CONTENT_LENGTH"] = _content_len;
-		_env["CONTENT_TYPE"] = _type;
-	}
 
 	std::string tmp;
 	for(std::unordered_map<std::string, std::string>::const_iterator it = _RP.getRequestH().begin();
@@ -135,7 +129,6 @@ void Cgi::process(char ** env_str)
 			g_error = 500;
 		close(fin);
 		close(fout);
-		//lseek
 		if (execve(_exec_str.c_str(), input_str, env_str) == -1)
 		{
 			g_error = 500;
