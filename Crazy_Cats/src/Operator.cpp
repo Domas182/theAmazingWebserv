@@ -267,7 +267,6 @@ void Operator::start_process()
 							clients[k].printRequest();
 
 							RequestParser RP(clients[k].tmpReq);
-							clients[k].printBody();
 							int i = find_server(RP.getPort());
 							Handler H(RP, clients[k]);
 							H.start_handling(_servers[i], clients[k]);
