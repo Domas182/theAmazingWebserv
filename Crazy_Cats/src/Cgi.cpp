@@ -6,7 +6,6 @@ Cgi::Cgi(Server & server, Client & client, std::string path, std::string query, 
 	_path(path), _query(query), _type(type), _RP(RP)
 {
 	_method = _RP.getMethod();
-	// _exec_str = server.getCgi();
 	_response.clear();
 	_error = false;
 	in = tmpfile();
@@ -130,7 +129,6 @@ void Cgi::process(char ** env_str)
 			g_error = 500;
 		close(fin);
 		close(fout);
-		//lseek
 		if (execve(_exec_str.c_str(), input_str, env_str) == -1)
 		{
 			g_error = 500;
