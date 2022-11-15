@@ -11,7 +11,7 @@
 
 int	g_error;
 
-int fdServer(int fd, std::vector<Server> servers)
+int fdServer(int fd, std::vector<Server>& servers)
 {
 	for (size_t i = 0; i < servers.size(); i++)
 	{
@@ -21,7 +21,7 @@ int fdServer(int fd, std::vector<Server> servers)
 	return (-1);
 }
 
-int lookClient(int fd, std::vector<Client> clients)
+int lookClient(int fd, std::vector<Client>& clients)
 {
 	for (size_t i = 0; i < clients.size(); i++)
 	{
@@ -31,7 +31,7 @@ int lookClient(int fd, std::vector<Client> clients)
 	return (-1);
 }
 
-int	findBodyLength(std::vector<unsigned char> request)
+int	findBodyLength(std::vector<unsigned char>& request)
 {
 
 	RequestParser RP(request);
@@ -51,7 +51,7 @@ int	findBodyLength(std::vector<unsigned char> request)
 	return (0);
 }
 
-bool crlfBool(std::vector<unsigned char> data, size_t i)
+bool crlfBool(std::vector<unsigned char>& data, size_t i)
 {
 	if (data[i] == '\r' && data[i + 1] == '\n')
 		return true;
@@ -65,7 +65,7 @@ void crlfPush(Client& client)
 	client.tmpReq.push_back('\n');	
 }
 
-void chunkedHandler(Client& client, std::vector<unsigned char> request, size_t& i, size_t& bytes)
+void chunkedHandler(Client& client, std::vector<unsigned char>& request, size_t& i, size_t bytes)
 {
 	while (i < bytes)
 	{
@@ -120,7 +120,7 @@ void headerFlagSetter(Client& client, int len)
 	}
 }
 
-void headerCountAndFlags(Client& client, int& len)
+void headerCountAndFlags(Client& client, int len)
 {
 	client.setFlagT();
 	len = findBodyLength(client.tmpReq);
@@ -128,7 +128,7 @@ void headerCountAndFlags(Client& client, int& len)
 	client.tmpLen = len;
 }
 
-void	RequestChecker(std::vector<unsigned char> request, Client& client, Server& server, size_t& bytes)
+void	RequestChecker(std::vector<unsigned char>& request, Client& client, Server& server, size_t bytes)
 {
 	size_t i = 0;
 	int contLen = 0;
