@@ -41,7 +41,6 @@ class RequestParser
 		//not sure if needed
 		std::unordered_map<std::string, std::string> const & getRequestH() const;
 		std::vector<std::string> const & getCRLF_split() const;
-
 		void		split_CRLF(std::vector<unsigned char>& buffer);
 		void		parseRequestLine(std::string reqLine);
 		std::string &		RequestLineMethod(std::string & method);

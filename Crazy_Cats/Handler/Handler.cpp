@@ -13,7 +13,7 @@ void time_function()
 	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 }
 
-Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _RP(RP)
+Handler::Handler(RequestParser RP, Client & client): _body(client.tmpBody), _RP(RP)
 {
 	this->_method = _RP.getMethod();
 	this->_URI = _RP.getURI();
@@ -25,7 +25,6 @@ Handler::Handler(RequestParser RP, Client & client): _body(client.getBody()), _R
 	this->_port = "";
 	this->_loc = 20;
 	this->_listing = false;
-	client.printBody();
 }
 
 Handler::~Handler()
