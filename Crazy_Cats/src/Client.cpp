@@ -208,3 +208,17 @@ void	Client::clearRequest()
 {
 	_request.clear();
 }
+
+void	Client::resetClient()
+{
+	tmpReq.clear();
+	clearResponse();
+	clearRequest();
+	setBFlagF();
+	setFlagF();
+	setHBFlagF();
+	setRFlagF();
+	setCFlagF();
+	tmpBody.clear();
+	tmpExtract.clear();		
+}

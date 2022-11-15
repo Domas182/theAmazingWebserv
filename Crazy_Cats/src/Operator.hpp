@@ -55,6 +55,10 @@ class Operator
 	void	start_parsing();
 	void	start_process();
 	int		find_server(uint32_t port);
+	void 	dataOnServer(std::vector<Client>& clients, PollFd& poFD, int i);
+	void	dataOnClient(std::vector<Client>& clients, PollFd& poFD, int i);
+	void	dataToSend(std::vector<Client>& clients, PollFd& poFD, int i);
+
 };
 
 std::ostream	&operator<<(std::ostream &os, const Operator &Operator);

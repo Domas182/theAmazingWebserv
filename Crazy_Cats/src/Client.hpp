@@ -99,6 +99,8 @@ class Client
         void 		printBody();
 		void		clearRequest();
 
+		void		resetClient();
+
 		//temp request holder
 		std::vector<unsigned char> tmpReq;
 		std::vector<unsigned char> tmpBody;
