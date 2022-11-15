@@ -37,9 +37,11 @@ class Operator
 {
 	private:
 	std::vector<Server>		_servers;
+	std::vector<Client>		_clients;
 	std::vector<Location>	_loc;
 	std::string				_infile_name;
 	std::ifstream			_infile;
+	PollFd					_poFD;
 
 	void	parse_server(Server &server);
 	void	parse_location(std::vector<std::string> tokens, Location &location);
@@ -54,10 +56,15 @@ class Operator
 
 	void	start_parsing();
 	void	start_process();
+	int		fdServer(int fd);
+	int 	lookClient(int fd);
 	int		find_server(uint32_t port);
-	void 	dataOnServer(std::vector<Client>& clients, PollFd& poFD, int i);
-	void	dataOnClient(std::vector<Client>& clients, PollFd& poFD, int i);
-	void	dataToSend(std::vector<Client>& clients, PollFd& poFD, int i);
+	void	setupServers();
+	void	RequestChecker(std::vector<unsigned char>& request, int c);
+	void 	dataOnServer(int i);
+	void	dataOnClient(int i);
+	void	dataToSend(int i);
+
 
 };
 
