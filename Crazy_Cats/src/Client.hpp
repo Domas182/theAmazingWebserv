@@ -91,6 +91,7 @@ class Client
 		void		setResp(std::string resp);
 		void		setSentBytes(int bytes);
 		void		setTotalSentBytes();
+		void 		eraseSentBit();
 		void		setStatusCode(std::string);
 		void 		pushRequest(unsigned char c);
 		void		pushBody(unsigned char c);
