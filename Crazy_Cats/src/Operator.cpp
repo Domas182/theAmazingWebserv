@@ -120,6 +120,7 @@ void	Operator::dataOnClient(int i)
 	} else {
 		try	{
 			RequestChecker(request, cIndex);
+			_clients[cIndex].printRequest();
 			}catch(const std::exception& e)	{
 				Response tmpRSP;
 				_clients[cIndex].setResp(tmpRSP.createErrorResponse(g_error, _servers[_clients[cIndex].getIndex()]));
