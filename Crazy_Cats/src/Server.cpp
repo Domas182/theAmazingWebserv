@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../incl/Server.hpp"
 
 extern int	g_error;
 

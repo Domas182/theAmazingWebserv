@@ -1,6 +1,5 @@
-
-#include "Socket.hpp"
-#include "../Request/RequestParser.hpp"
+#include "../incl/Socket.hpp"
+#include "../incl/RequestParser.hpp" 
 
 ft_tsocket::ft_tsocket(){}
 

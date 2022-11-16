@@ -1,4 +1,5 @@
-#include "RequestParser.hpp"
+#include "../incl/RequestParser.hpp"
+#include "../incl/Client.hpp"
 
 extern int	g_error;
 

@@ -1,13 +1,10 @@
-#include "Operator.hpp"
-#include "Server.hpp"
-#include "Poller.hpp"
-#include "Client.hpp"
-#include "stdlib.h"
-#include "../Request/RequestParser.hpp"
-#include "../Handler/Handler.hpp"
-#include "../Response/Response.hpp"
-#include <fstream>
-#include <iostream>
+#include "../incl/Operator.hpp"
+#include "../incl/Server.hpp"
+#include "../incl/Poller.hpp"
+#include "../incl/Client.hpp"
+#include "../incl/RequestParser.hpp"
+#include "../incl/Handler.hpp"
+#include "../incl/Response.hpp"
 
 int	g_error;
 

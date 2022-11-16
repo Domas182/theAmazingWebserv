@@ -1,7 +1,4 @@
-#include "Operator.hpp"
-
-#include <cstdlib>
-#include <iostream>
+#include "../incl/Operator.hpp"
 
 int	infile_format(std::string infile)
 {

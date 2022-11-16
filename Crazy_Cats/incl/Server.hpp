@@ -1,17 +1,7 @@
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
-
-#include <string>
-#include <iostream>
-#include <algorithm>
-#include <fstream>
-#include <sstream>
-#include <sys/wait.h>
-
-#include <vector>
-#include <set>
-#include <map>
+#include "CrazyCats.hpp"
 
 #include "Socket.hpp"
 #include "Poller.hpp"

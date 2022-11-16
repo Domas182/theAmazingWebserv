@@ -2,25 +2,8 @@
 #ifndef OPERATOR_HPP
 #define OPERATOR_HPP
 
-#include <string>
-#include <sys/socket.h>
-#include <netinet/if_ether.h>
-#include <netinet/in.h>
-#include <cstdlib>
-#include <iostream>
-#include <fcntl.h>
-#include <unistd.h>
-#include <cstring>
-#include <poll.h>
-#include <fstream>
-#include <sstream>
-#include <sys/wait.h>
-#include <vector>
-
+#include "CrazyCats.hpp"
 #include "Server.hpp"
-#include <iostream>
-#include <stdexcept>
-#include <iterator>
 
 #define SUCCESS 0
 #define FAILURE 1

@@ -1,21 +1,12 @@
-
 #ifndef HANDLER_HPP
 #define HANDLER_HPP
 
-#include <string>
-#include <iostream>
-#include <algorithm>
-#include <unordered_map>
-#include <map>
-#include <vector>
-
-#include "../src/Server.hpp"
-#include "../Response/Response.hpp"
-#include "../Request/RequestParser.hpp"
-#include "../src/Client.hpp"
-#include "../src/Cgi.hpp"
-
-
+#include "CrazyCats.hpp"
+#include "Server.hpp"
+#include "Response.hpp"
+#include "RequestParser.hpp"
+#include "Client.hpp"
+#include "Cgi.hpp"
 
 #define SUCCESS 0
 #define FAILURE 1
