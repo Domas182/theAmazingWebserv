@@ -21,22 +21,20 @@ class RequestParser
 		std::string const & getMethod() const;
 		std::string const & getURI() const;
 		std::string const & getVersion() const;
-		uint32_t const & getPort() const;
+		uint32_t const & 	getPort() const;
 		std::string const & getOldLocation() const;
-		// std::size_t const & getLineCount() const;
-		//not sure if needed
+		std::string const &	getCookies() const;
 		std::unordered_map<std::string, std::string> const & getRequestH() const;
 		std::vector<std::string> const & getCRLF_split() const;
-		void		split_CRLF(std::vector<unsigned char>& buffer);
-		void		parseRequestLine(std::string reqLine);
+
+		void				split_CRLF(std::vector<unsigned char>& buffer);
+		void				parseRequestLine(std::string reqLine);
 		std::string &		RequestLineMethod(std::string & method);
 		std::string &		RequestLineURI(std::string & URI);
-		void		RequestLineVersion(std::string & version);
-		void setPort();
-
-
-
-		void		parseRequestHeader();
+		void				RequestLineVersion(std::string & version);
+		void 				setPort();
+		void				parseRequestHeader();
+		void				checkForCookies();
 
 	private:
 
@@ -46,6 +44,7 @@ class RequestParser
 		//maybe not const, maybe needs to be modified?
 		std::string	_version;
 		std::string	_oldLocation;
+		std::string	_cookies;
 		std::vector<std::string> _CRLF_split;
 		std::unordered_map<std::string, std::string> _requestH;
 		// std::size_t				_line_count = _requestH.size();

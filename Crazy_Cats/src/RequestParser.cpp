@@ -91,6 +91,7 @@ void		RequestParser::split_CRLF(std::vector<unsigned char>& buffer)
 	}
 	parseRequestLine(_CRLF_split.front());
 	parseRequestHeader();
+	checkForCookies();
 	//body starts here
 }
 
@@ -223,7 +224,14 @@ void RequestParser::setPort()
 //hier vielleicht den missing host mit ner exception einbauen
 //TODO: herausfinden welche Headerfields wirklich gebraucht sind
 
-
+void	RequestParser::checkForCookies()
+{
+	std::unordered_map<std::string, std::string>::iterator it = _requestH.find("Cookie");
+	if (it != _requestH.end())
+	{
+		this->_cookies = it->second.erase(0, 1);
+	}
+}
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
@@ -258,5 +266,8 @@ std::string const & RequestParser::getOldLocation() const
 {
 	return this->_oldLocation;
 }
-
+std::string const & RequestParser::getCookies() const
+{
+	return this->_cookies;
+}
 /* ************************************************************************** */
