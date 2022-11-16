@@ -65,6 +65,7 @@ void Cgi::set_Env(Server & server)
 	_env["SERVER_NAME"] = server.getServerName();
 	_env["SERVER_PORT"] = server.getPortStr();
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
+	// _env["HTTP_COOKIE"] = _RP.getCookies();
 
 	std::string tmp;
 	for(std::unordered_map<std::string, std::string>::const_iterator it = _RP.getRequestH().begin();
@@ -101,13 +102,14 @@ void Cgi::set_Env(Server & server)
 	}
 	env_str[index] = NULL;
 
-	// for (int i = 0; env_str[i] != '\0'; i++)
-	// 	std::cout << env_str[i] << std::endl;
+	for (int i = 0; env_str[i] != '\0'; i++)
+		std::cout << env_str[i] << std::endl;
 	process(env_str);
 }
 
 void Cgi::process(char ** env_str)
 {
+	std::cout << "Here" << std::endl;
 	int fin = fileno(in);
 	int fout = fileno(tmp);
 	char ** input_str = NULL;

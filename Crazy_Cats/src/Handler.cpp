@@ -21,6 +21,7 @@ Handler::Handler(RequestParser RP, Client & client): _body(client.tmpBody), _RP(
 	this->_port = "";
 	this->_loc = 20;
 	this->_listing = false;
+	std::cout << YELLOW << _RP.getCookies() << std::endl;
 }
 
 Handler::~Handler()
@@ -254,7 +255,7 @@ void	Handler::start_handling(Server & server, Client & client)
 	check_oldLocation(server);
 	check_listing(server);
 	check_methods();
-	if (_req_type == "php" || _req_type == "py" || _listing == true || _type == "py")
+	if (_req_type == "php" || _req_type == "py" || _listing == true || _type == "py" )
 	{
 		if (_listing == true)
 			_req_type = "php";
