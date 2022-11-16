@@ -1,5 +1,4 @@
-#include "Operator.hpp"
-#include "Server.hpp"
+#include "../incl/Operator.hpp"
 
 Operator::Operator(std::string infile_name): _servers(), _loc(), _infile_name(infile_name.c_str()), _infile()
 {

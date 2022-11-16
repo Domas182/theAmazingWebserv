@@ -1,9 +1,5 @@
 
-#include "Handler.hpp"
-#include <iostream>
-#include <chrono>
-#include <ctime>
-
+#include "../incl/Handler.hpp"
 
 extern int	g_error;
 

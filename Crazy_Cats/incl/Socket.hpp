@@ -1,23 +1,11 @@
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 
-#include <sys/socket.h>
-#include <netinet/if_ether.h>
-#include <netinet/in.h>
-#include <cstdlib>
-#include <iostream>
-#include <fcntl.h>
-#include <unistd.h>
-#include <cstring>
-#include <poll.h>
-#include <fstream>
-#include <sstream>
-#include <sys/wait.h>
-#include <vector>
-#define MAX_BODY 50000
-
+#include "CrazyCats.hpp"
 #include "Poller.hpp"
 #include "Client.hpp"
+
+#define MAX_BODY 50000
 
 // ************************************************************************** //
 //                               ft_tsocket Class                             //

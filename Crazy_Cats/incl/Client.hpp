@@ -2,21 +2,8 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include <sys/socket.h>
-#include <netinet/if_ether.h>
-#include <netinet/in.h>
-#include <cstdlib>
-#include <iostream>
-#include <fcntl.h>
-#include <unistd.h>
-#include <cstring>
-#include <poll.h>
-#include <fstream>
-#include <sstream>
-#include <sys/wait.h>
-#include <vector>
-#include "../Colors.hpp"
-#include "../Request/RequestParser.hpp"
+#include "CrazyCats.hpp"
+#include "RequestParser.hpp"
 
 // ************************************************************************** //
 //                               Client Class                                 //

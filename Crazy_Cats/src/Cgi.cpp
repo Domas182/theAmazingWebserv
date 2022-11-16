@@ -1,4 +1,4 @@
-#include "Cgi.hpp"
+#include "../incl/Cgi.hpp"
 
 extern int	g_error;
 

@@ -2,20 +2,11 @@
 #ifndef CGI_HPP
 #define CGI_HPP
 
-#include <string>
-#include <iostream>
-#include <algorithm>
-#include <fstream>
-#include <sstream>
-#include <sys/wait.h>
-
-#include <vector>
-#include <map>
-
-// #include "../Request/RequestParser.hpp"
-#include "../src/Server.hpp"
-#include "../Response/Response.hpp"
-#include "../src/Client.hpp"
+#include "CrazyCats.hpp"
+#include "Server.hpp"
+#include "Response.hpp"
+#include "Client.hpp"
+#include "RequestParser.hpp"
 
 // ************************************************************************** //
 //                               Cgi Class                                 //

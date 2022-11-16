@@ -2,19 +2,7 @@
 #ifndef POLLER_HPP
 #define POLLER_HPP
 
-#include <sys/socket.h>
-#include <netinet/if_ether.h>
-#include <netinet/in.h>
-#include <cstdlib>
-#include <iostream>
-#include <fcntl.h>
-#include <unistd.h>
-#include <cstring>
-#include <poll.h>
-#include <fstream>
-#include <sstream>
-#include <sys/wait.h>
-#include <vector>
+#include "CrazyCats.hpp"
 
 // ************************************************************************** //
 //                               PollFd Class                                 //
