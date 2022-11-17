@@ -21,7 +21,6 @@ Handler::Handler(RequestParser RP, Client & client): _body(client.tmpBody), _RP(
 	this->_port = "";
 	this->_loc = 20;
 	this->_listing = false;
-	std::cout << YELLOW << _RP.getCookies() << std::endl;
 }
 
 Handler::~Handler()
@@ -167,7 +166,6 @@ void	Handler::handle_delete(Server & server, Client & client)
 
 void	Handler::handle_methods(Server & server, Client & client)
 {
-	std::cout << PINK << _path <<  RESET << std::endl;
 	if (this->_method == "GET")
 		handle_get(server, client);
 	else if (this->_method == "POST")
@@ -245,11 +243,6 @@ void	Handler::start_handling(Server & server, Client & client)
 		}
 		if (this->_path[0] == '/')
 			this->_path = this->_path.substr(1);
-		// std::cout << "HOST " << this->_host << std::endl;
-		// std::cout << "QURY " << _query << std::endl;
-		// std::cout << "PATH " << _path << std::endl;
-		// std::cout << "PORT " << this->_port << std::endl;
-		// std::cout << "URI " << this->_URI << std::endl;
 	}
 	change_path(server);
 	check_oldLocation(server);
