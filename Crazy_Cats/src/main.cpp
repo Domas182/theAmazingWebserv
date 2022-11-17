@@ -36,19 +36,18 @@ int main(int argc, char** argv)
 	}
 	else
 		file = "config_files/default.conf";
-	
+	Operator operate(file);
 	try
 	{
-		Operator operate(file);
 		operate.start_parsing();
 		std::cout << operate << std::endl;
-		operate.start_process();
 	}
 	catch (const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
 		return EXIT_FAILURE;
 	}
+	operate.start_process();
 	// atexit(checker);
 	return EXIT_SUCCESS;
 }

@@ -57,6 +57,7 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 			_clients[c].chunkedHandler(request, i, _servers[_clients[c].getIndex()].getNBytes());
 	}
 }
+//limit for request size 8192 bytes
 
 int Operator::fdServer(int fd)
 {
@@ -120,13 +121,17 @@ void	Operator::dataOnClient(int i)
 	} else {
 		try	{
 			RequestChecker(request, cIndex);
-			_clients[cIndex].printRequest();
-			}catch(const std::exception& e)	{
-				Response tmpRSP;
-				_clients[cIndex].setResp(tmpRSP.createErrorResponse(g_error, _servers[_clients[cIndex].getIndex()]));
-				if (g_error != 200)
-					g_error = 200;
-				_clients[cIndex].clearRequest();
+			// _clients[cIndex].printRequest();
+			}
+			catch(std::exception& e)
+			{
+					std::cerr << e.what() << '\n';
+					Response tmpRSP;
+					_clients[cIndex].setResp(tmpRSP.createErrorResponse(g_error, _servers[_clients[cIndex].getIndex()]));
+					if (g_error != 200)
+						g_error = 200;
+					_clients[cIndex].clearRequest();
+					_clients[cIndex].setRFlagF();
 			}
 			if (_clients[cIndex].getRFlag())
 			{
@@ -136,6 +141,8 @@ void	Operator::dataOnClient(int i)
 				Handler H(RP, _clients[cIndex]);
 				H.start_handling(_servers[sIndex], _clients[cIndex]);
 			}
+			if (g_error != 200)
+				g_error = 200;
 			request.clear();
 		}
 }
@@ -163,11 +170,12 @@ void	Operator::dataToSend(int i)
 void Operator::start_process()
 {
 	g_error = 200;
-
 	for (size_t i = 0; i < _servers.size(); ++i)
 		_servers[i].bindPort();
 	while(1)
 	{
+		size_t i = 0;
+		try{
 		poll(_poFD.getPfd().data(), _poFD.getFdCount(), 0); 
 		if (!_poFD.getFdCount())
 			setupServers();
@@ -184,6 +192,10 @@ void Operator::start_process()
 			if (i < _poFD.getFdCount())
 				if (_poFD.getPfd()[i].revents & POLLOUT)
 					dataToSend(i);
+		}
+		} catch (std::exception &e){
+			g_error = 200;
+			std::cerr << e.what() << std::endl;
 		}
 	}
 }
