@@ -14,7 +14,7 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 	int contLen = 0;
 	if (!_clients[c].getFlag())
 	{
-		while(!_clients[c].getFlag() && request[i] != '\0' && i < _servers[_clients[c].getIndex()].getNBytes())
+		while(i < _servers[_clients[c].getIndex()].getNBytes() && !_clients[c].getFlag() && request[i] != '\0')
 		{
 			if(crlfBool(request, i) || request[i] == '\n')
 			{
@@ -58,6 +58,19 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 	}
 }
 //limit for request size 8192 bytes
+void	Operator::RequestSizeCheck(int c, int i)
+{
+	if(_clients[c].tmpReq.size() == 0)
+		_clients[c].resetClient();
+	if(_clients[c].tmpReq.size() > 32768)
+	{
+		_clients[c].resetClient();
+		_clients[c].setH2BFlagT();
+		closeAndDelete(i);
+		//throw std::runtime_error("Header too big");
+	}
+}
+
 
 int Operator::fdServer(int fd)
 {
@@ -75,6 +88,12 @@ int Operator::lookClient(int fd)
 			return (i);
 	}
 	return (-1);
+}
+
+void	Operator::closeAndDelete(int i)
+{
+	close(_poFD.getPfd()[i].fd);
+	_poFD.deleteFd(i);
 }
 
 
@@ -106,12 +125,12 @@ void	Operator::dataOnServer(int i)
 	_clients.push_back(clie);
 }
 
-
 void	Operator::dataOnClient(int i)
 {
 	int cIndex = lookClient(_poFD.getPfd()[i].fd);
 	std::vector<unsigned char> request;
 	request = _servers[_clients[cIndex].getIndex()].sockRecv(i, _poFD);
+	//std::cout << _servers[_clients[cIndex].getIndex()].getLimitBody() << std::endl;
 	if (request.size() <= 0)
 	{
 		std::vector<Client>::iterator it(_clients.begin());
@@ -121,9 +140,8 @@ void	Operator::dataOnClient(int i)
 	} else {
 		try	{
 			RequestChecker(request, cIndex);
-			// _clients[cIndex].printRequest();
-			}
-			catch(std::exception& e)
+			RequestSizeCheck(cIndex, i);
+			}catch(std::exception& e)
 			{
 					std::cerr << e.what() << '\n';
 					Response tmpRSP;
@@ -155,12 +173,10 @@ void	Operator::dataToSend(int i)
 		if (_clients[cIndex].getResponseSize() > 0)
 		{
 			_servers[_clients[cIndex].getIndex()].sockSend(_poFD.getPfd()[i].fd, _clients[cIndex]);
-			if (_clients[cIndex].getResponseSize() == 0)
+			if (_clients[cIndex].getResponseSize() == 0)	
 			{
-				if (_clients[cIndex].getStatusCode() == "413"){
-					close(_poFD.getPfd()[i].fd);
-					_poFD.deleteFd(i);
-				}
+				if (_clients[cIndex].getStatusCode() == "413")
+					closeAndDelete(i);
 				_clients[cIndex].resetClient();
 			}							
 		}
@@ -176,7 +192,7 @@ void Operator::start_process()
 	{
 		size_t i = 0;
 		try{
-		poll(_poFD.getPfd().data(), _poFD.getFdCount(), 0); 
+		poll(_poFD.getPfd().data(), _poFD.getFdCount(), 100); 
 		if (!_poFD.getFdCount())
 			setupServers();
 		for (size_t i = 0; i < _poFD.getFdCount(); i++)
