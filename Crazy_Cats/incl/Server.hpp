@@ -9,6 +9,8 @@
 
 #define SUCCESS 0
 #define FAILURE 1
+#define MAX_BODY 65536
+
 #define STREND std::string::npos
 
 // ************************************************************************** //

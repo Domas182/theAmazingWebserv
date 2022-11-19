@@ -13,10 +13,12 @@ if (isset($_SESSION['username'])) {
     echo "<a href='logout.php'>Logout</a>";
 } else {
     echo "<form enctype=\"multipart/form-data\" action=\"session.php\" method=\"post\">
-		<p>Username: <input type=\"text\" name=\"username\" /></p>
-		<p>Password: <input type=\"password\" name=\"password\" /></p>
+		<p>Username: <input type=\"text\" name=username /></p>
+		<p>Password: <input type=\"password\" name=password /></p>
 		<p><input type=\"submit\" value=\"Login\" /></p>
 	</form>";
+	$username = $_SESSION['username'];
+	$password = $_SESSION['password'];
 }
 echo "</html>";
 echo "</body>";

@@ -25,7 +25,9 @@ class Cgi
 		std::string							_path_info;
 		std::string							_content_type;
 		RequestParser						_RP;
+		std::string							_body;
 		bool								_error;
+		char *								body;
 
 
 		FILE *								in; 
@@ -34,7 +36,7 @@ class Cgi
 
 	public:
 		Cgi(Server & server, Client & client, std::string path, std::string query,
-			std::string type, RequestParser & RP);
+			std::string type, RequestParser & RP, std::string _body_send);
 		~Cgi();
 
 		void		set_Env(Server & server);
