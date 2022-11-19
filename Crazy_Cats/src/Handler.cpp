@@ -19,6 +19,7 @@ Handler::Handler(RequestParser RP, Client & client): _body(client.tmpBody), _RP(
 	this->_path = "";
 	this->_query = "";
 	this->_port = "";
+	this->_body_send = "";
 	this->_loc = 20;
 	this->_listing = false;
 	std::cout << YELLOW << _RP.getCookies() << std::endl;
@@ -105,7 +106,6 @@ void Handler::body_extractor(Client& client)
 	get_file_info(fileBody);
 	std::string fileBody2(client.tmpBody.begin(), client.tmpBody.end());
 	pure_body(fileBody2, client);
-
 }
 
 void	Handler::handle_post(Server & server, Client & client)
@@ -251,23 +251,23 @@ void	Handler::start_handling(Server & server, Client & client)
 		// std::cout << "PORT " << this->_port << std::endl;
 		// std::cout << "URI " << this->_URI << std::endl;
 	}
+	std::cout << GREEN << _URI << RESET << std::endl;
 	change_path(server);
 	check_oldLocation(server);
 	check_listing(server);
 	check_methods();
-	if (_req_type == "php" || _req_type == "py" || _listing == true || _type == "py" )
+	if (_req_type == "php" || _req_type == "py" || _listing == true || _type == "py" || _type == "php")
 	{
-		if (_listing == true)
+		if (_listing == true || _type == "php")
 			_req_type = "php";
 		if (_type == "py")
 			_req_type = "py";
 		if (this->_method == "POST")
 		{
-			std::string query(_body.begin(), _body.end());
-			_query = query;
-			// std::cout << _query << std::endl;
+			std::string body(_body.begin(), _body.end());
+			_body_send = body;
 		}
-		Cgi CGI(server, client, _path, _query, _req_type, _RP);
+		Cgi CGI(server, client, _path, _query, _req_type, _RP, _body_send);
 		if (CGI.getError() == true)
 		{
 			handle_methods(server, client);
@@ -405,14 +405,18 @@ void	Handler::check_oldLocation(Server & server)
 	{
 		if (_oldLocation != "" && _URI != "/500_cat.jpeg")
 		{
+			std::cout << LB << _path << RESET << std::endl;
 			size_t start = _oldLocation.rfind('/');
 			std::string tmp = _oldLocation.substr(start);
 			if (tmp.rfind('.') == std::string::npos && tmp != "/" && tmp.rfind('?') == std::string::npos)
 			{
+				std::cout << RED << _path << RESET << std::endl;
 				for (std::vector<Location>::const_iterator it = server.getLocation().begin(); it != server.getLocation().end(); it++)
 				{
+					std::cout << LB << tmp << RESET << std::endl;
 					if (tmp == it->getProxy() && it->getDirectoryListing() == true)
 					{
+						std::cout << LB << _path << "URI " << _URI << RESET << std::endl;
 						if (std::count(_URI.begin(), _URI.end(), '/') > 0)
 						{
 							size_t start = _URI.rfind('/');
@@ -420,6 +424,7 @@ void	Handler::check_oldLocation(Server & server)
 							if (_file_req == true)
 							{
 								_path = server.getRoot() + it->getRoot() + tmp;
+								std::cout << PINK << _path << RESET << std::endl;
 							}
 						}
 						std::ifstream input_file;

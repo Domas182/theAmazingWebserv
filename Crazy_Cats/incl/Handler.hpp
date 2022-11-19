@@ -32,6 +32,7 @@ class Handler
 		std::string _filename;
 		std::string	_oldLocation;
 		std::string _webkit;
+		std::string _body_send;
 		std::unordered_map<std::string, std::string> _requestH;
 		std::vector<unsigned char> & _body;
 		std::map<std::string, std::vector<std::string> > _bodyHeader;

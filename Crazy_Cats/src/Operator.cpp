@@ -120,6 +120,8 @@ void	Operator::dataOnClient(int i)
 	} else {
 		try	{
 			RequestChecker(request, cIndex);
+			if (_clients[cIndex].tmpReq.size() == 0)
+				_clients[cIndex].resetClient();
 			_clients[cIndex].printRequest();
 			}catch(const std::exception& e)	{
 				Response tmpRSP;

@@ -91,7 +91,7 @@ void		RequestParser::split_CRLF(std::vector<unsigned char>& buffer)
 	}
 	parseRequestLine(_CRLF_split.front());
 	parseRequestHeader();
-	checkForCookies();
+	// checkForCookies();
 	//body starts here
 }
 
