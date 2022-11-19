@@ -44,9 +44,11 @@ class Operator
 	int		find_server(uint32_t port);
 	void	setupServers();
 	void	RequestChecker(std::vector<unsigned char>& request, int c);
+	void	RequestSizeCheck(int c, int i);
 	void 	dataOnServer(int i);
 	void	dataOnClient(int i);
 	void	dataToSend(int i);
+	void	closeAndDelete(int i);
 
 
 };

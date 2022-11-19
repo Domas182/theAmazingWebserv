@@ -99,7 +99,6 @@ std::string &		RequestParser::RequestLineMethod(std::string &Method)
 {
 	std::string delimeter = " ";
 	size_t pos = 0;
-
 	pos = Method.find(delimeter);
 	if (pos != std::string::npos)
 	{
@@ -111,14 +110,17 @@ std::string &		RequestParser::RequestLineMethod(std::string &Method)
 		else if (this->_method.compare("DELETE") == 0)
 			std::cout << RED << "DELETE" << RESET << std::endl;	 
 		else
+		{
 			g_error = 405;
+			throw std::runtime_error("Wrong method");
+		}
 		Method.erase(0, pos + delimeter.length());
 		return (Method);
 	}
 	else
 	{
-		throw std::runtime_error("Wrong requestline syntax");
 		g_error = 400;
+		throw std::runtime_error("Wrong requestline syntax");
 	}
 	return (Method);
 }

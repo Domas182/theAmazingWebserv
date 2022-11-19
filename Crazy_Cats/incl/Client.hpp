@@ -24,6 +24,7 @@ class Client
 		bool						_readyFlag;
 		bool						_hasBody;
 		bool						_isChunked;
+		bool						_headerTooBig;
 		int							_tmpCnt;
 		std::string					_response;
 		int							_bytesToSend;
@@ -49,6 +50,7 @@ class Client
 		bool				getRFlag();
 		bool				getHBFlag();
 		bool				getCFlag();
+		bool				getH2BFlag();
 		size_t				getBodySize();
 		int					getCnt();
 		std::string			getResponse();
@@ -74,6 +76,9 @@ class Client
 		void		setCFlagT();
 		void		setCFlagF();
     
+		void		setH2BFlagT();
+		void		setH2BFlagF();
+
 		void		setCnt(int i);
 		void		setResp(std::string resp);
 		void		setSentBytes(int bytes);
