@@ -19,6 +19,7 @@ Client::Client(int index, int socket) : _socket(socket), _sIndex(index)
 	_readyFlag = false;
 	_hasBody = false;
 	_isChunked = false;
+	_headerTooBig = false;		
 	_tmpCnt = 0;
 }
 
@@ -57,6 +58,11 @@ bool Client::getHBFlag()
 bool Client::getCFlag()
 {
 	return(_isChunked);
+}
+
+bool Client::getH2BFlag()
+{
+	return(_headerTooBig);
 }
 
 void Client::setFlagT()
@@ -107,6 +113,16 @@ void Client::setCFlagT()
 void Client::setCFlagF()
 {
 	_isChunked = false;
+}
+
+void Client::setH2BFlagT()
+{
+	_headerTooBig = true;
+}
+
+void Client::setH2BFlagF()
+{
+	_headerTooBig = false;
 }
 
 int Client::getCnt()
@@ -312,6 +328,7 @@ void	Client::resetClient()
 	setHBFlagF();
 	setRFlagF();
 	setCFlagF();
+	setH2BFlagF();
 	tmpBody.clear();
 	tmpExtract.clear();		
 }

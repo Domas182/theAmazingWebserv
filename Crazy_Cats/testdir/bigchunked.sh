@@ -1,1 +1,1 @@
-curl -H "Transfer-Encoding: chunked" -d @qute.dmg http://localhost:9999
+curl -H "Transfer-Encoding: chunked" -d @big.dmg http://localhost:8080

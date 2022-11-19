@@ -269,7 +269,7 @@ const std::vector<std::string> &Server::getMethods() const
 
 uint32_t Server::getLimitBody() const
 {
-	// std::cout << LB << this->_limit_body << RESET << std::endl;
+	//std::cout << LB << this->_limit_body << RESET << std::endl;
 	return (this->_limit_body);
 }
 
