@@ -19,34 +19,32 @@
 class Handler
 {
 	private:
-		std::string	_method;
-		std::vector<std::string>	_allowed_methods;
-		std::string	_URI;
-		std::string	_version;
-		std::string	_path;
-		std::string	_query;
-		std::string	_port;
-		std::string	_host;
-		std::string	_type;
-		std::string	_req_type;;
-		std::string _filename;
-		std::string	_oldLocation;
-		std::string _webkit;
-		std::string _body_send;
-		std::unordered_map<std::string, std::string> _requestH;
-		std::vector<unsigned char> & _body;
-		std::map<std::string, std::vector<std::string> > _bodyHeader;
-		Response  _RSP;
-		RequestParser	_RP;
-		bool		_file_req;
-		int			_loc;
-		bool		_listing;
+		std::string											_method;
+		std::vector<std::string>							_allowed_methods;
+		std::string											_URI;
+		std::string											_version;
+		std::string											_path;
+		std::string											_query;
+		std::string											_port;
+		std::string											_host;
+		std::string											_type;
+		std::string											_req_type;;
+		std::string 										_filename;
+		std::string											_oldLocation;
+		std::string 										_webkit;
+		std::string 										_body_send;
+		std::unordered_map<std::string, std::string> 		_requestH;
+		std::vector<unsigned char> & 						_body;
+		std::map<std::string, std::vector<std::string> > 	_bodyHeader;
+		Response  											_RSP;
+		RequestParser										_RP;
+		bool												_file_req;
+		int													_loc;
+		bool												_listing;
 
 	public:
 		Handler(RequestParser RP, Client & client);
 		~Handler();
-
-
 		void		check_methods();
 		void		start_handling(Server & server, Client & client);
 		void		change_path(Server & server);

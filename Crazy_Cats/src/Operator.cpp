@@ -54,7 +54,6 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 			_clients[c].chunkedHandler(request, i, _servers[_clients[c].getIndex()].getNBytes());
 	}
 }
-//limit for request size 8192 bytes
 void	Operator::RequestSizeCheck(int c, int i)
 {
 	if(_clients[c].tmpReq.size() == 0 && !_clients[c].getCFlag())
@@ -64,7 +63,6 @@ void	Operator::RequestSizeCheck(int c, int i)
 		_clients[c].resetClient();
 		_clients[c].setH2BFlagT();
 		closeAndDelete(i);
-		//throw std::runtime_error("Header too big");
 	}
 }
 

@@ -11,7 +11,7 @@
 class	PollFd
 {
 		private:
-				std::vector<struct pollfd>	_pfd;
+				std::vector<struct pollfd>		_pfd;
 		public:
 				PollFd();
 				~PollFd();

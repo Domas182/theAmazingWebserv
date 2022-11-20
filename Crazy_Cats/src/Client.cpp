@@ -1,5 +1,7 @@
 #include "../incl/Client.hpp"
 
+extern int	g_error;
+
 bool crlfBool(std::vector<unsigned char>& data, size_t i)
 {
 	if (data[i] == '\r' && data[i + 1] == '\n')
@@ -238,7 +240,6 @@ int Client::findBodyLength(std::vector<unsigned char>& request)
 	std::unordered_map<std::string, std::string>::const_iterator endit = RP.getRequestH().end();
 	if (got != endit)
 	{
-
 		size_t contLen = atoi(got->second.c_str());
 		this->tmpLen = contLen;
 		return (contLen);
@@ -334,6 +335,5 @@ void	Client::resetClient()
 	tmpBody.clear();
 	tmpExtract.clear();
 	tmpLen = 0;
-	//g_error = 200;
-	// would it work here?
+	g_error = 200;
 }
