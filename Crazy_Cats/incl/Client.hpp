@@ -80,26 +80,38 @@ class Client
 		void							setCFlagT();
 		void							setCFlagF();
     
-		void							setH2BFlagT();
-		void							setH2BFlagF();
+		void		setH2BFlagT();
+		void		setH2BFlagF();
 
-		void							setCnt(int i);
-		void							setResp(std::string resp);
-		void							setSentBytes(int bytes);
-		void							setTotalSentBytes();
-		void 							eraseSentBit();
-		void							setStatusCode(std::string);
-		void 							pushRequest(unsigned char c);
-		void							pushBody(unsigned char c);
-        void 							printRequest();
-        void 							printBody();
-		void							clearRequest();
-		void							crlfPush();
-		void							chunkedHandler(std::vector<unsigned char>& request, size_t& i, size_t bytes);
-		void							headerFlagSetter(int len);
-		int								findBodyLength(std::vector<unsigned char>& request);
-		void							headerCountAndFlags(int len);
-		void							resetClient();
+		void		setCnt(int i);
+		void		setResp(std::string resp);
+		void		setSentBytes(int bytes);
+		void		setTotalSentBytes();
+		void 		eraseSentBit();
+		void		setStatusCode(std::string);
+		void 		pushRequest(unsigned char c);
+		void		pushBody(unsigned char c);
+        void 		printRequest();
+        void 		printBody();
+		void		clearRequest();
+
+		void		crlfPush();
+		void		chunkedHandler(std::vector<unsigned char>& request, size_t& i, size_t bytes);
+		void		headerFlagSetter(int len);
+		int			findBodyLength(std::vector<unsigned char>& request);
+		void		headerCountAndFlags(int len);
+
+		void		resetClient();
+
+		//temp request holder
+		std::vector<unsigned char> tmpReq;
+		std::vector<unsigned char> tmpBody;
+		std::vector<unsigned char> tmpExtract;
+		std::vector<unsigned char> tmpChunkedBody;
+		std::string iHex;
+		size_t chunkSize;
+		int		tmpLen;
+		bool	chunkSizeSet;
 };
 
 bool 									crlfBool(std::vector<unsigned char>& data, size_t i);

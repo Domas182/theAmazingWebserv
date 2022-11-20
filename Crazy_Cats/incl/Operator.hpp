@@ -31,24 +31,25 @@ class Operator
 		void						check_data();
 
 	public:
-		Operator();
-		Operator(std::string infile);
-		~Operator(void);
-		const std::vector<Server>	&getServer() const;
-		void						start_parsing();
-		void						start_process();
-		int							fdServer(int fd);
-		int 						lookClient(int fd);
-		int							find_server(uint32_t port);
-		void						setupServers();
-		void						RequestChecker(std::vector<unsigned char>& request, int c);
-		void						RequestSizeCheck(int c, int i);
-		void 						dataOnServer(int i);
-		void						dataOnClient(int i);
-		void						dataToSend(int i);
-		void						closeAndDelete(int i);
+	Operator();
+	Operator(std::string infile);
+	~Operator(void);
 
+	const std::vector<Server>	&getServer() const;
 
+	void	start_parsing();
+	void	start_process();
+	int		fdServer(int fd);
+	int 	lookClient(int fd);
+	int		find_server(uint32_t port);
+	void	setupServers();
+	void	RequestChecker(std::vector<unsigned char>& request, int c);
+	void	RequestSizeCheck(int c, int i);
+	void 	dataOnServer(int i);
+	int		dataOnClient(int i);
+	void	dataToSend(int i);
+	void	closeAndDelete(int i);
+	void	cleanUp();
 };
 
 std::ostream	&operator<<(std::ostream &os, const Operator &Operator);

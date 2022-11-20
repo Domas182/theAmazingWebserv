@@ -23,6 +23,7 @@ Client::Client(int index, int socket) : _socket(socket), _sIndex(index)
 	_isChunked = false;
 	_headerTooBig = false;		
 	_tmpCnt = 0;
+
 	tmpLen = 0;
 }
 
@@ -323,17 +324,33 @@ void Client::chunkedHandler(std::vector<unsigned char>& request, size_t& i, size
 
 void	Client::resetClient()
 {
+	// tmpReq.clear();
+	// clearResponse();
+	// clearRequest();
+	// setBFlagF();
+	// setFlagF();
+	// setHBFlagF();
+	// setRFlagF();
+	// setCFlagF();
+	// setH2BFlagF();
+	// tmpBody.clear();
+	// tmpExtract.clear();
+
+	//_statCode = '0';
+	_requestFlag = false;
+	_bodyFlag = false;
+	_readyFlag = false;
+	_hasBody = false;
+	_isChunked = false;
+	_headerTooBig = false;		
+	_tmpCnt = 0;
+	theI = -1;
+	isEmpty = false;
+
 	tmpReq.clear();
-	clearResponse();
-	clearRequest();
-	setBFlagF();
-	setFlagF();
-	setHBFlagF();
-	setRFlagF();
-	setCFlagF();
-	setH2BFlagF();
 	tmpBody.clear();
 	tmpExtract.clear();
+
 	tmpLen = 0;
 	g_error = 200;
 }
