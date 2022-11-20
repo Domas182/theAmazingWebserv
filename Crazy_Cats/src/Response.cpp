@@ -121,21 +121,13 @@ void				Response::setErrorPayload(int code)
 	std::ostringstream ss;
 	std::ifstream input_file;
 	if (code == 400)
-	{
 		input_file.open("docs/error_pages/400.html");
-	//correct error path?
-	}
 	else if (code == 405)
-	{
 		input_file.open("docs/error_pages/405.html");
-	}
 	else if (code == 504)
-	{
 		input_file.open("docs/error_pages/504.html");
-	}
 	ss << input_file.rdbuf();
 	setPayload(ss.str());
-	// this->_payload = readFile;
 }
 
 std::string				Response::setContentLength(Server & server)
@@ -155,7 +147,6 @@ std::string				Response::setErrorContentLength()
 	std::string content_len = ss.str();
 	return (content_len);
 }
-//hier statt server den error payload nehmen
 
 std::string Response::set_time()
 {
@@ -164,11 +155,9 @@ std::string Response::set_time()
 	std::string s(std::ctime(&end_time));
 	return (s);
 }
-//is it a problem with the extra \n created by ctime?
 
 std::string Response::setContentType(std::string & path)
 {
-	// if (g_error == )
 	std::string content_type = path.substr(path.find(".") + 1);
 	return (content_type);
 }

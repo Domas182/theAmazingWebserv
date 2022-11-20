@@ -41,23 +41,16 @@ void Cgi::set_exec_str(Server & server)
 		_exec_str = _path;
 	if (_query != "")
 	{
-		// if (_method == "POST")
-		// 	_query = "?&" + _query;
-		// else
-		// {
 			if (_query.at(1) != '&')
 			{
 				std::string tmp = _query.substr(1);
 				_query = "?&" + tmp;
 			}
-		// }
 	}
 }
 
 void Cgi::set_Env(Server & server)
 {
-	std::cout << "***********" << _body << std::endl;
-
 	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	_env["PATH_INFO"] =_path;
 	_env["PATH_TRANSLATED"] = _path;
@@ -77,15 +70,6 @@ void Cgi::set_Env(Server & server)
 			tmp[i] = std::toupper(tmp[i]);
 		_env["HTTP_" + tmp] = it->second;
 	}
-	// if (_method == "POST")
-	// 	_env[_body] = "";
-	// PRINT ENV
-	for(std::unordered_map<std::string, std::string>::const_iterator it = _env.begin();
-	it != _env.end(); ++it)
-	{
-		std::cout << PINK << it->first << " " << it->second << RESET << std::endl;
-	}
-
 	char ** env_str = (char **)calloc(sizeof(char *), _env.size() + 1);
 	size_t index = 0;
 
@@ -104,9 +88,9 @@ void Cgi::set_Env(Server & server)
 		env_str[index] = c_str;
 		++index;
 	}
-	env_str[index] = NULL;
-	for (int i = 0; env_str[i] != '\0'; i++)
-		std::cout << GREEN << env_str[i] << RESET << std::endl;
+	// env_str[index] = NULL;
+	// for (int i = 0; env_str[i] != '\0'; i++)
+	// 	std::cout << GREEN << env_str[i] << RESET << std::endl;
 	process(env_str);
 }
 
@@ -118,8 +102,6 @@ void Cgi::process(char ** env_str)
 
 	if (_method == "POST")
 		this->body = const_cast<char *>(_body.c_str());
-
-	std::cout << LB << _body << RESET << std::endl;
 
 	pid_t pid = fork();
 
@@ -134,27 +116,17 @@ void Cgi::process(char ** env_str)
 	if (!pid)
 	{
 		if (dup2(fin, STDIN_FILENO) == -1)
-		{
 			g_error = 500;
-			perror("dup2 ");
-		}
 		if (dup2(fout, STDOUT_FILENO) == -1)
-		{
 			g_error = 500;
-			perror("dup2 ");
-		}
 		write(fin, _body.c_str(), _body.size());
 		if (lseek(fin, 0, SEEK_SET) == -1)
-		{
 			g_error = 500;
-			perror("write body ");
-		}
 		close(fin);
 		close(fout);
 		if (execve(_exec_str.c_str(), input_str, env_str) == -1)
 		{
 			g_error = 500;
-			perror("execve ");
 			exit(-1);
 		}
 		exit(1);
@@ -179,10 +151,7 @@ void Cgi::process(char ** env_str)
 			WIFEXITED(wait_child);
 			child_exit_status = WEXITSTATUS(wait_child);
 			if (child_exit_status == 255)
-			{
 				g_error = 500;
-				perror("child exit ");
-			}
 		}
 	}
 }
@@ -197,10 +166,7 @@ void	Cgi::CgiResponse(Server & server, Client & client)
 		g_error = 500;
 	long check = fread(buf, 1, len, tmp);
 	if (check != len)
-	{
 		g_error = 500;
-		perror("len ");
-	}
 	std::string read = std::string(buf);
 	free(buf);
 	int fout = fileno(tmp);
@@ -240,7 +206,6 @@ void	Cgi::create_Response(Server & server, std::string read)
 		this->_response += "\r\n\r\n";
 		this->_response += body;
 	}
-	std::cout << _response << std::endl;
 }
 
 std::string const & Cgi::getResponse() const
