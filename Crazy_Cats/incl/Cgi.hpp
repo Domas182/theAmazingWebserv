@@ -16,29 +16,26 @@ class Cgi
 {
 	private:
 		std::unordered_map<std::string, std::string>	_env;
-		std::string							_exec_str;
-		std::string							_path;
-		std::string							_query;
-		std::string							_method;
-		std::string							_type;
-		std::string							_content_len;
-		std::string							_path_info;
-		std::string							_content_type;
-		RequestParser						_RP;
-		std::string							_body;
-		bool								_error;
-		char *								body;
-
-
-		FILE *								in; 
-		FILE *								tmp;
-		std::string							_response;
+		std::string										_exec_str;
+		std::string										_path;
+		std::string										_query;
+		std::string										_method;
+		std::string										_type;
+		std::string										_content_len;
+		std::string										_path_info;
+		std::string										_content_type;
+		RequestParser									_RP;
+		std::string										_body;
+		bool											_error;
+		char *											body;
+		FILE *											in; 
+		FILE *											tmp;
+		std::string										_response;
 
 	public:
 		Cgi(Server & server, Client & client, std::string path, std::string query,
 			std::string type, RequestParser & RP, std::string _body_send);
 		~Cgi();
-
 		void		set_Env(Server & server);
 		void		set_exec_str(Server & server);
 		void		process(char ** env_str);

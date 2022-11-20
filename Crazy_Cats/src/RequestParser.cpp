@@ -3,45 +3,15 @@
 
 extern int	g_error;
 
-/*
-** ------------------------------- CONSTRUCTOR --------------------------------
-*/
-
 RequestParser::RequestParser(){}
+
+RequestParser::~RequestParser(){}
 
 RequestParser::RequestParser(std::vector<unsigned char>& request)
 {
 	this->_oldLocation = "";
 	split_CRLF(request);
-	// std::cout << *this  << std::endl; 
 }
-
-// RequestParser::RequestParser( const RequestParser & src )
-// {
-// }
-
-
-/*
-** -------------------------------- DESTRUCTOR --------------------------------
-*/
-
-RequestParser::~RequestParser()
-{
-}
-
-
-/*
-** --------------------------------- OVERLOAD ---------------------------------
-*/
-
-// RequestParser &				RequestParser::operator=( RequestParser const & rhs )
-// {
-// 	//if ( this != &rhs )
-// 	//{
-// 		//this->_value = rhs.getValue();
-// 	//}
-// 	return *this;
-// }
 
 std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
 {
@@ -62,7 +32,6 @@ std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
 	}
 	return o;
 }
-//debugging - method for printing if request was correctly parsed into the requestClassInstance
 
 
 /*
@@ -71,9 +40,6 @@ std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
 
 void		RequestParser::split_CRLF(std::vector<unsigned char>& buffer)
 {
-
-	//buffer.clear();
-
 	std::string CRLF(buffer.begin(), buffer.end());
 	std::string delimeter = "\r\n";
 	size_t pos = 0;
@@ -91,8 +57,6 @@ void		RequestParser::split_CRLF(std::vector<unsigned char>& buffer)
 	}
 	parseRequestLine(_CRLF_split.front());
 	parseRequestHeader();
-	// checkForCookies();
-	//body starts here
 }
 
 std::string &		RequestParser::RequestLineMethod(std::string &Method)
@@ -103,17 +67,10 @@ std::string &		RequestParser::RequestLineMethod(std::string &Method)
 	if (pos != std::string::npos)
 	{
 		this->_method = Method.substr(0, pos);
-		if (this->_method.compare("GET") == 0)
-			std::cout << RED << "GET" << RESET << std::endl;
-		else if (this->_method.compare("POST") == 0)
-			std::cout << RED << "POST" << RESET << std::endl;
-		else if (this->_method.compare("DELETE") == 0)
-			std::cout << RED << "DELETE" << RESET << std::endl;	 
-		else
-		{
-			g_error = 405;
-			throw std::runtime_error("Wrong method");
-		}
+		if (this->_method.compare("GET") != 0 
+		&& this->_method.compare("POST") != 0
+		&& this->_method.compare("DELETE") != 0)
+			g_error = 501;
 		Method.erase(0, pos + delimeter.length());
 		return (Method);
 	}
@@ -134,7 +91,6 @@ std::string &		RequestParser::RequestLineURI(std::string &URI)
 	if (pos != std::string::npos)
 	{
 		this->_URI = URI.substr(0, pos);
-		//better parsing aka check URI syntax (allowed chars and just *)
 		URI.erase(0, pos + delimeter.length());
 		return (URI);
 	}
@@ -144,7 +100,6 @@ std::string &		RequestParser::RequestLineURI(std::string &URI)
 		throw std::runtime_error("Wrong URI");
 	}
 }
-//TODO:URI character check??
 
 void		RequestParser::RequestLineVersion(std::string &version)
 {
@@ -171,7 +126,6 @@ void		RequestParser::RequestLineVersion(std::string &version)
 
 void		RequestParser::parseRequestLine(std::string reqLine)
 {
-	//make it more readable
 	RequestLineVersion(RequestLineURI(RequestLineMethod(reqLine)));
 }
 
@@ -181,8 +135,6 @@ void		RequestParser::parseRequestHeader()
 	std::vector<std::string>::iterator it = _CRLF_split.begin();
 	it++;
 	std::string delimeter = ":";
-	//hier z.b. kann der User request ohne doppelpunkt eingeben?
-	//und sollte man deswegen beim : splitten?
 	for(; it != _CRLF_split.end(); it++)
 	{
 		size_t pos = 0;
@@ -192,8 +144,6 @@ void		RequestParser::parseRequestHeader()
 			std::string a = it->substr(0, pos);
 			std::string b = it->substr(pos + 1, it->length());
 			this->_requestH.insert(std::pair<std::string, std::string>(a, b));
-			//check if insert was successful
-			//how??
 			a.clear();
 			b.clear();
 		}
@@ -207,7 +157,6 @@ void		RequestParser::parseRequestHeader()
 	std::unordered_map<std::string, std::string>::const_iterator endit = this->_requestH.end();
 	if (got != endit)
 		this->_oldLocation = got->second;
-	// std::cout << PINK << this->_oldLocation << RESET << std::endl;
 	setPort();
 }
 
@@ -223,17 +172,7 @@ void RequestParser::setPort()
 	}
 	this->_port = atol(tmp.c_str());
 }
-//hier vielleicht den missing host mit ner exception einbauen
-//TODO: herausfinden welche Headerfields wirklich gebraucht sind
 
-void	RequestParser::checkForCookies()
-{
-	std::unordered_map<std::string, std::string>::iterator it = _requestH.find("Cookie");
-	if (it != _requestH.end())
-	{
-		this->_cookies = it->second.erase(0, 1);
-	}
-}
 /*
 ** --------------------------------- ACCESSOR ---------------------------------
 */
@@ -267,9 +206,5 @@ uint32_t const & RequestParser::getPort() const
 std::string const & RequestParser::getOldLocation() const
 {
 	return this->_oldLocation;
-}
-std::string const & RequestParser::getCookies() const
-{
-	return this->_cookies;
 }
 /* ************************************************************************** */

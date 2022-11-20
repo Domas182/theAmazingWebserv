@@ -1,5 +1,7 @@
 #include "../incl/Client.hpp"
 
+extern int	g_error;
+
 bool crlfBool(std::vector<unsigned char>& data, size_t i)
 {
 	if (data[i] == '\r' && data[i + 1] == '\n')
@@ -21,10 +23,8 @@ Client::Client(int index, int socket) : _socket(socket), _sIndex(index)
 	_isChunked = false;
 	_headerTooBig = false;		
 	_tmpCnt = 0;
-	theI = -1;
 
-	isEmpty = false;
-	
+	tmpLen = 0;
 }
 
 Client::~Client(){}
@@ -141,7 +141,6 @@ void Client::setCnt(int i)
 
 void Client::setResp(std::string resp)
 {
-	// std::cout << resp << std::endl;
 	_response = resp;
 	_bytesToSend = _response.size();
 	_totalSentBytes = 0;
@@ -243,6 +242,7 @@ int Client::findBodyLength(std::vector<unsigned char>& request)
 	if (got != endit)
 	{
 		size_t contLen = atoi(got->second.c_str());
+		this->tmpLen = contLen;
 		return (contLen);
 	}
 	std::unordered_map<std::string, std::string>::const_iterator ITE = RP.getRequestH().find("Transfer-Encoding");
@@ -272,7 +272,6 @@ void Client::headerCountAndFlags(int len)
 	setFlagT();
 	len = findBodyLength(tmpReq);
 	headerFlagSetter(len);
-	tmpLen = len;
 }
 
 
@@ -285,6 +284,7 @@ void Client::crlfPush()
 
 void Client::chunkedHandler(std::vector<unsigned char>& request, size_t& i, size_t bytes)
 {
+
 	while (i < bytes)
 	{
 		if (!chunkSizeSet)
@@ -351,4 +351,6 @@ void	Client::resetClient()
 	tmpBody.clear();
 	tmpExtract.clear();
 
+	tmpLen = 0;
+	g_error = 200;
 }

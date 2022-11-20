@@ -12,69 +12,73 @@
 class Client
 {
 	private:
-		int							_socket;
-		int							_sIndex;
-		std::vector<unsigned char>	_answer;
-		std::string					_statCode;
-		int							_sentBytes;
-		int							_totalSentBytes;
-
-		bool						_requestFlag;
-		bool						_bodyFlag;
-		bool						_readyFlag;
-		bool						_hasBody;
-		bool						_isChunked;
-		bool						_headerTooBig;
-		int							_tmpCnt;
-		std::string					_response;
-		int							_bytesToSend;
-		std::vector<unsigned char> 	_request;
-		std::vector<unsigned char>	_body;
-		RequestParser				_RP;
+		int								_socket;
+		int								_sIndex;
+		std::vector<unsigned char>		_answer;
+		std::string						_statCode;
+		int								_sentBytes;
+		int								_totalSentBytes;
+		bool							_requestFlag;
+		bool							_bodyFlag;
+		bool							_readyFlag;
+		bool							_hasBody;
+		bool							_isChunked;
+		bool							_headerTooBig;
+		int								_tmpCnt;
+		std::string						_response;
+		int								_bytesToSend;
+		std::vector<unsigned char> 		_request;
+		std::vector<unsigned char>		_body;
+		RequestParser					_RP;
 		
 
 	public:
+		std::vector<unsigned char> 		tmpReq;
+		std::vector<unsigned char> 		tmpBody;
+		std::vector<unsigned char> 		tmpExtract;
+		std::vector<unsigned char> 		tmpChunkedBody;
+		std::string 					iHex;
+		size_t 							chunkSize;
+		int								tmpLen;
+		bool							chunkSizeSet;
+
 		Client();
 		Client(int index, int socket);
 		~Client();
-
-		RequestParser 		RP;
-		void bytesEsize();
-		void clearResponse();
-
-		int					&getSock();
-		int					getIndex();
-
-		bool				getFlag();
-		bool				getBFlag();
-		bool				getRFlag();
-		bool				getHBFlag();
-		bool				getCFlag();
-		bool				getH2BFlag();
-		size_t				getBodySize();
-		int					getCnt();
-		std::string			getResponse();
-		size_t				getResponseSize();
-		std::string			getStatusCode();
-		std::vector<unsigned char> & getRequest();
-		std::vector<unsigned char> & getBody();
-		RequestParser &		getRP();
+		void 							bytesEsize();
+		void 							clearResponse();
+		int								&getSock();
+		int								getIndex();
+		bool							getFlag();
+		bool							getBFlag();
+		bool							getRFlag();
+		bool							getHBFlag();
+		bool							getCFlag();
+		bool							getH2BFlag();
+		size_t							getBodySize();
+		int								getCnt();
+		std::string						getResponse();
+		size_t							getResponseSize();
+		std::string						getStatusCode();
+		std::vector<unsigned char> & 	getRequest();
+		std::vector<unsigned char> & 	getBody();
+		RequestParser &					getRP();
 
 
-		void		setFlagT();
-		void		setFlagF();
+		void							setFlagT();
+		void							setFlagF();
     
-		void		setBFlagT();
-		void		setBFlagF();
+		void							setBFlagT();
+		void							setBFlagF();
     
-		void		setRFlagT();
-		void		setRFlagF();
+		void							setRFlagT();
+		void							setRFlagF();
     
-		void		setHBFlagT();
-		void		setHBFlagF();
+		void							setHBFlagT();
+		void							setHBFlagF();
     
-		void		setCFlagT();
-		void		setCFlagF();
+		void							setCFlagT();
+		void							setCFlagF();
     
 		void		setH2BFlagT();
 		void		setH2BFlagF();
@@ -108,11 +112,7 @@ class Client
 		size_t chunkSize;
 		int		tmpLen;
 		bool	chunkSizeSet;
-
-		int 	theI;
-		bool	isEmpty;
 };
 
-bool crlfBool(std::vector<unsigned char>& data, size_t i);
-// TODO:integragte the requestParser in teh Client to make it better accesable!
+bool 									crlfBool(std::vector<unsigned char>& data, size_t i);
 #endif /* CLIENT_HPP */

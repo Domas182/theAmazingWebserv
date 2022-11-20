@@ -48,16 +48,12 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 			while (i < _servers[_clients[c].getIndex()].getNBytes())
 				_clients[c].tmpBody.push_back(request[i++]);
 			if (_clients[c].tmpBody.size() == _clients[c].tmpLen)
-			{
 				_clients[c].setRFlagT();
-				_clients[c].tmpLen = 0;
-			}
 		}
 		if (!_clients[c].getRFlag() && _clients[c].getCFlag())
 			_clients[c].chunkedHandler(request, i, _servers[_clients[c].getIndex()].getNBytes());
 	}
 }
-//limit for request size 8192 bytes
 void	Operator::RequestSizeCheck(int c, int i)
 {
 	if(_clients[c].tmpReq.size() == 0 && !_clients[c].getCFlag())
@@ -69,7 +65,6 @@ void	Operator::RequestSizeCheck(int c, int i)
 		_clients[c].resetClient();
 		_clients[c].setH2BFlagT();
 		closeAndDelete(i);
-		//throw std::runtime_error("Header too big");
 	}
 }
 
@@ -153,8 +148,6 @@ int	Operator::dataOnClient(int i)
 	int cIndex = lookClient(_poFD.getPfd()[i].fd);
 	std::vector<unsigned char> request;
 	request = _servers[_clients[cIndex].getIndex()].sockRecv(i, _poFD);
-	std::cout << "";
-
 	try	{
 		RequestChecker(request, cIndex);
 		RequestSizeCheck(cIndex, i);
@@ -242,5 +235,6 @@ void Operator::start_process()
 			g_error = 200;
 			std::cerr << e.what() << std::endl;
 		}
+		// system("leaks webserv");
 	}
 }
