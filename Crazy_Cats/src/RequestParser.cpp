@@ -13,7 +13,6 @@ RequestParser::RequestParser(std::vector<unsigned char>& request)
 {
 	this->_oldLocation = "";
 	split_CRLF(request);
-	// std::cout << *this  << std::endl; 
 }
 
 // RequestParser::RequestParser( const RequestParser & src )
@@ -207,7 +206,6 @@ void		RequestParser::parseRequestHeader()
 	std::unordered_map<std::string, std::string>::const_iterator endit = this->_requestH.end();
 	if (got != endit)
 		this->_oldLocation = got->second;
-	// std::cout << PINK << this->_oldLocation << RESET << std::endl;
 	setPort();
 }
 
