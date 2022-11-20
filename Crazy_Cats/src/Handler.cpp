@@ -109,7 +109,7 @@ void Handler::body_extractor(Client& client)
 
 void	Handler::handle_post(Server & server, Client & client)
 {
-	if ( client.tmpLen > server.getLimitBody())
+	if ( client.tmpLen > server.getLimitBody() && !client.getCFlag())
 	{
 		g_error = 413;
 		client.setStatusCode("413");
@@ -129,7 +129,7 @@ void	Handler::handle_post(Server & server, Client & client)
 	else if (client.getHBFlag() && client.getCFlag())
 	{
 		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
-		write_file(client.tmpBody, "chunked.txt");
+		write_file(client.tmpBody, "chunked");
 	}
 	if (g_error != 200)
 		g_error = 200;

@@ -39,7 +39,7 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 			}
 		}
 	}
-	if (_clients[c].tmpLen > _servers[c].getLimitBody())
+	if (_clients[c].tmpLen > _servers[c].getLimitBody() && !_clients[c].getCFlag())
 		_clients[c].setRFlagT();
 	if (_clients[c].getHBFlag() && _clients[c].getFlag() && !_clients[c].getRFlag())
 	{
@@ -60,9 +60,9 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 //limit for request size 8192 bytes
 void	Operator::RequestSizeCheck(int c, int i)
 {
-	if(_clients[c].tmpReq.size() == 0)
+	if(_clients[c].tmpReq.size() == 0 && !_clients[c].getCFlag())
 		_clients[c].resetClient();
-	if(_clients[c].tmpReq.size() > 32768)
+	if(_clients[c].tmpReq.size() > 32768 && !_clients[c].getCFlag())
 	{
 		_clients[c].resetClient();
 		_clients[c].setH2BFlagT();

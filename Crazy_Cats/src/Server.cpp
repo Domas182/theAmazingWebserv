@@ -53,11 +53,6 @@ std::vector<unsigned char> Server::sockRecv(int i, PollFd &oPoll)
 	return(_sock.socketRecv(i, oPoll));
 }
 
-std::vector<unsigned char> Server::testRecv(int i, PollFd &oPoll)
-{
-	return(_sock.testRecv(i, oPoll));
-}
-
 size_t &Server::getNBytes()
 {
 	return(_sock.nbytes);

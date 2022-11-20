@@ -54,20 +54,11 @@ int ft_tsocket::socketAccept()
 	return (nSock);
 }
 
-//int ft_tsocket::socketSend(int fd, std::string answer)
-//{
-//    int sBytes = 0;
-//    sBytes = send(fd, &answer[0], answer.size(), MSG_NOSIGNAL);
-//    return (sBytes);
-//}
-
 void ft_tsocket::socketSend(int fd, Client& client)
 {
 	int sBytes = 0;
 	std::string temp = client.getResponse();
-	//std::cout << "get? size: " << client.getResponseSize() << std::endl;
 	sBytes = send(fd, &client.getResponse()[0], client.getResponseSize(), 0);
-	//sBytes = send(fd, &client.getResponse(), client.getResponseSize(), MSG_NOSIGNAL);
 	client.setSentBytes(sBytes);
 	client.setTotalSentBytes();
 	client.eraseSentBit();
@@ -75,15 +66,10 @@ void ft_tsocket::socketSend(int fd, Client& client)
 
 std::vector<unsigned char> ft_tsocket::socketRecv(int i, PollFd &tPoll)
 {
-	//std::vector<unsigned char> buf(150728640);
 	std::vector<unsigned char> buf(65536);
-	// std::vector<unsigned char> buf(8192);
-	//std::vector<unsigned char> buf(8192);
-	//TODO:buf(x) == our maxread size is not the same as maxbody size == still missing!
+
 	nbytes = recv(tPoll.getPfd()[i].fd, &buf[0], buf.size(), MSG_DONTWAIT);
-	// int total = 0;
-	// while ((nbytes = recv(tPoll.getPfd()[i].fd, &buf[total], sizeof(buf) - total, MSG_DONTWAIT)) > 0)
-	// 	total += nbytes;
+
 	if (nbytes <= 0)
 	{
 		close(tPoll.getPfd()[i].fd);
@@ -91,30 +77,6 @@ std::vector<unsigned char> ft_tsocket::socketRecv(int i, PollFd &tPoll)
 	}
 	return (buf);
 }
-
-
-//testing new approach
-std::vector<unsigned char> ft_tsocket::testRecv(int i, PollFd &tPoll)
-{
-	std::vector<unsigned char> buf(4);
-	std::vector<unsigned char> temp;
-	int j = 4;
-	nbytes = recv(tPoll.getPfd()[i].fd, &buf[0], buf.size(), MSG_DONTWAIT);
-	while (temp[j-3] != '\r' && temp[j-2] != '\n' && temp[j-1] != '\r' && temp[j] != '\n')
-	{
-		nbytes = recv(tPoll.getPfd()[i].fd, &buf[0], buf.size(), MSG_DONTWAIT);
-		std::cout << buf;
-		temp.push_back(buf[0]);
-		j++;
-	}
-	if (nbytes <= 0)
-	{
-		close(tPoll.getPfd()[i].fd);
-		tPoll.deleteFd(i);
-	}
-	return (temp);
-}
-
 
 struct sockaddr_in const& ft_tsocket::getAddress() const
 {

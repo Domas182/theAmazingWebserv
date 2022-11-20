@@ -35,7 +35,6 @@ class ft_tsocket
 		//int		socketSend(int fd, std::string answer);
 		void		socketSend(int fd, Client& client);
 		std::vector<unsigned char>	socketRecv(int i, PollFd &objectPoll);
-		std::vector<unsigned char>	testRecv(int i, PollFd &objectPoll);
 		struct sockaddr_in const&	getAddress() const;
 		int const& 					getSocketFd() const;
 		int getAddrlen();
