@@ -59,6 +59,7 @@ void ft_tsocket::socketSend(int fd, Client& client)
 	int sBytes = 0;
 	std::string temp = client.getResponse();
 	sBytes = send(fd, &client.getResponse()[0], client.getResponseSize(), 0);
+	//TODO:check and protect
 	client.setSentBytes(sBytes);
 	client.setTotalSentBytes();
 	client.eraseSentBit();
