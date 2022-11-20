@@ -48,10 +48,7 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 			while (i < _servers[_clients[c].getIndex()].getNBytes())
 				_clients[c].tmpBody.push_back(request[i++]);
 			if (_clients[c].tmpBody.size() == _clients[c].tmpLen)
-			{
 				_clients[c].setRFlagT();
-				_clients[c].tmpLen = 0;
-			}
 		}
 		if (!_clients[c].getRFlag() && _clients[c].getCFlag())
 			_clients[c].chunkedHandler(request, i, _servers[_clients[c].getIndex()].getNBytes());
@@ -130,7 +127,6 @@ void	Operator::dataOnClient(int i)
 	int cIndex = lookClient(_poFD.getPfd()[i].fd);
 	std::vector<unsigned char> request;
 	request = _servers[_clients[cIndex].getIndex()].sockRecv(i, _poFD);
-	//std::cout << _servers[_clients[cIndex].getIndex()].getLimitBody() << std::endl;
 	if (request.size() <= 0)
 	{
 		std::vector<Client>::iterator it(_clients.begin());

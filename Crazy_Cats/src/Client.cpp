@@ -21,6 +21,7 @@ Client::Client(int index, int socket) : _socket(socket), _sIndex(index)
 	_isChunked = false;
 	_headerTooBig = false;		
 	_tmpCnt = 0;
+	tmpLen = 0;
 }
 
 Client::~Client(){}
@@ -137,7 +138,6 @@ void Client::setCnt(int i)
 
 void Client::setResp(std::string resp)
 {
-	// std::cout << resp << std::endl;
 	_response = resp;
 	_bytesToSend = _response.size();
 	_totalSentBytes = 0;
@@ -238,7 +238,9 @@ int Client::findBodyLength(std::vector<unsigned char>& request)
 	std::unordered_map<std::string, std::string>::const_iterator endit = RP.getRequestH().end();
 	if (got != endit)
 	{
+
 		size_t contLen = atoi(got->second.c_str());
+		this->tmpLen = contLen;
 		return (contLen);
 	}
 	std::unordered_map<std::string, std::string>::const_iterator ITE = RP.getRequestH().find("Transfer-Encoding");
@@ -268,7 +270,6 @@ void Client::headerCountAndFlags(int len)
 	setFlagT();
 	len = findBodyLength(tmpReq);
 	headerFlagSetter(len);
-	tmpLen = len;
 }
 
 
@@ -281,6 +282,7 @@ void Client::crlfPush()
 
 void Client::chunkedHandler(std::vector<unsigned char>& request, size_t& i, size_t bytes)
 {
+
 	while (i < bytes)
 	{
 		if (!chunkSizeSet)
@@ -330,38 +332,8 @@ void	Client::resetClient()
 	setCFlagF();
 	setH2BFlagF();
 	tmpBody.clear();
-	tmpExtract.clear();		
+	tmpExtract.clear();
+	tmpLen = 0;
+	//g_error = 200;
+	// would it work here?
 }
-
-// 	while(1)
-// 	{
-// 		size_t i = 0;
-// 		try{
-// 		poll(_poFD.getPfd().data(), _poFD.getFdCount(), 0); 
-// 		if (!_poFD.getFdCount())
-// 			setupServers();
-// 		for (; i < _poFD.getFdCount(); i++)
-// 		{
-// 			if (_poFD.getPfd()[i].revents & POLLIN)
-// 			{
-// 				int k;
-// 				if ((k = fdServer(_poFD.getPfd()[i].fd)) != -1)
-// 					dataOnServer(k);
-// 				else
-// 					dataOnClient(i);
-// 			}
-// 			if (i < _poFD.getFdCount())
-// 				if (_poFD.getPfd()[i].revents & POLLOUT)
-// 					dataToSend(i);
-// 		}
-// 		} catch (std::exception &e){
-// 			g_error = 200;
-// 			size_t cl = lookClient(_poFD.getPfd()[i].fd);
-// //			_clients[lookClient(_poFD.getPfd()[i].fd)].clearResponse();
-// 			std::vector<Client>::iterator it(_clients.begin());
-// 			for (int x = 0; x < cl; x++)
-// 				it++;
-// 			_clients.erase(it);
-// 			std::cerr << e.what() << std::endl;
-// 		}
-// 	}

@@ -49,7 +49,7 @@ void Handler::pure_body(std::string & fileBody, Client& client)
 		std::string test;
 		rn = this->_webkit;
 		if ((pos = fileBody.find(rn)) != std::string::npos)
-			test = fileBody.substr(0, pos);
+			test = fileBody.substr(0, pos - 2);
 		std::copy(test.begin(), test.end(), std::back_inserter(client.tmpExtract));
 	}
 }
@@ -244,7 +244,6 @@ void	Handler::start_handling(Server & server, Client & client)
 		if (this->_path[0] == '/')
 			this->_path = this->_path.substr(1);
 	}
-	std::cout << GREEN << _URI << RESET << std::endl;
 	change_path(server);
 	check_oldLocation(server);
 	check_listing(server);
@@ -398,18 +397,14 @@ void	Handler::check_oldLocation(Server & server)
 	{
 		if (_oldLocation != "" && _URI != "/500_cat.jpeg")
 		{
-			std::cout << LB << _path << RESET << std::endl;
 			size_t start = _oldLocation.rfind('/');
 			std::string tmp = _oldLocation.substr(start);
 			if (tmp.rfind('.') == std::string::npos && tmp != "/" && tmp.rfind('?') == std::string::npos)
 			{
-				std::cout << RED << _path << RESET << std::endl;
 				for (std::vector<Location>::const_iterator it = server.getLocation().begin(); it != server.getLocation().end(); it++)
 				{
-					std::cout << LB << tmp << RESET << std::endl;
 					if (tmp == it->getProxy() && it->getDirectoryListing() == true)
 					{
-						std::cout << LB << _path << "URI " << _URI << RESET << std::endl;
 						if (std::count(_URI.begin(), _URI.end(), '/') > 0)
 						{
 							size_t start = _URI.rfind('/');
@@ -417,7 +412,6 @@ void	Handler::check_oldLocation(Server & server)
 							if (_file_req == true)
 							{
 								_path = server.getRoot() + it->getRoot() + tmp;
-								std::cout << PINK << _path << RESET << std::endl;
 							}
 						}
 						std::ifstream input_file;
