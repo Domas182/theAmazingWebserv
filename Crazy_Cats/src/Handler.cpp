@@ -129,7 +129,7 @@ void	Handler::handle_post(Server & server, Client & client)
 	else if (client.getHBFlag() && client.getCFlag())
 	{
 		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
-		write_file(client.tmpBody, "chunked");
+		write_file(client.tmpBody, "chunked.jpg");
 	}
 	if (g_error != 200)
 		g_error = 200;

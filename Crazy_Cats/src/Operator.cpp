@@ -209,5 +209,6 @@ void Operator::start_process()
 			g_error = 200;
 			std::cerr << e.what() << std::endl;
 		}
+		// system("leaks webserv");
 	}
 }
