@@ -9,11 +9,6 @@ int	infile_format(std::string infile)
 	return (0);
 }
 
-// void checker()
-// {
-// 	system("leaks webserv");
-// }
-
 int main(int argc, char** argv)
 {
 	if (argc > 2)
@@ -48,6 +43,5 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 	operate.start_process();
-	// atexit(checker);
 	return EXIT_SUCCESS;
 }

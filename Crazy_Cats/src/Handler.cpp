@@ -32,7 +32,8 @@ void Handler::write_file(std::vector<unsigned char> & input, std::string filenam
 {
 	std::fstream file;
 	file.open(filename, std::ios_base::out);
-	//TODO:should we protect that?
+	if (!file.is_open())
+		g_error = 500;
 	for (size_t i = 0; i < input.size(); i++)
 		file << input[i];
 	file.close();
@@ -123,18 +124,17 @@ void	Handler::handle_post(Server & server, Client & client)
 	else if (client.getHBFlag() && !client.getCFlag() && g_error != 413)
 	{
 		body_extractor(client);
-		client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
 		write_file(client.tmpExtract, this->_filename);
+		client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
 	} 
 	else if (client.getHBFlag() && client.getCFlag())
 	{
-		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
 		write_file(client.tmpBody, "chunked");
+		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
 	}
 	if (g_error != 200)
 		g_error = 200;
 }
-//TODO: can't we make the g_error set back in the operator??
 
 void	Handler::handle_get(Server & server, Client & client)
 {
@@ -169,33 +169,31 @@ void	Handler::handle_methods(Server & server, Client & client)
 	if (this->_method == "GET")
 		handle_get(server, client);
 	else if (this->_method == "POST")
-	{
 		handle_post(server, client);
-	}
 	else if (this->_method == "DELETE")
 		handle_delete(server, client);
-	
-
+	if (g_error != 200)
+	{
+		server.set_Content(this->_path, g_error);
+		client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
+	}
 }
 
 void	Handler::check_methods()
 {
 	bool check = false;
-	if (_file_req == false)
+	if (_method != "GET" && _method != "POST" && _method != "DELETE")
 	{
-		if (_method == "HEAD" || _method == "PUT" || _method == "CONNECT" || _method == "OPTIONS" || _method == "TRACE")
-		{
-			g_error = 501;
-			return ;
-		}
-		for (std::vector<std::string>::const_iterator it = _allowed_methods.begin(); it != _allowed_methods.end(); it++)
-		{
-			if (it->data() == _method)
-				check = true;
-		}
-		if (check == false)
-			g_error = 405;
+		g_error = 501;
+		return ;
 	}
+	for (std::vector<std::string>::const_iterator it = _allowed_methods.begin(); it != _allowed_methods.end(); it++)
+	{
+		if (it->data() == _method)
+			check = true;
+	}
+	if (check == false)
+		g_error = 405;
 }
 
 void	Handler::start_handling(Server & server, Client & client)
@@ -391,6 +389,21 @@ void	Handler::check_listing(Server & server)
 	}
 }
 
+void	Handler::check_cgi(Server & server)
+{
+	bool check = false;
+	if (_req_type == "php" || _req_type == "py")
+	{
+		for (std::vector<std::string>::const_iterator it = server.getCgi().begin(); it != server.getCgi().end(); it++)
+		{
+			if (it->data() == _req_type)
+				check = true;
+		}
+		if (check == false)
+			g_error = 501;
+	}
+}
+
 void	Handler::check_oldLocation(Server & server)
 {
 	if (!server.getLocation().empty() && _URI != "/")
@@ -425,4 +438,5 @@ void	Handler::check_oldLocation(Server & server)
 			}
 		}
 	}
+	check_cgi(server);
 }

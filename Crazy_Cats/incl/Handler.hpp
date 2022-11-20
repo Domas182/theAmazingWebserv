@@ -61,7 +61,7 @@ class Handler
 		void 		pure_body(std::string & fileBody, Client& client);
 		void 		write_file(std::vector<unsigned char> & input, std::string filename);
 		void		detect_error_img(Server & server);
-
+		void		check_cgi(Server & server);
 };
 
 #endif /* HANDLER_HPP */
