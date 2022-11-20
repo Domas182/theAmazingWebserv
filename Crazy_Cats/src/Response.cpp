@@ -1,9 +1,8 @@
 #include "../incl/Response.hpp"
 
-/*
-** ------------------------------- CONSTRUCTOR --------------------------------
-*/
 Response::Response(){}
+
+Response::~Response(){}
 
 std::string Response::createResponse (int code, Server & server, std::string & path, std::string & version)
 {
@@ -29,36 +28,10 @@ std::string Response::createErrorResponse (int code, Server & server)
 	return(response);
 }
 
-// Response::Response( const Response & src )
-// {
-// }
-
-
-/*
-** -------------------------------- DESTRUCTOR --------------------------------
-*/
-
-Response::~Response()
-{
-}
-
-
-/*
-** --------------------------------- OVERLOAD ---------------------------------
-*/
-
-// Response &				Response::operator=( Response const & rhs )
-// {
-// 	//if ( this != &rhs )
-// 	//{
-// 		//this->_value = rhs.getValue();
-// 	//}
-// 	return *this;
-// }
-
 /*
 ** --------------------------------- METHODS ----------------------------------
 */
+
 std::string Response::constructResponse() const
 {
 	std::string response = getVersion() + " " + getCode() + " " + getPhrase() + "\n";
@@ -110,13 +83,11 @@ void			Response::setCodePhrase(int code)
 }
 
 void				Response::setPayload(std::string readFile)
-//readFile is the return of std::string readFileIntoString2(const std::string& path) 
 {
 	this->_payload = readFile;
 }
 
 void				Response::setErrorPayload(int code)
-//readFile is the return of std::string readFileIntoString2(const std::string& path) 
 {
 	std::ostringstream ss;
 	std::ifstream input_file;
@@ -225,10 +196,5 @@ void			Response::createCodePhraseMap()
 		this->_codePhrase.insert(std::pair<int, std::string>(505,"HTTP Version Not Supported"));
 
 }
-
-/*
-** --------------------------------- ACCESSOR ---------------------------------
-*/
-
 
 /* ************************************************************************** */

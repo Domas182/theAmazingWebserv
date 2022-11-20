@@ -3,12 +3,6 @@
 
 extern int	g_error;
 
-void time_function()
-{
-	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-}
-
 Handler::Handler(RequestParser RP, Client & client): _body(client.tmpBody), _RP(RP)
 {
 	this->_method = _RP.getMethod();
@@ -54,6 +48,7 @@ void Handler::pure_body(std::string & fileBody, Client& client)
 		std::copy(test.begin(), test.end(), std::back_inserter(client.tmpExtract));
 	}
 }
+
 void	Handler::get_file_info(std::string& fileBody)
 {
 	std::string rn = "\r\n";
@@ -424,9 +419,7 @@ void	Handler::check_oldLocation(Server & server)
 							size_t start = _URI.rfind('/');
 							tmp = _URI.substr(start + 1);
 							if (_file_req == true)
-							{
 								_path = server.getRoot() + it->getRoot() + tmp;
-							}
 						}
 						std::ifstream input_file;
 						input_file.open(_path);

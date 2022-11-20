@@ -3,38 +3,15 @@
 
 extern int	g_error;
 
-/*
-** ------------------------------- CONSTRUCTOR --------------------------------
-*/
-
 RequestParser::RequestParser(){}
+
+RequestParser::~RequestParser(){}
 
 RequestParser::RequestParser(std::vector<unsigned char>& request)
 {
 	this->_oldLocation = "";
 	split_CRLF(request);
 }
-
-/*
-** -------------------------------- DESTRUCTOR --------------------------------
-*/
-
-RequestParser::~RequestParser()
-{
-}
-
-/*
-** --------------------------------- OVERLOAD ---------------------------------
-*/
-
-// RequestParser &				RequestParser::operator=( RequestParser const & rhs )
-// {
-// 	//if ( this != &rhs )
-// 	//{
-// 		//this->_value = rhs.getValue();
-// 	//}
-// 	return *this;
-// }
 
 std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
 {
