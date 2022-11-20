@@ -108,6 +108,9 @@ class Client
 		size_t chunkSize;
 		int		tmpLen;
 		bool	chunkSizeSet;
+
+		int 	theI;
+		bool	isEmpty;
 };
 
 bool crlfBool(std::vector<unsigned char>& data, size_t i);

@@ -8,7 +8,8 @@ void PollFd::addFd(int fd)
 {
 	struct pollfd pfd;
 	pfd.fd = fd;
-	pfd.events = POLLIN | POLLOUT;
+	//pfd.events = POLLIN | POLLOUT;
+	pfd.events = POLLRDNORM | POLLWRNORM;
 	_pfd.push_back(pfd);
 }
 

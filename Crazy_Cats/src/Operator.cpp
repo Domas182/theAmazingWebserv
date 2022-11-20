@@ -61,7 +61,9 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 void	Operator::RequestSizeCheck(int c, int i)
 {
 	if(_clients[c].tmpReq.size() == 0 && !_clients[c].getCFlag())
+	{
 		_clients[c].resetClient();
+	}
 	if(_clients[c].tmpReq.size() > 32768 && !_clients[c].getCFlag())
 	{
 		_clients[c].resetClient();
@@ -70,7 +72,6 @@ void	Operator::RequestSizeCheck(int c, int i)
 		//throw std::runtime_error("Header too big");
 	}
 }
-
 
 int Operator::fdServer(int fd)
 {
@@ -96,6 +97,28 @@ void	Operator::closeAndDelete(int i)
 	_poFD.deleteFd(i);
 }
 
+void 	Operator::cleanUp()
+{
+	for (size_t i = 0; i < _poFD.getFdCount(); i++)
+	{
+		int ci;
+		if ((ci = lookClient(_poFD.getPfd()[i].fd)) != -1)
+		{
+			if(_clients[ci].isEmpty)
+				closeAndDelete(i);
+		}
+	}
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i].isEmpty)
+		{
+			std::vector<Client>::iterator it(_clients.begin());
+			for (int m = 0; m < i; m++)
+				it++;
+			_clients.erase(it);
+		}
+	}	
+}
 
 int	Operator::find_server(uint32_t port)
 {
@@ -125,44 +148,49 @@ void	Operator::dataOnServer(int i)
 	_clients.push_back(clie);
 }
 
-void	Operator::dataOnClient(int i)
+int	Operator::dataOnClient(int i)
 {
 	int cIndex = lookClient(_poFD.getPfd()[i].fd);
 	std::vector<unsigned char> request;
 	request = _servers[_clients[cIndex].getIndex()].sockRecv(i, _poFD);
-	//std::cout << _servers[_clients[cIndex].getIndex()].getLimitBody() << std::endl;
-	if (request.size() <= 0)
-	{
-		std::vector<Client>::iterator it(_clients.begin());
-		for (int m = 0; m < cIndex; m++)
-			it++;
-		_clients.erase(it);		
-	} else {
-		try	{
-			RequestChecker(request, cIndex);
-			RequestSizeCheck(cIndex, i);
-			}catch(std::exception& e)
-			{
-					std::cerr << e.what() << '\n';
-					Response tmpRSP;
-					_clients[cIndex].setResp(tmpRSP.createErrorResponse(g_error, _servers[_clients[cIndex].getIndex()]));
-					if (g_error != 200)
-						g_error = 200;
-					_clients[cIndex].clearRequest();
-					_clients[cIndex].setRFlagF();
-			}
-			if (_clients[cIndex].getRFlag())
-			{
-				RequestParser RP(_clients[cIndex].tmpReq);
-				int sIndex;
-				sIndex = find_server(RP.getPort());
-				Handler H(RP, _clients[cIndex]);
-				H.start_handling(_servers[sIndex], _clients[cIndex]);
-			}
-			if (g_error != 200)
-				g_error = 200;
-			request.clear();
+	std::cout << "";
+
+	try	{
+		RequestChecker(request, cIndex);
+		RequestSizeCheck(cIndex, i);
+		if (_clients[cIndex].tmpReq.size() == 0)
+		{
+			// std::vector<Client>::iterator it(_clients.begin());
+			// for (int m = 0; m < cIndex; m++)
+			// 	it++;
+			// _clients.erase(it);
+			_clients[cIndex].theI = i;
+			_clients[cIndex].isEmpty = true;
+
+			return (-1);
 		}
+		}catch(std::exception& e)
+		{
+				std::cerr << e.what() << '\n';
+				Response tmpRSP;
+				_clients[cIndex].setResp(tmpRSP.createErrorResponse(g_error, _servers[_clients[cIndex].getIndex()]));
+				if (g_error != 200)
+					g_error = 200;
+				_clients[cIndex].clearRequest();
+				_clients[cIndex].setRFlagF();
+		}
+		if (_clients[cIndex].getRFlag())
+		{
+			RequestParser RP(_clients[cIndex].tmpReq);
+			int sIndex;
+			sIndex = find_server(RP.getPort());
+			Handler H(RP, _clients[cIndex]);
+			H.start_handling(_servers[sIndex], _clients[cIndex]);
+		}
+		if (g_error != 200)
+			g_error = 200;
+		request.clear();
+	return (0);
 }
 
 void	Operator::dataToSend(int i)
@@ -190,25 +218,26 @@ void Operator::start_process()
 		_servers[i].bindPort();
 	while(1)
 	{
-		size_t i = 0;
 		try{
-		poll(_poFD.getPfd().data(), _poFD.getFdCount(), 100); 
+		poll(_poFD.getPfd().data(), _poFD.getFdCount(), 1000); 
 		if (!_poFD.getFdCount())
 			setupServers();
 		for (size_t i = 0; i < _poFD.getFdCount(); i++)
 		{
-			if (_poFD.getPfd()[i].revents & POLLIN)
+			if (_poFD.getPfd()[i].revents & POLLRDNORM)
 			{
 				int k;
 				if ((k = fdServer(_poFD.getPfd()[i].fd)) != -1)
 					dataOnServer(k);
 				else
-					dataOnClient(i);
+					int x = dataOnClient(i);
 			}
 			if (i < _poFD.getFdCount())
-				if (_poFD.getPfd()[i].revents & POLLOUT)
+				if (_poFD.getPfd()[i].revents & POLLWRNORM)
 					dataToSend(i);
 		}
+		cleanUp();
+
 		} catch (std::exception &e){
 			g_error = 200;
 			std::cerr << e.what() << std::endl;

@@ -21,6 +21,10 @@ Client::Client(int index, int socket) : _socket(socket), _sIndex(index)
 	_isChunked = false;
 	_headerTooBig = false;		
 	_tmpCnt = 0;
+	theI = -1;
+
+	isEmpty = false;
+	
 }
 
 Client::~Client(){}
@@ -320,48 +324,31 @@ void Client::chunkedHandler(std::vector<unsigned char>& request, size_t& i, size
 
 void	Client::resetClient()
 {
-	tmpReq.clear();
-	clearResponse();
-	clearRequest();
-	setBFlagF();
-	setFlagF();
-	setHBFlagF();
-	setRFlagF();
-	setCFlagF();
-	setH2BFlagF();
-	tmpBody.clear();
-	tmpExtract.clear();		
-}
+	// tmpReq.clear();
+	// clearResponse();
+	// clearRequest();
+	// setBFlagF();
+	// setFlagF();
+	// setHBFlagF();
+	// setRFlagF();
+	// setCFlagF();
+	// setH2BFlagF();
+	// tmpBody.clear();
+	// tmpExtract.clear();
 
-// 	while(1)
-// 	{
-// 		size_t i = 0;
-// 		try{
-// 		poll(_poFD.getPfd().data(), _poFD.getFdCount(), 0); 
-// 		if (!_poFD.getFdCount())
-// 			setupServers();
-// 		for (; i < _poFD.getFdCount(); i++)
-// 		{
-// 			if (_poFD.getPfd()[i].revents & POLLIN)
-// 			{
-// 				int k;
-// 				if ((k = fdServer(_poFD.getPfd()[i].fd)) != -1)
-// 					dataOnServer(k);
-// 				else
-// 					dataOnClient(i);
-// 			}
-// 			if (i < _poFD.getFdCount())
-// 				if (_poFD.getPfd()[i].revents & POLLOUT)
-// 					dataToSend(i);
-// 		}
-// 		} catch (std::exception &e){
-// 			g_error = 200;
-// 			size_t cl = lookClient(_poFD.getPfd()[i].fd);
-// //			_clients[lookClient(_poFD.getPfd()[i].fd)].clearResponse();
-// 			std::vector<Client>::iterator it(_clients.begin());
-// 			for (int x = 0; x < cl; x++)
-// 				it++;
-// 			_clients.erase(it);
-// 			std::cerr << e.what() << std::endl;
-// 		}
-// 	}
+	//_statCode = '0';
+	_requestFlag = false;
+	_bodyFlag = false;
+	_readyFlag = false;
+	_hasBody = false;
+	_isChunked = false;
+	_headerTooBig = false;		
+	_tmpCnt = 0;
+	theI = -1;
+	isEmpty = false;
+
+	tmpReq.clear();
+	tmpBody.clear();
+	tmpExtract.clear();
+
+}
