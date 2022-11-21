@@ -33,13 +33,13 @@ class Cgi
 		std::string										_response;
 
 	public:
-		Cgi(Server & server, Client & client, std::string path, std::string query,
+		Cgi(Server & server, std::string path, std::string query,
 			std::string type, RequestParser & RP, std::string _body_send);
 		~Cgi();
 		void		set_Env(Server & server);
-		void		set_exec_str(Server & server);
+		void		set_exec_str();
 		void		process(char ** env_str);
-		void		CgiResponse(Server & server, Client & client);
+		void		CgiResponse(Server & server);
 		void		create_Response(Server & server, std::string read);
 		std::string	const & getResponse() const;
 		bool		const & getError() const;

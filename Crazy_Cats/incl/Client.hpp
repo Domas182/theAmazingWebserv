@@ -41,6 +41,7 @@ class Client
 		size_t 							chunkSize;
 		int								tmpLen;
 		bool							chunkSizeSet;
+		bool							isEmpty;
 
 		Client();
 		Client(int index, int socket);
@@ -104,14 +105,14 @@ class Client
 		void		resetClient();
 
 		//temp request holder
-		std::vector<unsigned char> tmpReq;
-		std::vector<unsigned char> tmpBody;
-		std::vector<unsigned char> tmpExtract;
-		std::vector<unsigned char> tmpChunkedBody;
-		std::string iHex;
-		size_t chunkSize;
-		int		tmpLen;
-		bool	chunkSizeSet;
+		// std::vector<unsigned char> tmpReq;
+		// std::vector<unsigned char> tmpBody;
+		// std::vector<unsigned char> tmpExtract;
+		// std::vector<unsigned char> tmpChunkedBody;
+		// std::string iHex;
+		// size_t chunkSize;
+		// int		tmpLen;
+		// bool	chunkSizeSet;
 };
 
 bool 									crlfBool(std::vector<unsigned char>& data, size_t i);

@@ -23,6 +23,7 @@ Client::Client(int index, int socket) : _socket(socket), _sIndex(index)
 	_isChunked = false;
 	_headerTooBig = false;		
 	_tmpCnt = 0;
+	isEmpty = false;
 
 	tmpLen = 0;
 }
@@ -344,7 +345,6 @@ void	Client::resetClient()
 	_isChunked = false;
 	_headerTooBig = false;		
 	_tmpCnt = 0;
-	theI = -1;
 	isEmpty = false;
 
 	tmpReq.clear();

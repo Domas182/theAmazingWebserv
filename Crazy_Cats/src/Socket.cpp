@@ -70,12 +70,14 @@ std::vector<unsigned char> ft_tsocket::socketRecv(int i, PollFd &tPoll)
 {
 	std::vector<unsigned char> buf(65536);
 
-	nbytes = recv(tPoll.getPfd()[i].fd, &buf[0], buf.size(), MSG_DONTWAIT);
-
-	if (nbytes <= 0)
+	if (tPoll.getPfd()[i].fd)
 	{
-		close(tPoll.getPfd()[i].fd);
-		tPoll.deleteFd(i);
+		nbytes = recv(tPoll.getPfd()[i].fd, &buf[0], buf.size(), MSG_DONTWAIT);
+		if (nbytes <= 0)
+		{
+			close(tPoll.getPfd()[i].fd);
+			tPoll.deleteFd(i);
+		}
 	}
 	return (buf);
 }
