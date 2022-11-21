@@ -1,8 +1,6 @@
 CC = c++
 
-FLAGS = -std=c++98 -Werror -Wall -Wextra
-
-FLAGS += -g
+FLAGS = -g -std=c++98 -Wall -Wextra 
 
 NAME = webserv
 
@@ -29,7 +27,7 @@ $(NAME): $(OBJ) $(HEADERS)
 	@echo "\n$(GREEN)$(NAME) created$(DEFAULT)"
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | prep
-	@$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
+	@$(CC) $(FLAGS) -MMD -MP -c $< -o $@
 
 prep:
 	@mkdir -p $(OBJ_DIR)

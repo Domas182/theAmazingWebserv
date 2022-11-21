@@ -39,7 +39,7 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 			}
 		}
 	}
-	if (_clients[c].tmpLen > _servers[c].getLimitBody() && !_clients[c].getCFlag())
+	if (_clients[c].tmpLen > static_cast<int>(_servers[c].getLimitBody()) && !_clients[c].getCFlag())
 		_clients[c].setRFlagT();
 	if (_clients[c].getHBFlag() && _clients[c].getFlag() && !_clients[c].getRFlag())
 	{
@@ -47,7 +47,7 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 		{
 			while (i < _servers[_clients[c].getIndex()].getNBytes())
 				_clients[c].tmpBody.push_back(request[i++]);
-			if (_clients[c].tmpBody.size() == _clients[c].tmpLen)
+			if (static_cast<int>(_clients[c].tmpBody.size()) == _clients[c].tmpLen)
 				_clients[c].setRFlagT();
 		}
 		if (!_clients[c].getRFlag() && _clients[c].getCFlag())
@@ -56,10 +56,6 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 }
 void	Operator::RequestSizeCheck(int c, int i)
 {
-	if(_clients[c].tmpReq.size() == 0 && !_clients[c].getCFlag())
-	{
-		_clients[c].resetClient();
-	}
 	if(_clients[c].tmpReq.size() > 32768 && !_clients[c].getCFlag())
 	{
 		_clients[c].resetClient();
@@ -108,7 +104,7 @@ void 	Operator::cleanUp()
 		if (_clients[i].isEmpty)
 		{
 			std::vector<Client>::iterator it(_clients.begin());
-			for (int m = 0; m < i; m++)
+			for (size_t m = 0; m < i; m++)
 				it++;
 			_clients.erase(it);
 		}
@@ -146,20 +142,22 @@ void	Operator::dataOnServer(int i)
 int	Operator::dataOnClient(int i)
 {
 	int cIndex = lookClient(_poFD.getPfd()[i].fd);
+	std::cout << "NO COLORS!: C INDEX: " << cIndex << std::endl;
+	
+	if (cIndex == -1)
+	{
+
+		return -1;
+	}
 	std::vector<unsigned char> request;
+	
 	request = _servers[_clients[cIndex].getIndex()].sockRecv(i, _poFD);
 	try	{
 		RequestChecker(request, cIndex);
 		RequestSizeCheck(cIndex, i);
 		if (_clients[cIndex].tmpReq.size() == 0)
-		{
-			// std::vector<Client>::iterator it(_clients.begin());
-			// for (int m = 0; m < cIndex; m++)
-			// 	it++;
-			// _clients.erase(it);
-			_clients[cIndex].theI = i;
+		{	
 			_clients[cIndex].isEmpty = true;
-
 			return (-1);
 		}
 		}catch(std::exception& e)
@@ -223,7 +221,7 @@ void Operator::start_process()
 				if ((k = fdServer(_poFD.getPfd()[i].fd)) != -1)
 					dataOnServer(k);
 				else
-					int x = dataOnClient(i);
+					dataOnClient(i);
 			}
 			if (i < _poFD.getFdCount())
 				if (_poFD.getPfd()[i].revents & POLLWRNORM)

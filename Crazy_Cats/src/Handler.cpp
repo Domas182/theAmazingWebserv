@@ -105,7 +105,7 @@ void Handler::body_extractor(Client& client)
 
 void	Handler::handle_post(Server & server, Client & client)
 {
-	if ( client.tmpLen > server.getLimitBody() && !client.getCFlag())
+	if ( client.tmpLen > static_cast<int>(server.getLimitBody()) && !client.getCFlag())
 	{
 		g_error = 413;
 		client.setStatusCode("413");
@@ -253,7 +253,7 @@ void	Handler::start_handling(Server & server, Client & client)
 			std::string body(_body.begin(), _body.end());
 			_body_send = body;
 		}
-		Cgi CGI(server, client, _path, _query, _req_type, _RP, _body_send);
+		Cgi CGI(server, _path, _query, _req_type, _RP, _body_send);
 		if (CGI.getError() == true)
 		{
 			handle_methods(server, client);

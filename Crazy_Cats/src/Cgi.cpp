@@ -2,7 +2,7 @@
 
 extern int	g_error;
 
-Cgi::Cgi(Server & server, Client & client, std::string path, std::string query, std::string type, RequestParser & RP, std::string _body_send) : 
+Cgi::Cgi(Server & server, std::string path, std::string query, std::string type, RequestParser & RP, std::string _body_send) : 
 	_path(path), _query(query), _type(type), _RP(RP), _body(_body_send)
 {
 	_method = _RP.getMethod();
@@ -10,9 +10,9 @@ Cgi::Cgi(Server & server, Client & client, std::string path, std::string query, 
 	_error = false;
 	in = tmpfile();
 	tmp = tmpfile();
-	set_exec_str(server);
+	set_exec_str();
 	set_Env(server);
-	CgiResponse(server, client);
+	CgiResponse(server);
 }
 
 Cgi::~Cgi()
@@ -33,7 +33,7 @@ void free_array(char **input)
 	input = NULL;
 }
 
-void Cgi::set_exec_str(Server & server)
+void Cgi::set_exec_str()
 {
 	if (_type == "php")
 		_exec_str = "docs/cgi/php-cgi";
@@ -156,7 +156,7 @@ void Cgi::process(char ** env_str)
 	}
 }
 
-void	Cgi::CgiResponse(Server & server, Client & client)
+void	Cgi::CgiResponse(Server & server)
 {
 	fseek(tmp, 0, SEEK_END);
 	long len = ftell(tmp);
