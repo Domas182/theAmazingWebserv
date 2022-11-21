@@ -58,9 +58,12 @@ void	Operator::RequestSizeCheck(int c, int i)
 {
 	if(_clients[c].tmpReq.size() > 32768 && !_clients[c].getCFlag())
 	{
+		// std::cout << "too big?" << std::endl;
 		_clients[c].resetClient();
 		_clients[c].setH2BFlagT();
 		closeAndDelete(i);
+		g_error = 413;
+		throw std::runtime_error("Requestheader too big");
 	}
 }
 

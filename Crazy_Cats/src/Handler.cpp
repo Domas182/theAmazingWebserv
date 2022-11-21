@@ -120,11 +120,11 @@ void	Handler::handle_post(Server & server, Client & client)
 	{
 		body_extractor(client);
 		write_file(client.tmpExtract, this->_filename);
-		client.setResp(this->_RSP.createResponse(g_error, server, this->_path, this->_version));
+		server.set_Content(this->_path, 1);
+		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
 	} 
 	else if (client.getHBFlag() && client.getCFlag())
 	{
-		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
 		write_file(client.tmpBody, "chunked.jpg");
 		client.setResp(this->_RSP.createResponse(201, server, this->_path, this->_version));
 	}
