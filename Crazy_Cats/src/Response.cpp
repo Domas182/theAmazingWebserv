@@ -28,10 +28,6 @@ std::string Response::createErrorResponse (int code, Server & server)
 	return(response);
 }
 
-/*
-** --------------------------------- METHODS ----------------------------------
-*/
-
 std::string Response::constructResponse() const
 {
 	std::string response = getVersion() + " " + getCode() + " " + getPhrase() + "\n";
@@ -82,12 +78,12 @@ void			Response::setCodePhrase(int code)
 	
 }
 
-void				Response::setPayload(std::string readFile)
+void	Response::setPayload(std::string readFile)
 {
 	this->_payload = readFile;
 }
 
-void				Response::setErrorPayload(int code)
+void	Response::setErrorPayload(int code)
 {
 	std::ostringstream ss;
 	std::ifstream input_file;
@@ -101,7 +97,7 @@ void				Response::setErrorPayload(int code)
 	setPayload(ss.str());
 }
 
-std::string				Response::setContentLength(Server & server)
+std::string	Response::setContentLength(Server & server)
 {
 	uint32_t len = server.getContent().length();
 	std::stringstream ss;
@@ -110,7 +106,7 @@ std::string				Response::setContentLength(Server & server)
 	return (content_len);
 }
 
-std::string				Response::setErrorContentLength()
+std::string	Response::setErrorContentLength()
 {
 	uint32_t len = this->_payload.length();
 	std::stringstream ss;
@@ -133,7 +129,7 @@ std::string Response::setContentType(std::string & path)
 	return (content_type);
 }
 
-void				Response::setResponseH(Server & server, std::string & path)
+void	Response::setResponseH(Server & server, std::string & path)
 {
 	this->_responseH.insert(std::pair<std::string, std::string>("Date:", this->set_time()));
 	this->_responseH.insert(std::pair<std::string, std::string>("Content-Length:", this->setContentLength(server)));
@@ -141,7 +137,7 @@ void				Response::setResponseH(Server & server, std::string & path)
 	this->_responseH.insert(std::pair<std::string, std::string>("Server:", server.getServerName()));
 }
 
-void				Response::setErrorResponseH(Server & server)
+void	Response::setErrorResponseH(Server & server)
 {
 	this->_responseH.insert(std::pair<std::string, std::string>("Date:", this->set_time()));
 	this->_responseH.insert(std::pair<std::string, std::string>("Content-Length:", this->setErrorContentLength()));
@@ -150,7 +146,7 @@ void				Response::setErrorResponseH(Server & server)
 }
 
 
-void			Response::createCodePhraseMap()
+void	Response::createCodePhraseMap()
 {
 
 		this->_codePhrase.insert(std::pair<int, std::string>(100,"Continue"));
@@ -196,5 +192,3 @@ void			Response::createCodePhraseMap()
 		this->_codePhrase.insert(std::pair<int, std::string>(505,"HTTP Version Not Supported"));
 
 }
-
-/* ************************************************************************** */

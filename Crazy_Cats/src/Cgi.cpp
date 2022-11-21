@@ -88,9 +88,6 @@ void Cgi::set_Env(Server & server)
 		env_str[index] = c_str;
 		++index;
 	}
-	// env_str[index] = NULL;
-	// for (int i = 0; env_str[i] != '\0'; i++)
-	// 	std::cout << GREEN << env_str[i] << RESET << std::endl;
 	process(env_str);
 }
 
