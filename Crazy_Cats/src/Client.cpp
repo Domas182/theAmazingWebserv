@@ -24,7 +24,6 @@ Client::Client(int index, int socket) : _socket(socket), _sIndex(index)
 	_headerTooBig = false;		
 	_tmpCnt = 0;
 	isEmpty = false;
-
 	tmpLen = 0;
 }
 
@@ -196,21 +195,21 @@ std::string Client::getStatusCode()
 	return (_statCode);
 }
 
-void    Client::pushRequest(unsigned char c)
+void Client::pushRequest(unsigned char c)
 {
     _request.push_back(c);
 }
 
-void    Client::pushBody(unsigned char c)
+void Client::pushBody(unsigned char c)
 {
-    _body.push_back(c);
+	_body.push_back(c);
 }
 
-void    Client::printRequest()
+void Client::printRequest()
 {
-    for (size_t i = 0; i < tmpReq.size(); i++)
-        std::cout << tmpReq[i];
-    std::cout << std::endl;
+	for (size_t i = 0; i < tmpReq.size(); i++)
+		std::cout << tmpReq[i];
+	std::cout << std::endl;
 }
 
 size_t Client::getBodySize()
@@ -223,11 +222,11 @@ RequestParser & Client::getRP()
 	return (_RP);
 }
 
-void    Client::printBody()
+void Client::printBody()
 {
-    for (size_t i = 0; i < tmpBody.size(); i++)
-        std::cout << LB << tmpBody[i];
-    std::cout << RESET << std::endl;
+	for (size_t i = 0; i < tmpBody.size(); i++)
+		std::cout << LB << tmpBody[i];
+	std::cout << RESET << std::endl;
 }
 
 void	Client::clearRequest()
@@ -261,10 +260,10 @@ void Client::headerFlagSetter(int len)
 		setFlagT();
 		setCFlagT();
 		setHBFlagT();
-		chunkSizeSet = false;	
+		chunkSizeSet = false;
 	}else{
 		setFlagT();
-		setRFlagT();		
+		setRFlagT();
 	}
 }
 
@@ -325,19 +324,6 @@ void Client::chunkedHandler(std::vector<unsigned char>& request, size_t& i, size
 
 void	Client::resetClient()
 {
-	// tmpReq.clear();
-	// clearResponse();
-	// clearRequest();
-	// setBFlagF();
-	// setFlagF();
-	// setHBFlagF();
-	// setRFlagF();
-	// setCFlagF();
-	// setH2BFlagF();
-	// tmpBody.clear();
-	// tmpExtract.clear();
-
-	//_statCode = '0';
 	_requestFlag = false;
 	_bodyFlag = false;
 	_readyFlag = false;

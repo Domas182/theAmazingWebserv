@@ -58,7 +58,6 @@ void	Operator::RequestSizeCheck(int c, int i)
 {
 	if(_clients[c].tmpReq.size() > 32768 && !_clients[c].getCFlag())
 	{
-		// std::cout << "too big?" << std::endl;
 		_clients[c].resetClient();
 		_clients[c].setH2BFlagT();
 		closeAndDelete(i);
@@ -186,7 +185,7 @@ void	Operator::dataToSend(int i)
 				if (_clients[cIndex].getStatusCode() == "413")
 					closeAndDelete(i);
 				_clients[cIndex].resetClient();
-			}							
+			}
 		}
 	}	
 }
@@ -217,11 +216,9 @@ void Operator::start_process()
 					dataToSend(i);
 		}
 		cleanUp();
-
 		} catch (std::exception &e){
 			g_error = 200;
 			std::cerr << e.what() << std::endl;
 		}
-		// system("leaks webserv");
 	}
 }

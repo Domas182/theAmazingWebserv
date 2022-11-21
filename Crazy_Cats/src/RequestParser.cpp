@@ -13,7 +13,7 @@ RequestParser::RequestParser(std::vector<unsigned char>& request)
 	split_CRLF(request);
 }
 
-std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
+std::ostream &		operator<<( std::ostream & o, RequestParser const & r )
 {
 	int i = 0;
 	o << GREEN  "Method = " << r.getMethod() << "\n"
@@ -26,19 +26,14 @@ std::ostream &			operator<<( std::ostream & o, RequestParser const & r )
 		i++;
 	}
 	for(std::unordered_map<std::string, std::string>::const_iterator itnew = r.getRequestH().begin();
-    itnew != r.getRequestH().end(); ++itnew)
+	itnew != r.getRequestH().end(); ++itnew)
 	{
-    	o << YELLOW << "MAP	" << itnew->first << " " << itnew->second << RESET << "\n";
+		o << YELLOW << "MAP	" << itnew->first << " " << itnew->second << RESET << "\n";
 	}
 	return o;
 }
 
-
-/*
-** --------------------------------- METHODS ----------------------------------
-*/
-
-void		RequestParser::split_CRLF(std::vector<unsigned char>& buffer)
+void	RequestParser::split_CRLF(std::vector<unsigned char>& buffer)
 {
 	std::string CRLF(buffer.begin(), buffer.end());
 	std::string delimeter = "\r\n";
@@ -83,7 +78,7 @@ std::string &		RequestParser::RequestLineMethod(std::string &Method)
 }
 
 
-std::string &		RequestParser::RequestLineURI(std::string &URI)
+std::string &	RequestParser::RequestLineURI(std::string &URI)
 {
 	std::string delimeter = " ";
 	size_t pos = 0;
@@ -101,7 +96,7 @@ std::string &		RequestParser::RequestLineURI(std::string &URI)
 	}
 }
 
-void		RequestParser::RequestLineVersion(std::string &version)
+void	RequestParser::RequestLineVersion(std::string &version)
 {
 	std::string delimeter = " ";
 	size_t pos = 0;
@@ -124,12 +119,12 @@ void		RequestParser::RequestLineVersion(std::string &version)
 	}
 }
 
-void		RequestParser::parseRequestLine(std::string reqLine)
+void	RequestParser::parseRequestLine(std::string reqLine)
 {
 	RequestLineVersion(RequestLineURI(RequestLineMethod(reqLine)));
 }
 
-void		RequestParser::parseRequestHeader()
+void	RequestParser::parseRequestHeader()
 {
 
 	std::vector<std::string>::iterator it = _CRLF_split.begin();
@@ -173,26 +168,26 @@ void RequestParser::setPort()
 	this->_port = atol(tmp.c_str());
 }
 
-/*
-** --------------------------------- ACCESSOR ---------------------------------
-*/
-
 std::string const & RequestParser::getMethod() const
 {
 	return this->_method;
 }
+
 std::string const & RequestParser::getURI() const
 {
 	return this->_URI;
 }
+
 std::string const & RequestParser::getVersion() const
 {
 	return this->_version;
 }
+
 std::unordered_map<std::string, std::string> const & RequestParser::getRequestH() const
 {
 	return this->_requestH;
 }
+
 std::vector<std::string> const & RequestParser::getCRLF_split() const
 {
 	return this->_CRLF_split;
@@ -207,4 +202,3 @@ std::string const & RequestParser::getOldLocation() const
 {
 	return this->_oldLocation;
 }
-/* ************************************************************************** */

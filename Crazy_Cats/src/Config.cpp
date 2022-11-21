@@ -1,11 +1,7 @@
 #include "../incl/Operator.hpp"
 
 Operator::Operator(std::string infile_name): _servers(), _loc(), _infile_name(infile_name.c_str()), _infile()
-{
-	_infile.open(_infile_name);
-	if (!_infile.is_open())
-		throw std::invalid_argument("Error❗\nCould not open Config file");
-}
+{}
 
 Operator::Operator()
 {}
@@ -209,7 +205,6 @@ void Operator::parse_server(Server &server)
 		else if (!tokens.empty() && tokens.at(0) == "cgi")
 		{
 			if (tokens.size() < 2 || tokens.size() > 3 || server.c == true)
-			// if (tokens.size() < 2 || server.setCgi(tokens.back()) || server.c == true)
 				throw std::invalid_argument("Error❗\nInvalid information in Config file for cgi in line:\n " + line);
 			else
 			{
@@ -263,6 +258,10 @@ void Operator::check_data()
 void Operator::start_parsing()
 {
 	std::string line;
+
+	_infile.open(_infile_name);
+	if (!_infile.is_open())
+		throw std::invalid_argument("Error❗\nCould not open Config file");
 
 	while (getline(_infile, line))
 	{

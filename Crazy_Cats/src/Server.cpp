@@ -170,7 +170,7 @@ int Server::setLimitBody(std::string limit)
 		limit.erase(remove(limit.begin(), limit.end(), ';'));
 	std::stringstream s(limit);
 	s >> tmp;
-	if (tmp < 0 || check_uint32(limit))
+	if (tmp < 0 || tmp >= 4294967295)
 		return (FAILURE);
 	this->_limit_body = atol(limit.c_str());
 	return (SUCCESS);
