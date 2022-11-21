@@ -90,15 +90,6 @@ void	Operator::closeAndDelete(int i)
 
 void 	Operator::cleanUp()
 {
-	// for (size_t i = 0; i < _poFD.getFdCount(); i++)
-	// {
-	// 	int ci;
-	// 	if ((ci = lookClient(_poFD.getPfd()[i].fd)) != -1)
-	// 	{
-	// 		if(_clients[ci].isEmpty)
-	// 			closeAndDelete(i);
-	// 	}
-	// }
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
 		if (_clients[i].isEmpty)
