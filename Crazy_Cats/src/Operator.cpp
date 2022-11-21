@@ -39,7 +39,7 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 			}
 		}
 	}
-	if (_clients[c].tmpLen > static_cast<int>(_servers[c].getLimitBody()) && !_clients[c].getCFlag())
+	if (static_cast<uint32_t>(_clients[c].tmpLen) > _servers[_clients[c].getIndex()].getLimitBody() && !_clients[c].getCFlag())
 		_clients[c].setRFlagT();
 	if (_clients[c].getHBFlag() && _clients[c].getFlag() && !_clients[c].getRFlag())
 	{
@@ -47,7 +47,7 @@ void 	Operator::RequestChecker(std::vector<unsigned char>& request, int c)
 		{
 			while (i < _servers[_clients[c].getIndex()].getNBytes())
 				_clients[c].tmpBody.push_back(request[i++]);
-			if (static_cast<int>(_clients[c].tmpBody.size()) == _clients[c].tmpLen)
+			if (_clients[c].tmpBody.size() == static_cast<uint32_t>(_clients[c].tmpLen))
 				_clients[c].setRFlagT();
 		}
 		if (!_clients[c].getRFlag() && _clients[c].getCFlag())

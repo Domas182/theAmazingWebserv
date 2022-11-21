@@ -105,7 +105,7 @@ void Handler::body_extractor(Client& client)
 
 void	Handler::handle_post(Server & server, Client & client)
 {
-	if ( client.tmpLen > static_cast<int>(server.getLimitBody()) && !client.getCFlag())
+	if ( static_cast<uint32_t>(client.tmpLen) > server.getLimitBody() && !client.getCFlag())
 	{
 		g_error = 413;
 		client.setStatusCode("413");
